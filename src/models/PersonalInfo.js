@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import Paginate from 'mongoose-paginate-v2'
-
+//dddd
 
 const PersonalInfoShema = mongoose.Schema({
     firstName:String,
