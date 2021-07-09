@@ -2,17 +2,18 @@ import { gql } from "apollo-server-express";
 
 export default gql`
     extend type Query{
-        allPernalInfo:[PersonalInfo!]!
+        allPersonalInfos:[PersonalInfo!]!
         getPersonalInfoById(id:ID!):PersonalInfo!
         getPersonalInfoWithPagination(page:Int!, limit:Int!, keyword:String):PaginateResponse!
     }
     extend type Mutation{
-        createPernalInfo(newInfo:PersonalInfoInput!):PersonalInfoResponse
+        createPersonalInfo(newInfo:PersonalInfoInput!):PersonalInfoResponse
         updatePersonalInfo(updatedInfo:PersonalInfoInput!,id:ID!):PersonalInfoResponse
         deletePersonalInfo(id:ID!): PersonalInfoResponse
     }
 
     type PersonalInfo{
+        id:ID
         firstName:String
         lastName:String
         age:Int
@@ -30,7 +31,7 @@ export default gql`
         updatedAt:Date
     }
     input PersonalInfoInput{       
-         firstName:String
+        firstName:String
         lastName:String
         age:Int
         gender:String
@@ -51,7 +52,8 @@ export default gql`
 
     type PaginateResponse {
         paginator: Paginator
-        personalInfo: [PersonalInfo!]!
+        personalInfos: [PersonalInfo!]!
     }
-
 `;
+
+

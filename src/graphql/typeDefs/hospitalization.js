@@ -1,52 +1,60 @@
-import {gql} from 'apollo-server-express'
+import { gql } from "apollo-server-express";
 
 export default gql`
   extend type Query {
-    allHospitalizes:[Hospitalize!]!
-    getHospitalizeWithPagination(page:Int!, limit:Int!, keyword:String):HospitalizePaginator!
-    getHospitalizeById(id:ID!):Hospitalize!
+    allHospitalizations: [Hospitalization!]!
+    getHospitalizationWithPagination(
+      page: Int!
+      limit: Int!
+      keyword: String
+    ): HospitalizePaginator!
+    getHospitalizationById(id: ID!): Hospitalization!
   }
 
-  extend type Mutation{
-    createHospitalize(newHospitalize:HospitalizeInput):HospitalizeResponse!
-    updateHospitalize(updatedHospitalize:HospitalizeInput,id:ID!):HospitalizeResponse!
-    deleteHospitalize(id:ID!):HospitalizeResponse!
+  extend type Mutation {
+    createHospitalization(
+      newHospitalization: HospitalizeInput
+    ): HospitalizeResponse!
+    updateHospitalization(
+      updatedHospitalization: HospitalizeInput
+      id: ID!
+    ): HospitalizeResponse!
+    deleteHospitalization(id: ID!): HospitalizeResponse!
   }
 
-  type Hospitalize {
-      id:ID!
-    hostpitalName:String
-    village:String
+  type Hospitalization {
+    id: ID!
+    hostpitalName: String
+    village: String
     commune: String
     district: String
-    province:String
-    personInchage:String
+    province: String
+    personInchage: String
     long: Float
     Lat: Float
-        personalInfo: [Patient!]!
-        createdAt:Date 
-        updatedAt:Date
+    personalInfo: [Patient!]!
+    createdAt: Date
+    updatedAt: Date
   }
- 
 
   input HospitalizeInput {
-    hostpitalName:String
-    village:String
+    hostpitalName: String
+    village: String
     commune: String
     district: String
-    province:String
-    personInchage:String
+    province: String
+    personInchage: String
     long: Float
     Lat: Float
   }
 
   type HospitalizeResponse {
-      success: Boolean 
-      message:String
+    success: Boolean
+    message: String
   }
 
-  type HospitalizePaginator{
-      Hospitalizes:[Hospitalize!]!
-      paginator: Paginator!
+  type HospitalizePaginator {
+    hospitalizations: [Hospitalization!]!
+    paginator: Paginator!
   }
-`
+`;

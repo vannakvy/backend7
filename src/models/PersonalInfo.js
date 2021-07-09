@@ -65,5 +65,9 @@ const PersonalInfoShema = mongoose.Schema({
     timestamps: true
 })
 
+
+PersonalInfoShema.plugin(Paginate)
+
 const PersonalInfo = mongoose.model("PersonalInfo",PersonalInfoShema);
+
 export default PersonalInfo;
