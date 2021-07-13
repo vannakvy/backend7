@@ -38,7 +38,6 @@ const PersonalInfoShema = mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 ref:'quarantines'
             },
-        
             case:{
                 direct: {
                     type: Boolean,

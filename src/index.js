@@ -62,7 +62,6 @@ const startApp = async () => {
     server.applyMiddleware({
       app,
       cors: true,
-     
     });   
 
     const httpServer = http.createServer(app);

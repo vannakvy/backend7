@@ -2,14 +2,7 @@ import mongoose from 'mongoose'
 import Paginate from 'mongoose-paginate-v2' 
 
 const HospitalizationSchema = mongoose.Schema({
-    hostpitalName:String,
-    village:String,
-    commune: String,
-    district: String,
-    province:String,
-    personInchage:String,
-    long: Number,
-    Lat: Number,
+  
     citizens:[
         {
             startDate:Date,

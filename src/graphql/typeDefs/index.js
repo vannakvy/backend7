@@ -3,8 +3,8 @@ import image from './image';
 import user from './user';
 import PersonalInfo from './PersonalInfo';
 import Case from './Case'
-import quarantine from './quarantine';
-import hospitalization from './hospitalization';
+import quarantineInfo from './quarantineInfo';
+import hospitalInfo from './hospitalInfo';
 
 export default [
     user,
@@ -12,6 +12,6 @@ export default [
     baseDefs,
     PersonalInfo,
     Case,
-    quarantine,
-    hospitalization
+    quarantineInfo,
+    hospitalInfo
 ];
