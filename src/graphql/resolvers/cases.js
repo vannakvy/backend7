@@ -20,8 +20,9 @@ export default {
 
 
         allCases:async(_,{},{Case})=>{
-            const Cases = await Case.find({});
-            return Cases;
+            const cases = await Case.find({});
+            console.log(cases);
+            return cases;
         },
         //@Desc Getting all cases  with pagination 
         //@access auth
