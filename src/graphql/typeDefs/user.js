@@ -41,7 +41,7 @@ export default gql`
         roles:[Role!]!
         createdAt: String
         updatedAt: String
-        tel:String!
+        tel:String
     }
 
     type AuthUser {
