@@ -102,7 +102,7 @@ export default {
       let user = await User.findOne({
         username,
       });
-      console.log(user)
+      console.log(user,"dddd")
       // If User is not found
       if (!user) {
         throw new ApolloError("Username not found", "404");
