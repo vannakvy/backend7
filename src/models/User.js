@@ -16,9 +16,8 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
-    tel:{
-        type: String
-    },
+    tel: String,
+    
     email: {
         type: String,
         required: true

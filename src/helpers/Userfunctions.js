@@ -15,7 +15,7 @@ export const issueAuthToken = async (jwtPayload) => {
     let token = await sign(jwtPayload, SECRET, {
         expiresIn: 100
     });
-    console.log(token)
+
     return `Bearer ${token}`;
 };
 export const serializeUser = user => pick(user, [
@@ -24,5 +24,6 @@ export const serializeUser = user => pick(user, [
     'username',
     'lastName',
     'firstName',
-    'roles'
+    'roles',
+    'tel'
 ]);

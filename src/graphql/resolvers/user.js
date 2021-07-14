@@ -92,7 +92,7 @@ export default {
      * @Access Public
      */
     loginUser: async (_, { username, password }, { User }) => {
-      console.log(password)
+   
       // Validate Incoming User Credentials
       await UserAuthenticationRules.validate(
         { username, password },
@@ -102,7 +102,7 @@ export default {
       let user = await User.findOne({
         username,
       });
-      console.log(user,"dddd")
+      
       // If User is not found
       if (!user) {
         throw new ApolloError("Username not found", "404");
@@ -114,6 +114,7 @@ export default {
         throw new ApolloError("The password is not correct");
       }
       user = await serializeUser(user);
+      console.log(user);
       // Issue Token
       let token = await issueAuthToken(user);
       return {
