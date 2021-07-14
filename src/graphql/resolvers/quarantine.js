@@ -17,8 +17,8 @@ export default {
     //
 
     allQuarantines: async (_, {}, { Quarantine }) => {
-      const Quarantines = await Quarantine.find({});
-      return Quarantines;
+      const quarantines = await Quarantine.find({}).populate("personalInfo quarantineInfo");
+      return quarantines;
     },
     //@Desc Getting all Quarantines  with pagination
     //@access auth
@@ -34,7 +34,7 @@ export default {
         sort: {
           createdAt: -1,
         },
-        // populate: "customer",
+        populate:"personalInfo quarantineInfo",
       };
 
       let query = {
@@ -48,15 +48,14 @@ export default {
       };
 
       const quarantines = await Quarantine.paginate(query, options);
-      console.log(quarantines)
       return quarantines;
     },
     //@Desc getting the Quarantine by id
     //@access auth
 
     getQuarantineById: async (_, { id }, { Quarantine }) => {
-      const Quarantines = await Quarantine.findById(id);
-      return Quarantines;
+      const quarantines = await Quarantine.findById(id).populae("personalInfo quarantineInfo");
+      return quarantines;
     },
   },
   Mutation: {

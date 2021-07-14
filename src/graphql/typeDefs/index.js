@@ -5,7 +5,8 @@ import PersonalInfo from './PersonalInfo';
 import Case from './Case'
 import quarantineInfo from './quarantineInfo';
 import hospitalInfo from './hospitalInfo';
-
+import quantine  from './quantine';
+import hospitalization from './hospitalization';
 export default [
     user,
     image,
@@ -13,5 +14,9 @@ export default [
     PersonalInfo,
     Case,
     quarantineInfo,
-    hospitalInfo
+    hospitalInfo,
+    quantine,
+    hospitalization
 ];
+
+ 

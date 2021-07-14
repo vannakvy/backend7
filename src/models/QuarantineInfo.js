@@ -11,6 +11,7 @@ const QuarantineInfoSchema = mongoose.Schema({
     long: Number,
     Lat: Number,
     other:String,
+    capacity:{type:Number,required:true,default:0},
     personInCharge:{
         name:String,
         position:String,

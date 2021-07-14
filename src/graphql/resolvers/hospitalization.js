@@ -19,8 +19,9 @@ export default {
         //
 
         allHospitalizations:async(_,{},{Hospitalization})=>{
-            const Hospitalizations = await Hospitalization.find({});
-            return Hospitalizations;
+            const hospitalizations = await Hospitalization.find({}).populate("personalInfo hospitalInfo");
+            console.log(hospitalizations)
+            return hospitalizations;
         },
         //@Desc Getting all Hospitalizations  with pagination 
         //@access auth
@@ -32,21 +33,20 @@ export default {
                 sort: {
                   createdAt: -1,
                 },
-                // populate: "customer",
+                populate:"hospitalInfo personalInfo",
               };
 
-              let query = {
-                $or: [
-                  { hostpitalName: { $regex: keyword, $options: "i" } },
-                  { village: { $regex: keyword, $options: "i" } },
-                  { commune: { $regex: keyword, $options: "i" } },
-                  { disctrict: { $regex: keyword, $options: "i" } },
-                  { province: { $regex: keyword, $options: "i" } },
-                ],
-              };
-
+            //   let query = {
+            //     $or: [
+            //       { hostpitalName: { $regex: keyword, $options: "i" } },
+            //       { village: { $regex: keyword, $options: "i" } },
+            //       { commune: { $regex: keyword, $options: "i" } },
+            //       { disctrict: { $regex: keyword, $options: "i" } },
+            //       { province: { $regex: keyword, $options: "i" } },
+            //     ],
+            //   };
+              let query ={}
               const hospitalizations = await Hospitalization.paginate(query, options);
-              console.log(hospitalizations)
               return hospitalizations;
         },
 
@@ -54,8 +54,8 @@ export default {
         //@access auth
 
         getHospitalizationById:async(_  ,{id},{Hospitalization})=>{
-            const Hospitalizations = await Hospitalization.findById(id);
-            return Hospitalizations
+            const hospitalizations = await Hospitalization.findById(id).populate("hospitalInfo personalInfo");
+            return hospitalizations
         },
     },
     Mutation:{
@@ -65,14 +65,15 @@ export default {
         createHospitalization:async(_,{newHospitalization},{Hospitalization})=>{
             try {
                 
-                const isExisted = await Hospitalization.findOne({hostpitalName:newHospitalization.hostpitalName});
-                console.log(isExisted)
-                if(isExisted){
-                    return{
-                        message:"The hospital with this name is already exist",
-                        success: false
-                    }
-                }
+      
+            //    console.log(newHospitalization);
+            //     if(isExisted){
+            //         return{
+            //             message:"The hospitalization with this name is already exist",
+            //             success: false
+            //         }
+            //     }
+
                 const hospitalizations = new Hospitalization(newHospitalization);
                 const isCreated = await hospitalizations.save();
                 if(!isCreated){
