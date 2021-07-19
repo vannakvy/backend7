@@ -39,10 +39,10 @@ export default {
 
               let query = {
                 $or: [
-                 
+                    { caseName: { $regex: keyword, $options: "i" } },
                   { village: { $regex: keyword, $options: "i" } },
                   { commune: { $regex: keyword, $options: "i" } },
-                  { disctrict: { $regex: keyword, $options: "i" } },
+                  { district: { $regex: keyword, $options: "i" } },
                   { province: { $regex: keyword, $options: "i" } },
                 ],
               };

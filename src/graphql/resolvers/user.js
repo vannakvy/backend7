@@ -130,11 +130,13 @@ export default {
      */
     addRole: async (_, { userId, role }, { User }) => {
       try {
+        console.log(role)
         let user = await User.findById(userId);
+        
         if (user) {
-          let exist = user.roles.find((r) => r.role === role);
-
-          if (exist) {
+          const search =(role) => user.roles.find(element => element.role === role);
+         console.log(search())
+          if (search()) {
             return {
               message: "this role is already exist",
               success: false,

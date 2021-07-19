@@ -18,8 +18,9 @@ export default gql`
         caseName:String
         village:String
         commune:String
-        disctrict:String
+        district:String
         province:String
+        other:String
         date:Date
         long:Float
         lat:Float
@@ -31,11 +32,12 @@ export default gql`
         caseName:String
         village:String
         commune:String
-        disctrict:String
+        district:String
         province:String
         date:Date
         long:Float
         lat:Float
+        other:String
   }
   type CaseResponse {
       success: Boolean 

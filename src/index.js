@@ -12,8 +12,10 @@ import AuthMiddleware from "./middlewares/auth";
 import connectDB from "./config/db";
 import http from "http";
 import path from 'path'
+import dotenv from 'dotenv'
 
 const app = express();
+dotenv.config()
 
 // Add Authentication Middleware 
 app.use(AuthMiddleware);

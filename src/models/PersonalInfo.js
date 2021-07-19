@@ -9,57 +9,47 @@ const PersonalInfoShema = mongoose.Schema({
     gender:String,
     tel:String,
     nationality:String,
-    ocupation:String,
+    occupation:String,
     idCard:String,
     profileImg:String,
     village:String,
     commune:String,
-    disctrict:String,
+    district:String,
     province:String,
-    long:Number,
-    lat:Number,
+    other:String,
     relapse:Boolean,
     relapseAt:Date,
     vacinated:Number,
-    history:[
-        {
-            positive:Boolean,
-            positiveAt:Date,
-            death:Boolean,
-            deathAt:Date,
-            recovered:Boolean,
-            recoveredAt:Date,
-            hospitalization:{
-                type:mongoose.Schema.Types.ObjectId,
-                ref: 'hospitalizations'
-            },
-        
-            quarantine:{
-                type: mongoose.Schema.Types.ObjectId,
-                ref:'quarantines'
-            },
-            case:{
-                direct: {
-                    type: Boolean,
-                    required: true,
-                    default: false
-                },
-                caseID:{
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: 'cases'
-                }
-            },
-
-            relations:[{
-                personalInfo:{
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: 'personalInfo'
-                }
-            }]
-
+    direct: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    case:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Case'
+    },
+    currentState:{
+        confirm:{
+            type:Boolean,
+         
+            default: false
+        },
+        confirmedAt:Date,
+        recovered:{
+            type:Boolean,
+      
+            default: false
         }
-    ]
-
+        ,
+        recoveredAt:Date,
+        death:{
+            type:Boolean,
+          
+            default: false
+        },
+        deathAt:Date
+    }
 },{
     timestamps: true
 })

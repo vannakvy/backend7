@@ -37,7 +37,7 @@ export default {
 
               let query = {
                 $or: [
-                  { hostpitalName: { $regex: keyword, $options: "i" } },
+                  { hospitalName: { $regex: keyword, $options: "i" } },
                   { village: { $regex: keyword, $options: "i" } },
                   { commune: { $regex: keyword, $options: "i" } },
                   { disctrict: { $regex: keyword, $options: "i" } },
@@ -65,7 +65,7 @@ export default {
         createHospitalInfo:async(_,{newHospitalInfo},{HospitalInfo})=>{
             try {
                 
-                const isExisted = await HospitalInfo.findOne({hostpitalName:newHospitalInfo.hostpitalName});
+                const isExisted = await HospitalInfo.findOne({hospitalName:newHospitalInfo.hospitalName});
             
                 if(isExisted){
                     return{

@@ -7,15 +7,16 @@ const QuarantineInfoSchema = mongoose.Schema({
     commune: String,
     district: String,
     province:String,
-    personInchage:String,
     long: Number,
-    Lat: Number,
+    lat: Number,
     other:String,
     capacity:{type:Number,required:true,default:0},
     personInCharge:{
-        name:String,
+        firstName:String,
+        lastName:String,
         position:String,
-        tel:String
+        others:String,
+        tel:String,
     },
 },{
     timestamps: true

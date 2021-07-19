@@ -5,11 +5,12 @@ const CaseSchema = mongoose.Schema({
         caseName:String,
         village:String,
         commune:String,
-        disctrict:String,
+        district:String,
         province:String,
         date:Date,
         long:Number,
-        lat:Number
+        lat:Number,
+        other:String
 },{timestamps: true}) 
 
 CaseSchema.plugin(Paginate)

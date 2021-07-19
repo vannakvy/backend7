@@ -14,6 +14,7 @@ export default gql`
   }
 
   type QuarantineInfo {
+        capacity:Int
         id:ID
         locationName:String
         village:String
@@ -26,6 +27,7 @@ export default gql`
         createdAt:Date 
         updatedAt:Date
         personInCharge:PersonInCharge
+        other:String
   }
 
   input QuarantineInfoInput {
@@ -34,12 +36,11 @@ export default gql`
         commune: String
         district: String
         province:String
-        personInchage:String
         long: Float
-        Lat: Float
-        personIncharge:PersonInChargeInput
-   
-        
+        lat: Float
+        other:String
+        capacity:Int
+        personInCharge:PersonInChargeInput
   }
   type QuarantineInfoResponse {
       success: Boolean 
@@ -49,7 +50,7 @@ export default gql`
         firstName:String
         lastName:String
         position:String
-        other:String
+        others:String
         tel:String
   }
 
@@ -57,7 +58,7 @@ export default gql`
         firstName:String
         lastName:String
         position:String
-        other:String
+        others:String
         tel:String
   }
 
@@ -66,3 +67,4 @@ export default gql`
       paginator: Paginator!
   }
 `
+

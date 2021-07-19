@@ -2,19 +2,20 @@ import mongoose from 'mongoose'
 import Paginate from 'mongoose-paginate-v2'
 
 const HospitalInfoSchema = mongoose.Schema({
-    hostpitalName:String,
+    hospitalName:String,
     village:String,
     commune: String,
     district: String,
     province:String,
     personInchage:String,
     long: Number,
-    Lat: Number,
-    handler:{
+    lat: Number,
+    other:String,
+    personInCharge:{
         firstName:String,
         lastName:String,
         position:String,
-        other:String,
+        others:String,
         tel:String
     },
 })

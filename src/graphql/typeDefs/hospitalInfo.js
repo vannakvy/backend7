@@ -24,13 +24,14 @@ export default gql`
 
   type HospitalInfo {
     id: ID!
-    hostpitalName: String
+    hospitalName: String
     village: String
     commune: String
     district: String
     province: String
     long: Float
-    Lat: Float
+    lat: Float
+    other:String
     createdAt: Date
     updatedAt: Date
     personInCharge: PersonInCharge
@@ -38,13 +39,14 @@ export default gql`
   }
 
   input HospitalInfoInput {
-    hostpitalName: String
+    hospitalName: String
     village: String
     commune: String
     district: String
     province: String
     long: Float
-    Lat: Float
+    lat: Float
+    other:String
     personInCharge:PersonInChargeInput
   }
 

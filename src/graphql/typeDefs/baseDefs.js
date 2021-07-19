@@ -14,7 +14,8 @@ export default gql`
             BASIC,
             ADMIN,
             DEVELOPER,
-            POLICE
+            POLICE,
+            MARTMANAGER
           }
         
         type Query {

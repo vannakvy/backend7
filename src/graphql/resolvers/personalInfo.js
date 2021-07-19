@@ -20,7 +20,7 @@ export default {
 
 
         allPersonalInfos:async(_,{},{PersonalInfo})=>{
-            const personalInfos = await PersonalInfo.find({});
+            const personalInfos = await PersonalInfo.find({}).populate('case');
             return personalInfos;
         },
         //@Desc Getting all the persoanl Info with pagination 
@@ -33,7 +33,7 @@ export default {
                 sort: {
                   createdAt: -1,
                 },
-                // populate: "customer",
+                populate: "case",
               };
 
               let query = {
@@ -50,11 +50,51 @@ export default {
               const personalInfos = await PersonalInfo.paginate(query, options);
               return personalInfos;
         },
+
+        //@Desc getting all the info by case Id with pagination \
+        //@Access Auth 
+
+        getPersonalInfoByCaseWithPagination:async(_,{page,limit,keyword,caseId},{PersonalInfo})=>{
+            const options = {
+                page: page || 1,
+                limit: limit || 10,
+                customLabels: PersonalInfoLabels,
+                sort: {
+                  createdAt: -1,
+                },
+                // populate: "case",
+              };
+
+              let query = {
+                  $and:[{
+                    $or: [
+                        { firstName: { $regex: keyword, $options: "i" } },
+                        { lastName: { $regex: keyword, $options: "i" } },
+                        { village: { $regex: keyword, $options: "i" } },
+                        { commune: { $regex: keyword, $options: "i" } },
+                        { disctrict: { $regex: keyword, $options: "i" } },
+                        { province: { $regex: keyword, $options: "i" } },
+                      ],
+                    },
+                    { case: { $eq: caseId.toString() } },
+                  ]
+               
+              };
+
+              const personalInfos = await PersonalInfo.paginate(query, options);
+              return personalInfos;
+        },
+
+
+
+
         //@Desc getting the personalInfo by id
         //@access auth
 
         getPersonalInfoById:async(_  ,{id},{PersonalInfo})=>{
             const persoanalInfo = await PersonalInfo.findById(id);
+         let a=   Object.bsonsize(PersonalInfo.findById())
+         console.log(a)
             return persoanalInfo
         },
     },

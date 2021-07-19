@@ -67,7 +67,7 @@ const QuarantineLabels = {
       //@Desc create new Quarantine
       //@access auth
       createQuarantineInfo: async (_, { newQuarantineInfo }, { QuarantineInfo }) => {
-       
+       console.log(newQuarantineInfo);
         try {
           const isExisted = await QuarantineInfo.findOne({
             locationName: newQuarantineInfo.locationName,
@@ -83,6 +83,7 @@ const QuarantineLabels = {
           const quarantines = new QuarantineInfo(newQuarantineInfo);
      
           const isCreated = await quarantines.save();
+          console.log(isCreated)
           if (!isCreated) {
             return {
               message: "Cannot create Quarantine",
