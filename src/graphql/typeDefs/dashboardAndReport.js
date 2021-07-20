@@ -17,6 +17,7 @@ type AllProvince{
     deathToday: Int
     recovered: Int 
     recoveredToday:Int
+    _id:String
     
     # totalQuarantine:Int
     # totalQuantineToday:Int 

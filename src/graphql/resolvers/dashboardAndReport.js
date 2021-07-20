@@ -103,12 +103,11 @@ export default {
       return dataForBoxes;
     },
     getAllDistrictForMap: async (_, {}, { PersonalInfo }) => {
-      let today = new Date();
-      today.setHours(0, 0, 0, 0); // set to 0:00
-      let tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() +1);
 
-      console.log(today,tomorrow)
+      
+      let today = new Date();
+      today.setHours(0,0,0,0)
+    
       const data = await PersonalInfo.aggregate([
         {
           $project: {
@@ -125,53 +124,34 @@ export default {
               // Set to 1 if currentState.death = true
               $cond: [{ $eq: ["$currentState.death", true] }, 1, 0],
             },
-            confirmToday: [{
-              $cond: [ {$and : [ { $gte: [ "$currentState.confirmedAt", today] },
-              { $lt: [ "$currentState.confirmedAt",tomorrow] }] }, 1,0 ] 
-            },]
-
-
-            
-            // recoveredToday: {
-            //   // Set to 1 if value < 10
-            //   $cond: [
-            //     { "currentState.recoveredAt": { $gte: today, $lt: tomorrow } },
-            //     1,
-            //     0,
-            //   ],
-            // },
-            // deathToday: {
-            //   // Set to 1 if value < 10
-            //   $cond: [
-            //     { "currentState.deathAt": { $gte: today, $lt: tomorrow } },
-            //     1,
-            //     0,
-            //   ],
-            // },
+            confirmedAt:{ 
+              $cond: [{ $gte: [ "$currentState.confirmedAt", today] }, 1, 0],
+            },
+            recoveredAt:{ 
+              $cond: [{ $gte: [ "$currentState.recoveredAt", today] }, 1, 0],
+            },
+            deathAt:{ 
+              $cond: [{ $gte: [ "$currentState.deathAt", today] }, 1, 0],
+            }
+          
           },
         },
         {
           $group: {
             _id: "$district",
-            confirm: { $sum: "$confirm" },
+            confirmedCase: { $sum: "$confirm" },
             recovered: { $sum: "$recovered" },
             death: { $sum: "$death" },
-            confirmToday: { $sum: "$confirmToday" },
-            // recoveredToday: { $sum: "$recoveredToday" },
-            // deathToday: { $sum: "$deathToday" },
+            confirmedCaseToday: { $sum: "$confirmedAt"},
+            recoveredToday: { $sum: "$recoveredToday" },
+            deathToday: { $sum: "$deathToday" },
           },
         },
       ]);
-console.log("Ddd")
-      console.log(data);
 
-      // const data = await PersonalInfo.aggregate([
-      //   { "$group": {
-      //     "_id": "$district",
-      //     "countOfUsers": { "$sum": 1 },  //Count the number of user ids
-      //     "subscribersCount": { "$sum": { "$size": "$subscribers" }}  // Get the size of the subscribers array and make summation
-      //   }}
-      // ])
+   console.log(data)
+return data
+
     },
   },
 };

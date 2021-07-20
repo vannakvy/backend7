@@ -19,7 +19,10 @@ const PersonalInfoShema = mongoose.Schema({
     other:String,
     relapse:Boolean,
     relapseAt:Date,
-    vacinated:Number,
+    vaccinated:{
+        type:Number,
+        default:0
+    },
     sampleTest:[{
         date: {type: Date, required: true,default:new Date()},
         times:{type: Number, required: true,default:0},
