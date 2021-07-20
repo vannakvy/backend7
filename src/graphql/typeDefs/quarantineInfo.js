@@ -23,7 +23,7 @@ export default gql`
         province:String
         personInchage:String
         long: Float
-        Lat: Float
+        lat: Float
         createdAt:Date 
         updatedAt:Date
         personInCharge:PersonInCharge

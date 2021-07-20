@@ -4,8 +4,8 @@ import {gql} from 'apollo-server-express'
 export default gql`
 
 extend type Query {
-    getAllProvince: AllProvince!
-    getOneProvince:[OneProvince!]!
+    getAllProvince(district:String): AllProvince!
+    getAllDistrictForMap:[AllProvince!]!
     getHospitalForMap: [HospitalForMap]!
     getQuarantineForMap:[QuarantineForMap!]!
 }
@@ -17,12 +17,17 @@ type AllProvince{
     deathToday: Int
     recovered: Int 
     recoveredToday:Int
-    totalQuarantine:Int
-    totalQuantineToday:Int 
-    totalHospital:Int 
-    totalHospitalToday:Int 
+    
+    # totalQuarantine:Int
+    # totalQuantineToday:Int 
+    # totalHospital:Int 
+    # totalHospitalToday:Int 
+    # allQuantineActive:Int,
+    # allQuantineToday:Int,
+    # allHospitalActive:Int,
+    # allHospitalToday:Int,
 }
-type OneProvince{
+type ByProvince{
     confirmedCase:Int
     confirmedCaseToday:Int
     death: Int 
@@ -56,6 +61,5 @@ type QuarantineForMap{
     newToday:Int
     totalInHospital:Int  
 }
-
-
 `
+

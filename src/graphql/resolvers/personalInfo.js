@@ -46,7 +46,6 @@ export default {
                   { province: { $regex: keyword, $options: "i" } },
                 ],
               };
-
               const personalInfos = await PersonalInfo.paginate(query, options);
               return personalInfos;
         },
@@ -78,7 +77,6 @@ export default {
                     },
                     { case: { $eq: caseId.toString() } },
                   ]
-               
               };
 
               const personalInfos = await PersonalInfo.paginate(query, options);
@@ -92,13 +90,40 @@ export default {
         //@access auth
 
         getPersonalInfoById:async(_  ,{id},{PersonalInfo})=>{
-            const persoanalInfo = await PersonalInfo.findById(id);
-         let a=   Object.bsonsize(PersonalInfo.findById())
-         console.log(a)
+            const persoanalInfo = await PersonalInfo.findById(id).populate('case');
             return persoanalInfo
         },
     },
     Mutation:{
+
+             //@Desc add Sample test to the hospitalization 
+        //@Access 
+
+        recordSampleTest:async(_,{sampleTest,personalInfoId},{PersonalInfo})=>{
+            try {
+        const updatedData  = await  PersonalInfo.findByIdAndUpdate(personalInfoId, {$push: {sampleTest: sampleTest}});
+                   if(!updatedData){
+                    return {
+                        success: false,
+                        message:"មិនទាន់មានអ្នកកំណត់ត្រានេះទេ"
+                    }
+                }
+                if(sampleTest.result ===true){
+                    await  PersonalInfo.findByIdAndUpdate(personalInfoId,  { "$set": {"currentState.confirm": true,"currentState.confirmedAt":sampleTest.date }});
+                }
+            
+                return {
+                    success: true,
+                    message:"ជោគជ័យ"
+                }
+
+            } catch (error) {
+                return {
+                    success: false,
+                    message: error.message
+                }
+            }
+        },
 
         //@Desc create new Personal Info
         //@access auth

@@ -4,16 +4,16 @@ import Paginate from "mongoose-paginate-v2";
 const QuarantineSchema = mongoose.Schema({
   in: { type: Boolean, required: true, default: true },
   date_in: { type: Date, required: true, default: new Date() },
-  out: { type: Boolean, required: true, default: false },
   personalType: {
     type: String,
+    required: true,
     enum: ["សហគមន៍", "តាមផ្លូងអាកាស", "ពលករ"],
     default: "សហគមន៍",
   },
   date_out: { type: Date },
   out_status: String, // die, escape,negative, positive,
   personalInfo: { type: mongoose.Schema.Types.ObjectId, ref: "PersonalInfo" },
-  quatantineInfo: {
+  quarantineInfo: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "QuarantineInfo",
   },

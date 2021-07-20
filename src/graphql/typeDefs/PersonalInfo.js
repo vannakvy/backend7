@@ -19,6 +19,7 @@ export default gql`
 
   extend type Mutation {
     createPersonalInfo(newInfo: PersonalInfoInput!): PersonalInfoResponse
+    recordSampleTest(sampleTest:SampleTestInput!,personalInfoId:ID!):PersonalInfoResponse!
     updatePersonalInfo(
       updatedInfo: PersonalInfoInput!
       id: ID!
@@ -41,7 +42,6 @@ export default gql`
     commune: String
     district: String
     province: String
-   
     case:Case
     direct: Boolean
     other:String
@@ -51,6 +51,7 @@ export default gql`
     createdAt: Date
     updatedAt: Date
     currentState: currentStatus
+    sampleTest:[SampleTest]
   }
 
   type currentStatus{
@@ -61,9 +62,26 @@ export default gql`
         death:Boolean,
         deathAt:Date
   }
+  type SampleTest{
+    id:ID!
+    date: Date,
+    times:Int,
+    location:String,
+    result:Boolean,
+    symptom:String,
+    other:String,
+  }
 
+  input SampleTestInput{
+    date: Date,
+    times:Int,
+    location:String,
+    result:Boolean,
+    symptom:String,
+    other:String,
+  }
   input currentStatusInput{
-    confirm:Boolean,
+        confirm:Boolean,
         confirmedAt:Date,
         recovered:Boolean,
         recoveredAt:Date,

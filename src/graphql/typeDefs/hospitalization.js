@@ -4,6 +4,8 @@ export default gql`
   extend type Query {
     allHospitalizations:[Hospitalization!]!
     getHospitalizationWithPagination(page:Int!, limit:Int!, keyword:String):HospitalizationPaginator!
+    getQuarantineByHospitalIdIdWithPagination(page:Int!, limit:Int!, keyword:String,hospitalId:ID!):HospitalizationPaginator!
+   
     getHospitalizationById(id:ID!):Hospitalization!
   }
 
@@ -17,7 +19,6 @@ export default gql`
     id:ID
     in:Boolean
    date_in: Date
-   out:Boolean
    date_out: Date
    out_status:String,
    personalInfo:PersonalInfo!,
@@ -28,28 +29,11 @@ export default gql`
     updatedAt:Date
   }
 
-  type SampleTest{
-    date: Date,
-    times:Int,
-    location:String,
-    result:Boolean,
-    symptom:String,
-    other:String,
-  }
-
-  input SampleTestInput{
-    date: Date,
-    times:Int,
-    location:String,
-    result:Boolean,
-    symptom:String,
-    other:String,
-  }
+ 
 
   input HospitalizationInput {
     in:Boolean
    date_in: Date
-   out:Boolean
    date_out: Date
    out_status:String,
    personalInfo:ID!,

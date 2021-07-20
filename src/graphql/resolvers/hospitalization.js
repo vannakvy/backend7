@@ -49,30 +49,53 @@ export default {
               const hospitalizations = await Hospitalization.paginate(query, options);
               return hospitalizations;
         },
-
+    //@Desc Getting all Hospitalization  with pagination by HospitalId
+    //@access auth
+    getQuarantineByHospitalIdIdWithPagination: async (
+        _,
+        { page, limit, keyword,hospitalId},
+        { Hospitalization }
+      ) => {
+        const options = {
+          page: page || 1,
+          limit: limit || 10,
+          customLabels: HospitalizationLabels,
+          sort: {
+            createdAt: -1,
+          },
+          populate:"personalInfo hospitalInfo",
+        };
+  
+        let query = {
+          $and:[{
+            $or: [
+                { others: { $regex: keyword, $options: "i" } },
+              ],
+            },
+            { hospitalInfo: { $eq: hospitalId.toString() } },
+          ]
+      };
+  
+        const hospitalizations = await Hospitalization.paginate(query, options);
+       
+        return hospitalizations;
+      },
         //@Desc getting the Hospitalization by id
         //@access auth
 
         getHospitalizationById:async(_  ,{id},{Hospitalization})=>{
-            const hospitalizations = await Hospitalization.findById(id).populate("hospitalInfo personalInfo");
+            const hospitalizations = await Hospitalization.findById(id).populate("hospitalInfo hospitalInfo");
             return hospitalizations
         },
     },
     Mutation:{
+  
+
 
         //@Desc create new Hospitalization
         //@access auth
         createHospitalization:async(_,{newHospitalization},{Hospitalization})=>{
             try {
-                
-      
-            //    console.log(newHospitalization);
-            //     if(isExisted){
-            //         return{
-            //             message:"The hospitalization with this name is already exist",
-            //             success: false
-            //         }
-            //     }
 
                 const hospitalizations = new Hospitalization(newHospitalization);
                 const isCreated = await hospitalizations.save();
