@@ -6,8 +6,8 @@ export default gql`
 extend type Query {
     getAllProvince(district:String): AllProvince!
     getAllDistrictForMap:[AllProvince!]!
-    getHospitalForMap: [HospitalForMap]!
-    getQuarantineForMap:[QuarantineForMap!]!
+    getDataForGrap: GraphData!
+  
 }
 
 type AllProvince{
@@ -19,48 +19,18 @@ type AllProvince{
     recoveredToday:Int
     _id:String
     
-    # totalQuarantine:Int
-    # totalQuantineToday:Int 
-    # totalHospital:Int 
-    # totalHospitalToday:Int 
-    # allQuantineActive:Int,
-    # allQuantineToday:Int,
-    # allHospitalActive:Int,
-    # allHospitalToday:Int,
 }
-type ByProvince{
-    confirmedCase:Int
-    confirmedCaseToday:Int
-    death: Int 
-    deathToday: Int
-    recovered: Int 
-    recoveredToday:Int
-    totalQuarantine:Int
-    totalQuantineToday:Int 
-    totalHospital:Int 
-    totalHospitalToday:Int
-    long:Float 
-    lat:Float  
+type GraphData{
+    cases:[Data] 
+    recovered:[Data]
+    deaths:[Data]
+}
+type Data{
+    date:Date
+    value: Int
 }
 
-type HospitalForMap{
-        district:String
-        hospitalName: String
-        long: Float 
-        lat:Float 
-        active:Int
-        newToday:Int
-        totalInHospital:Int
-}
 
-type QuarantineForMap{
-    district:String
-    locationName: String
-    long: Float 
-    lat:Float 
-    active:Int
-    newToday:Int
-    totalInHospital:Int  
-}
+
 `
 

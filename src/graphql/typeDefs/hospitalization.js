@@ -29,18 +29,15 @@ export default gql`
     updatedAt:Date
   }
 
- 
-
   input HospitalizationInput {
     in:Boolean
    date_in: Date
    date_out: Date
    out_status:String,
-   personalInfo:ID!,
-   hospitalInfo:ID!,
+   personalInfo:ID,
+   hospitalInfo:ID,
    others:String,
    samplTest:SampleTestInput
-
   }
   type HospitalizationResponse {
       success: Boolean 
