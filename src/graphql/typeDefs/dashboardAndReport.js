@@ -6,7 +6,7 @@ export default gql`
 extend type Query {
     getAllProvince(district:String): AllProvince!
     getAllDistrictForMap:[AllProvince!]!
-    getDataForGrap: GraphData!
+    getDataForGrap: GraphResponse
   
 }
 
@@ -20,15 +20,19 @@ type AllProvince{
     _id:String
     
 }
-type GraphData{
-    cases:[Data] 
-    recovered:[Data]
-    deaths:[Data]
+
+# create a scalar type linked from customerReserver 
+# this is for helping us with object type that have dynamic key 
+scalar JSON
+type GraphResponse{
+    cases:[JSON]
+    recovered:[JSON]
+    deaths:[JSON]
 }
-type Data{
-    date:Date
-    value: Int
-}
+
+
+
+
 
 
 

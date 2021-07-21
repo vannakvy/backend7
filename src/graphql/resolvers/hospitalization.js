@@ -84,14 +84,22 @@ export default {
         //@access auth
 
         getHospitalizationById:async(_  ,{id},{Hospitalization})=>{
-            const hospitalizations = await Hospitalization.findById(id).populate("hospitalInfo hospitalInfo");
+            const hospitalizations = await Hospitalization.findById(id).populate("hospitalInfo personalInfo");
             return hospitalizations
+        },
+        getHospitalizationByPersonalInfo:async(_,{personalId},{Hospitalization,Quarantine})=>{
+            const hospitalization = await Hospitalization.findOne({"personalInfo":personalId}).populate("hospitalInfo personalInfo");
+            console.log(hospitalization)
+            const quarantine = await Quarantine.findOne({"personalInfo":personalId}).populate("quarantineInfo personalInfo");
+    
+            return {
+                hospitalInfo: hospitalization,
+                quarantineInfo: quarantine
+            }
         },
     },
     Mutation:{
   
-
-
         //@Desc create new Hospitalization
         //@access auth
         createHospitalization:async(_,{newHospitalization},{Hospitalization})=>{
@@ -116,6 +124,9 @@ export default {
                 }
             }
         },
+
+
+      
 
         //@Desc delete the Hospitalization
         //@access admin 

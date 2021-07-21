@@ -1,5 +1,9 @@
-import { GraphQLDateTime } from "graphql-iso-date";
+import { GraphQLDateTime} from "graphql-iso-date";
+import { GraphQLJSONObject } from 'graphql-type-json';
 
 export default  {
-    Date: GraphQLDateTime
+    Date: GraphQLDateTime,
+    JSON:GraphQLJSONObject
   };
+
+

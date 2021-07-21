@@ -5,7 +5,7 @@ export default gql`
     allHospitalizations:[Hospitalization!]!
     getHospitalizationWithPagination(page:Int!, limit:Int!, keyword:String):HospitalizationPaginator!
     getQuarantineByHospitalIdIdWithPagination(page:Int!, limit:Int!, keyword:String,hospitalId:ID!):HospitalizationPaginator!
-   
+    getHospitalizationByPersonalInfo(personalId:ID!):DataForPersonalInfo
     getHospitalizationById(id:ID!):Hospitalization!
   }
 
@@ -14,7 +14,10 @@ export default gql`
     updateHospitalization(updatedHospitalization:HospitalizationInput,id:ID!):HospitalizationResponse!
     deleteHospitalization(id:ID!):HospitalizationResponse!
   }
-
+type DataForPersonalInfo{
+ hospitalInfo: Hospitalization
+  quarantineInfo: Quarantine
+}
   type Hospitalization {
     id:ID
     in:Boolean

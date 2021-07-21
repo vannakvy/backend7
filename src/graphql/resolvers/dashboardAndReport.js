@@ -1,4 +1,4 @@
-import moment from 'moment'
+import moment from "moment";
 export default {
   Query: {
     //@Desc getAllProvinces
@@ -152,80 +152,74 @@ export default {
 
     //@Desc getting all the data and group for the graph
 
-    getDataForGrap:async (_, {},{PersonalInfo})=>{
-
+    getDataForGrap: async (_, {}, { PersonalInfo }) => {
+    
       const convert = (e) => {
-        let array = []
-        let limitDate = 4
-        e.map(load => {
-          if (load._id !== null ) {
-            if(new Date(load._id).getDate() > new Date().getDate() - limitDate && new Date(load._id).getDate() >= 0){
-              let x = { [moment(load._id).format("MM/DD/YY")]: load.confirm }
-              array.push(x)
-            }
+        let array = [];
+        let limitDate = 2;
+        e.map((load) => {
+          if (load._id.month !== null) {
+            if (limitDate == 0) return;
+            let x = {
+              [`${load._id.month}/${load._id.day}/${load._id.year}`]:
+                load.confirm,
+            };
+            limitDate -= 1;
+            array.push(x);
+            // }
           }
-        })
-        return array
-      }
+        });
+        return array;
+      };
 
-      const cases = await PersonalInfo.aggregate([
-        {
-          $project: {
-            "currentState.confirmedAt": 1,
-            confirm: {
-              // Set to 1 if currentState.confirm = true
-              $cond: [{ $eq: ["$currentState.confirm", true] }, 1, 0],
-            },
-          },
-        },
+      let confirm = await PersonalInfo.aggregate([
         {
           $group: {
-            _id: "$currentState.confirmedAt",
-            confirm: { $sum: "$confirm" },
+            _id: {
+              month: { $month: "$currentState.confirmedAt" },
+              day: { $dayOfMonth: "$currentState.confirmedAt" },
+              year: { $year: "$currentState.confirmedAt" },
+            },
+            confirm: { $sum: 1 },
           },
         },
       ]);
-      const recovered = await PersonalInfo.aggregate([
-        {
-          $project: {
-            "currentState.recoveredAt": 1,
-            recovered: {
-              // Set to 1 if currentState.confirm = true
-              $cond: [{ $eq: ["$currentState.recover", true] }, 1, 0],
-            },
-          },
-        },
+      let recovered = await PersonalInfo.aggregate([
         {
           $group: {
-            _id: "$currentState.recoveredAt",
-            recovered: { $sum: "$recovered" },
+            _id: {
+              month: { $month: "$currentState.recoveredAt" },
+              day: { $dayOfMonth: "$currentState.recoveredAt" },
+              year: { $year: "$currentState.recoveredAt" },
+            },
+            recovered: { $sum: 1 },
           },
         },
       ]);
-
-      const deaths = await PersonalInfo.aggregate([
-        {
-          $project: {
-            "currentState.deathAt": 1,
-            death: {
-              // Set to 1 if currentState.confirm = true
-              $cond: [{ $eq: ["$currentState.death", true] }, 1, 0],
-            },
-          },
-        },
+      let deathAt = await PersonalInfo.aggregate([
         {
           $group: {
-            _id: "$currentState.deathAt",
-            confirm: { $sum: "$death" },
+            _id: {
+              month: { $month: "$currentState.deathAt" },
+              day: { $dayOfMonth: "$currentState.deathAt" },
+              year: { $year: "$currentState.deathAt" },
+            },
+            death: { $sum: 1 },
           },
         },
       ]);
-      console.log(cases)
-  let a = convert(cases)
-  console.log(a)
+      console.log(convert(confirm));
+      console.log(convert(recovered));
+      console.log(convert(deathAt));
+      return {
+        cases: convert(confirm),
+        recovered: convert(recovered),
+        deaths: convert(deathAt),
+      };
 
-console.log(recovered)
-console.log(deaths)
-    }
+      //   console.log(a)
+      // console.log(recovered)
+      // console.log(deaths)
+    },
   },
 };

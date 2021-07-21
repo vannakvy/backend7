@@ -4,6 +4,7 @@ export default gql`
   extend type Query {
     allPersonalInfos: [PersonalInfo!]!
     getPersonalInfoById(id: ID!): PersonalInfo!
+   
     getPersonalInfoWithPagination(
       page: Int!
       limit: Int!
