@@ -5,7 +5,7 @@ export {default as PersonalInfo} from './PersonalInfo'
 export {default as Hospitalization} from './Hospitalization' 
 export {default as QuarantineInfo} from './QuarantineInfo'
 export {default as HospitalInfo} from './HospitalInfo'
-
+export {default as AffectedLocation} from './AffectedLocation'
 
 
 

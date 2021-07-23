@@ -15,7 +15,7 @@ export default {
       let confirmToday = 0;
       let recoveredToday = 0;
       let deathToday = 0;
-      if (district === "") {
+      if (district === "" || district === "ករំីណីទាំងអស់") {
         confirm = await PersonalInfo.countDocuments({
           "currentState.confirm": true,
         });
@@ -39,14 +39,6 @@ export default {
         deathToday = await PersonalInfo.countDocuments({
           "currentState.deathAt": { $gte: today, $lt: tomorrow },
         });
-
-        // const allHospital = await Hospitalization.countDocuments({});
-        // const allHospitalActive = await Hospitalization.countDocuments({"in":true});
-        // const allHospitalToday = await Hospitalization.countDocuments({$and:[{"in":true},{"date_in": { $gte: today, $lt: tomorrow }}]});
-
-        // const allQuarantine = await Quarantine.countDocuments({});
-        // const allQuantineActive = await Quarantine.countDocuments({"in":true});
-        // const allQuantineToday = await Quarantine.countDocuments({$and:[{"in":true},{"date_in": { $gte: today, $lt: tomorrow }}]});
       } else {
         confirm = await PersonalInfo.countDocuments({
           $and: [{ "currentState.confirm": true }, { district: district }],
@@ -153,7 +145,6 @@ export default {
     //@Desc getting all the data and group for the graph
 
     getDataForGrap: async (_, {}, { PersonalInfo }) => {
-    
       const convert = (e) => {
         let array = [];
         let limitDate = 2;
@@ -161,8 +152,8 @@ export default {
           if (load._id.month !== null) {
             if (limitDate == 0) return;
             let x = {
-              [`${load._id.month}/${load._id.day}/${load._id.year}`]:
-                load.confirm,
+              x: `${load._id.month}/${load._id.day}/${load._id.year}`,
+              y: load.value,
             };
             limitDate -= 1;
             array.push(x);
@@ -172,6 +163,37 @@ export default {
         return array;
       };
 
+      // const convert =(arr)=>{
+      //   let limit = 15;
+      //   var result = {};
+      //   for (var i = 0; i < limit; i++) {
+
+      //     if(arr[i]._id.month !== null) {
+      //       let a = `${arr[i]._id.month}`
+      //       console.log(a)
+      //       result[a] = arr[i].confirm;
+      //     }
+
+      //   }
+      //   console.log(result,"fff")
+      //   return result;
+      // }
+
+      //   const convert = (e) => {
+      //     let array = {}
+      //     let limitDate = 4
+      //     e.map(load => {
+      //         var y =`${load._id.month}/${load._id.day}/${load._id.year}`
+      //         if (load._id.month !== null) {
+      //             if (new Date(y).getDate() > new Date().getDate() - limitDate && new Date(y).getDate() >= 0) {
+      //                 let x = { [y]: load.confirm }
+      //                 array = {...array, ...x}
+      //             }
+      //         }
+      //     })
+      //    return array;
+      // }
+
       let confirm = await PersonalInfo.aggregate([
         {
           $group: {
@@ -180,7 +202,7 @@ export default {
               day: { $dayOfMonth: "$currentState.confirmedAt" },
               year: { $year: "$currentState.confirmedAt" },
             },
-            confirm: { $sum: 1 },
+            value: { $sum: 1 },
           },
         },
       ]);
@@ -192,7 +214,7 @@ export default {
               day: { $dayOfMonth: "$currentState.recoveredAt" },
               year: { $year: "$currentState.recoveredAt" },
             },
-            recovered: { $sum: 1 },
+            value: { $sum: 1 },
           },
         },
       ]);
@@ -204,22 +226,103 @@ export default {
               day: { $dayOfMonth: "$currentState.deathAt" },
               year: { $year: "$currentState.deathAt" },
             },
-            death: { $sum: 1 },
+            value: { $sum: 1 },
           },
         },
       ]);
-      console.log(convert(confirm));
-      console.log(convert(recovered));
-      console.log(convert(deathAt));
+      // console.log(confirm);
+
       return {
         cases: convert(confirm),
         recovered: convert(recovered),
         deaths: convert(deathAt),
       };
+    },
+    // @Desc getting the data for report
+    //auth and private
+    getDataForReport: async (_, { start, end }, { PersonalInfo }) => {
+      let today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const data = await PersonalInfo.aggregate([
+        {
+          $project: {
+            district: 1,
+            menConfirmToday: {
+              $cond: [ {$and : [ { $eq: [ "$gender", "ប្រុស"] },
+              { $gte: [ "$currentState.confirmedAt",today] }] }, 1,0 ]
+            },
+            womenConfirmToday: {
+              $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
+             { $gte: [ "$currentState.confirmedAt",today] }] }, 1,0 ]
+            },
+             menConfirm: {
+              $cond: [ {$and : [ { $eq: [ "$gender", "ប្រុស"] },
+              { $eq: [ "$currentState.confirm",true] }] }, 1,0 ]
+            },
+            womenConfirm: {
+              $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
+              { $eq: [ "$currentState.confirm",true] }] }, 1,0 ]
+          },
 
-      //   console.log(a)
-      // console.log(recovered)
-      // console.log(deaths)
+          //For Recovery
+          menRecoveredToday: {
+            $cond: [ {$and : [ { $eq: [ "$gender", "ប្រុស"] },
+            { $gte: [ "$currentState.recoveredAt",today] }] }, 1,0 ]
+          },
+          womenRecoveredToday: {
+            $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
+           { $gte: [ "$currentState.recoveredAt",today] }] }, 1,0 ]
+          },
+           menRecovered: {
+            $cond: [ {$and : [ { $eq: [ "$gender", "ប្រុស"] },
+            { $eq: [ "$currentState.recovered",true] }] }, 1,0 ]
+          },
+          womenRecovered: {
+            $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
+            { $eq: [ "$currentState.recovered",true] }] }, 1,0 ]
+        },
+
+        //For Deaths
+        menDeathsToday: {
+          $cond: [ {$and : [ { $eq: [ "$gender", "ប្រុស"] },
+          { $gte: [ "$currentState.deathAt",today] }] }, 1,0 ]
+        },
+        womenDeathsToday: {
+          $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
+         { $gte: [ "$currentState.deathAt",today] }] }, 1,0 ]
+        },
+         menDeaths: {
+          $cond: [ {$and : [ { $eq: [ "$gender", "ប្រុស"] },
+          { $eq: [ "$currentState.death",true] }] }, 1,0 ]
+        },
+        womenDeaths: {
+          $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
+          { $eq: [ "$currentState.death",true] }] }, 1,0 ]
+      },
+        //
+          },
+        },
+        {
+          $group: {
+            _id: "$district",
+            menConfirmToday: { $sum: "$menConfirmToday" },
+           womenConfirmToday: { $sum: "$womenConfirmToday" },
+           menConfirm: { $sum: "$menConfirm" },
+           womenConfirm: { $sum: "$womenConfirm" },
+           
+           menRecoveredToday: { $sum: "$menConfirmToday" },
+           womenRecoveredToday: { $sum: "$womenRecoveredToday" },
+           menRecovered: { $sum: "$menRecovered" },
+           womenRecovered: { $sum: "$womenRecovered" },
+
+           menDeathsToday: { $sum: "$menDeathsToday" },
+           womenDeathsToday: { $sum: "$womenDeathsToday" },
+           menDeaths: { $sum: "$menDeaths" },
+           womenDeaths: { $sum: "$womenDeaths" },
+          },
+        },
+      ]);
+
     },
   },
 };

@@ -11,7 +11,6 @@ export default gql`
   extend type Mutation{
     createQuarantine(newQuarantine:QuarantineInput):QuarantineResponse!
     updateQuarantine(updatedQuarantine:QuarantineInput,id:ID!):QuarantineResponse!
-  
     deleteQuarantine(id:ID!):QuarantineResponse!
   }
 

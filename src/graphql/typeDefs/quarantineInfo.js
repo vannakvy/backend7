@@ -21,7 +21,6 @@ export default gql`
         commune: String
         district: String
         province:String
-        personInchage:String
         long: Float
         lat: Float
         createdAt:Date 

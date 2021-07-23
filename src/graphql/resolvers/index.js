@@ -9,6 +9,7 @@ import quarantine from './quarantine';
 import quarantineInfo from './quarantineInfo'
 import hospitalInfo from './hospitalInfo';
 import dashboardAndReport from './dashboardAndReport';
+import affectedLocation from './affectedLocation';
 export default [
     user,
     image,
@@ -19,7 +20,8 @@ export default [
     quarantineInfo,
     hospitalInfo,
     quarantine,
-    dashboardAndReport
+    dashboardAndReport,
+    affectedLocation
 ]  
 
 
