@@ -19,6 +19,12 @@ type AllProvince{
     recovered: Int 
     recoveredToday:Int
     _id:String
+    totalHospital:Int,
+    totalHospitalization:Int,
+    totalPeopleInHospitalization:Int,
+    totalQuarantine:Int,
+    totalAffectedLocation:Int,
+    totalPeopleInQuarantine:Int
     
 }
 
@@ -29,7 +35,7 @@ type AllProvince{
 #     cases:[JSON]
 #     recovered:[JSON]
 #     deaths:[JSON]
-# }
+# }+
 
 scalar JSON
 type GraphResponse{
@@ -43,9 +49,6 @@ type Graps{
     x: String
     y:Int
 }
-
-
-
 
 
 `

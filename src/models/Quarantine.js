@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import Paginate from "mongoose-paginate-v2";
 
 const QuarantineSchema = mongoose.Schema({
-  in: { type: Boolean, required: true, default: true },
   date_in: { type: Date, required: true, default: new Date() },
   personalType: {
     type: String,
@@ -10,8 +9,7 @@ const QuarantineSchema = mongoose.Schema({
     enum: ["សហគមន៍", "តាមផ្លូងអាកាស", "ពលករ"],
     default: "សហគមន៍",
   },
-  date_out: { type: Date },
-  out_status: String, // die, escape,negative, positive,
+  date_out: { type: Date, default:null },
   personalInfo: { type: mongoose.Schema.Types.ObjectId, ref: "PersonalInfo" },
   quarantineInfo: {
     type: mongoose.Schema.Types.ObjectId,

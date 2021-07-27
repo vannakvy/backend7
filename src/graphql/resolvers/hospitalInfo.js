@@ -66,7 +66,6 @@ export default {
             try {
                 
                 const isExisted = await HospitalInfo.findOne({hospitalName:newHospitalInfo.hospitalName});
-            
                 if(isExisted){
                     return{
                         message:"The hospital with this name is already exist",
@@ -78,17 +77,20 @@ export default {
                 if(!isCreated){
                     return {
                         message:"Cannot create HopitalInfo",
-                        success: false
+                        success: false,
+                        hospitalInfos:null
                     }
                 }
                 return {
                     message:"HopitalInfo created successfully!",
-                    success: true
+                    success: true,
+                    hospitalInfos:isCreated
                 }
             } catch (error) {
                 return {
                     message:"មិន​អាចបង្កើតទេ សូមទាក់ទង admin" ,
-                    success: false
+                    success: false,
+                    hospitalInfos:null
                 }
             }
         },
@@ -124,7 +126,7 @@ export default {
         //@access auth
 
         updateHospitalInfo:async(_,{id,updatedHospitalInfo},{HospitalInfo})=>{
-            
+        
             try {
                 const isUpdated = await HospitalInfo.findByIdAndUpdate(id,updatedHospitalInfo);
                 if(!isUpdated){

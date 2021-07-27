@@ -15,7 +15,6 @@ const QuarantineLabels = {
       //@Desc getting all the Quantine
       //@access private
       //
-  
       allQuarantineInfos: async (_, {}, { QuarantineInfo }) => {
         const quarantines = await QuarantineInfo.find({});
         return quarantines;
@@ -72,32 +71,34 @@ const QuarantineLabels = {
           const isExisted = await QuarantineInfo.findOne({
             locationName: newQuarantineInfo.locationName,
           });
-  
           if (isExisted) {
             return {
               message: "The Quarantine with this name is already exist",
               success: false,
+              quarantineInfo:null
             };
           }
-         
           const quarantines = new QuarantineInfo(newQuarantineInfo);
      
           const isCreated = await quarantines.save();
-          console.log(isCreated)
+        
           if (!isCreated) {
             return {
               message: "Cannot create Quarantine",
               success: false,
+              quarantineInfo:null
             };
           }
           return {
             message: "Quarantine created successfully!",
             success: true,
+            quarantineInfo: isCreated
           };
         } catch (error) {
           return {
             message: "Cannot create Quarantine Please contact the admin",
             success: false,
+            quarantineInfo:null
           };
         }
       },
@@ -108,8 +109,6 @@ const QuarantineLabels = {
       deleteQuarantineInfo: async (_, { id }, { QuarantineInfo }) => {
         try {
           const deletedInfo = await QuarantineInfo.findByIdAndDelete(id);
-  
-    
           if (!deletedInfo) {
             return {
               success: false,

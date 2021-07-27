@@ -8,7 +8,7 @@ export default gql`
   }
 
   extend type Mutation{
-    createAffectedLocation(newAffectedLocation:AffectedLocationInput):AffectedLocationResponse!
+    createAffectedLocation(newAffectedLocation:AffectedLocationInput):AffectedLocationResponseWithId!
     updateAffectedLocation(updatedAffectedLocation:AffectedLocationInput,id:ID!):AffectedLocationResponse!
     deleteAffectedLocation(id:ID!):AffectedLocationResponse!
   }
@@ -24,10 +24,8 @@ export default gql`
         open:Boolean
         openAt:Date 
         closeAt:Date
-        case:Case!
         long:Float
         lat:Float
-        personalInfo:PersonalInfo
         coorporate:Boolean
         infected:Boolean
         createdAt:Date 
@@ -44,8 +42,6 @@ export default gql`
         open:Boolean
         openAt:Date 
         closeAt:Date
-        personalInfo:ID!
-        case:ID!
         long:Float
         lat:Float
         coorporate:Boolean
@@ -54,6 +50,12 @@ export default gql`
   type AffectedLocationResponse {
       success: Boolean 
       message:String
+  }
+
+  type AffectedLocationResponseWithId {
+      success: Boolean 
+      message:String
+      affectedLocation: AffectedLocation
   }
 
   type AffectedLocationPaginator{

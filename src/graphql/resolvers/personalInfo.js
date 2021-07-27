@@ -56,7 +56,7 @@ export default {
         getPersonalInfoByCaseWithPagination:async(_,{page,limit,keyword,caseId},{PersonalInfo})=>{
             const options = {
                 page: page || 1,
-                limit: limit || 10,
+                limit: limit || 20,
                 customLabels: PersonalInfoLabels,
                 sort: {
                   createdAt: -1,
@@ -156,7 +156,7 @@ export default {
             try {
                 const deletedInfo = await PersonalInfo.findByIdAndDelete(id);
 
-                console.log(deletedInfo)
+             
                 if(!deletedInfo){
                     return {
                         success: false,

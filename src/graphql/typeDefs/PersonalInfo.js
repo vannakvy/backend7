@@ -29,6 +29,8 @@ export default gql`
   }
 
   type PersonalInfo {
+    englishName:String,
+    patientId:String
     id: ID
     firstName: String
     lastName: String
@@ -44,6 +46,7 @@ export default gql`
     district: String
     province: String
     case:Case
+    relation:String,
     direct: Boolean
     other:String
     relapse: Boolean
@@ -51,11 +54,14 @@ export default gql`
     vaccinated: Int
     createdAt: Date
     updatedAt: Date
+    interviewed: Boolean
     currentState: currentStatus
     sampleTest:[SampleTest]
+    travelHistory:TravelHistory
+    illness:String,
   }
-
   type currentStatus{
+        covidVariant:String,
         confirm:Boolean,
         confirmedAt:Date,
         recovered:Boolean,
@@ -71,9 +77,25 @@ export default gql`
     result:Boolean,
     symptom:String,
     other:String,
+    resonForTesting:String,
+    symptomStart:Date,
   }
-
+  type TravelHistory{
+        arriveDate:Date,
+        fromCountry:String,
+        reasonForComing:String,
+        leavingDate:Date,
+        toCountry:String,
+    },
+    input TravelHistoryInput{
+        arriveDate:Date,
+        fromCountry:String,
+        reasonForComing:String,
+        leavingDate:Date,
+        toCountry:String,
+    },
   input SampleTestInput{
+    resonForTesting:String,
     date: Date,
     times:Int,
     location:String,
@@ -82,6 +104,7 @@ export default gql`
     other:String,
   }
   input currentStatusInput{
+    covidVariant:String,
         confirm:Boolean,
         confirmedAt:Date,
         recovered:Boolean,
@@ -92,8 +115,11 @@ export default gql`
 
   
   input PersonalInfoInput {
+    englishName:String,
+    patientId:String
     currentState:currentStatusInput
     firstName: String
+    interviewed:Boolean
     lastName: String
     age: Int
     case:ID!
@@ -112,6 +138,8 @@ export default gql`
     relapse: Boolean
     relapseAt: Date
     vaccinated: Int
+    travelHistory:TravelHistoryInput
+    relation:String,
   }
   type PersonalInfoResponse {
     success: Boolean

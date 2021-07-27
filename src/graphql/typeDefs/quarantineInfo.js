@@ -8,7 +8,7 @@ export default gql`
   }
 
   extend type Mutation{
-    createQuarantineInfo(newQuarantineInfo:QuarantineInfoInput):QuarantineInfoResponse!
+    createQuarantineInfo(newQuarantineInfo:QuarantineInfoInput):QuarantineInfoResponseWidthData!
     updateQuarantineInfo(updatedQuarantineInfo:QuarantineInfoInput,id:ID!):QuarantineInfoResponse!
     deleteQuarantineInfo(id:ID!):QuarantineInfoResponse!
   }
@@ -46,6 +46,11 @@ export default gql`
   type QuarantineInfoResponse {
       success: Boolean 
       message:String
+  }
+  type QuarantineInfoResponseWidthData{
+      success: Boolean 
+      message:String
+      quarantineInfo:QuarantineInfo
   }
   type PersonInCharge{
         firstName:String

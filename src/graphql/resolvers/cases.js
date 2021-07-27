@@ -21,7 +21,6 @@ export default {
 
         allCases:async(_,{},{Case})=>{
             const cases = await Case.find({});
-            console.log(cases);
             return cases;
         },
         //@Desc Getting all cases  with pagination 
@@ -76,17 +75,21 @@ export default {
                 if(!isCreated){
                     return {
                         message:"Cannot create case",
-                        success: false
+                        success: false,
+                        case: {}
                     }
                 }
                 return {
                     message:"case created successfully!",
-                    success: true
+                    success: true,
+                    case:isCreated
+
                 }
             } catch (error) {
                 return {
                     message:"Cannot create case Please contact the admin",
-                    success: false
+                    success: false,
+                    case:{}
                 }
             }
         },
@@ -98,7 +101,7 @@ export default {
             try {
                 const deletedInfo = await Case.findByIdAndDelete(id);
 
-                console.log(deletedInfo)
+              
                 if(!deletedInfo){
                     return {
                         success: false,
@@ -129,7 +132,7 @@ export default {
                         message: "Case updated not successfully"
                     }
                 }
-                console.log(isUpdated)
+          
                 return {
                     success: true,
                     message: "case updated successfully !"

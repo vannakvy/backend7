@@ -16,10 +16,8 @@ export default gql`
 
   type Quarantine {
     id:ID
-    in:Boolean
    date_in: Date
    date_out: Date
-   out_status:String,
    personalInfo:PersonalInfo,
    quarantineInfo:QuarantineInfo,
    personalType:String,
@@ -29,11 +27,9 @@ export default gql`
   }
 
   input QuarantineInput {
-    in:Boolean
    date_in: Date
    date_out: Date
    personalType:String
-   out_status:String,
    personalInfo:ID!,
    quarantineInfo:ID!,
    others:String,    

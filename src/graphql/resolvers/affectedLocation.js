@@ -18,7 +18,6 @@ export default {
         //@access private 
         //
 
-
         allAffectedLocations:async(_,{},{AffectedLocation})=>{
             const affectedLocations = await AffectedLocation.find({}).populate("case personalInfo");
             console.log(affectedLocations);
@@ -34,7 +33,7 @@ export default {
                 sort: {
                   createdAt: -1,
                 },
-                populate: "case personalInfo",
+                // populate: "case personalInfo",
               };
 
               let query = {
@@ -48,6 +47,7 @@ export default {
               };
 
               const affectedLocations = await AffectedLocation.paginate(query, options);
+              console.log()
               return affectedLocations;
         },
         //@Desc getting the AffectedLocation by id
@@ -66,30 +66,33 @@ export default {
             try {
                
                 const isExisted = await AffectedLocation.find({affectedLocationName:newAffectedLocation.affectedLocationName});
-                console.log(isExisted)
+               
                 if(isExisted==[]){
                     return{
                         message:"The AffectedLocation with this name is already exist",
-                        success: false
+                        success: false,
+                        id:null
                     }
                 }
-             
                 const affectedLocations = new AffectedLocation(newAffectedLocation);
                 const isCreated = await affectedLocations.save();
                 if(!isCreated){
                     return {
                         message:"Cannot create AffectedLocation",
-                        success: false
+                        success: false,
+                        affectedLocation: null
                     }
                 }
                 return {
                     message:"AffectedLocation created successfully!",
-                    success: true
+                    success: true,
+                    affectedLocation: isCreated
                 }
             } catch (error) {
                 return {
                     message:"Cannot create AffectedLocation Please contact the admin",
-                    success: false
+                    success: false,
+                    affectedLocation: null
                 }
             }
         },
@@ -100,8 +103,7 @@ export default {
         deleteAffectedLocation:async(_,{id},{AffectedLocation})=>{
             try {
                 const deletedInfo = await AffectedLocation.findByIdAndDelete(id);
-
-                console.log(deletedInfo)
+               
                 if(!deletedInfo){
                     return {
                         success: false,
@@ -132,7 +134,6 @@ export default {
                         message: "AffectedLocation updated not successfully"
                     }
                 }
-                console.log(isUpdated)
                 return {
                     success: true,
                     message: "AffectedLocation updated successfully !"

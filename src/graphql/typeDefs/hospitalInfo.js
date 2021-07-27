@@ -14,7 +14,7 @@ export default gql`
   extend type Mutation {
     createHospitalInfo(
       newHospitalInfo: HospitalInfoInput
-    ): HospitalInfoResponse!
+    ): HospitalInfoResponseWithData!
     updateHospitalInfo(
       updatedHospitalInfo: HospitalInfoInput
       id: ID!
@@ -53,6 +53,12 @@ export default gql`
   type HospitalInfoResponse {
     success: Boolean
     message: String
+  }
+
+  type HospitalInfoResponseWithData{
+    success: Boolean
+    message: String
+    hospitalInfos:HospitalInfo
   }
 
   type HospitalInfoPaginator {

@@ -8,11 +8,16 @@ export default gql`
   }
 
   extend type Mutation{
-    createCase(newCase:CaseInput):CaseResponse!
+    createCase(newCase:CaseInput):ResponseWithCaseId!
     updateCase(updatedCase:CaseInput,id:ID!):CaseResponse!
     deleteCase(id:ID!):CaseResponse!
   }
 
+type ResponseWithCaseId{
+  message: String 
+  success: Boolean 
+  case:Case
+}
   type Case {
         id:ID!
         caseName:String

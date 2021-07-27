@@ -9,6 +9,7 @@ import quantine  from './quantine';
 import hospitalization from './hospitalization';
 import dashboardAndReport from './dashboardAndReport';
 import affectedLocation from './affectedLocation'
+import historyLocation from './historyLocation';
 export default [
     user,
     image,
@@ -20,7 +21,8 @@ export default [
     quantine,
     hospitalization,
     dashboardAndReport,
-    affectedLocation
+    affectedLocation,
+    historyLocation
 ];
 
  

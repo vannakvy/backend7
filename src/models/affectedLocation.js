@@ -11,14 +11,6 @@ const AffectedLocationSchema = mongoose.Schema({
     open:Boolean,
     openAt:Date,
     closeAt:Date,
-    case:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref:"Case"
-    },
-    personalInfo:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref:"PersonalInfo"
-    },
     long:Number,
     lat:Number,
     coorporate:{

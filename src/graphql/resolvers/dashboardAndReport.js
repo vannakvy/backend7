@@ -7,7 +7,7 @@ export default {
     getAllProvince: async (
       _,
       { district },
-      { PersonalInfo, Quarantine, Hospitalization }
+      { PersonalInfo, Quarantine, Hospitalization, AffectedLocation,HospitalInfo,QuarantineInfo}
     ) => {
       let confirm = 0;
       let recover = 0;
@@ -15,6 +15,8 @@ export default {
       let confirmToday = 0;
       let recoveredToday = 0;
       let deathToday = 0;
+  
+
       if (district === "" || district === "ករំីណីទាំងអស់") {
         confirm = await PersonalInfo.countDocuments({
           "currentState.confirm": true,
@@ -77,6 +79,26 @@ export default {
         });
       }
 
+      //Hospital for the box in the dashboard 
+     let totalHospital = await HospitalInfo.countDocuments({})
+     let totalHospitalization = await Hospitalization.countDocuments({})
+     let totalPeopleInHospitalization = await Hospitalization.countDocuments({         
+      $and: [
+    { "in": true },
+    { "date_out": null },
+  ],})
+
+  
+  // Quarantine for the box in tghe dashboard 
+     let totalQuarantine = await QuarantineInfo.countDocuments({})
+     let totalAffectedLocation = await AffectedLocation.countDocuments({})
+     let totalPeopleInQuarantine = await Quarantine.countDocuments({         
+        $and: [
+      { "in": true },
+      { "date_out": null },
+    ],})
+// console.log(totalHospital,totalHospitalization,totalPeopleInHospitalization,totalQuarantine,totalAffectedLocation,totalPeopleInQuarantine)
+    
       let dataForBoxes = {
         confirmedCase: confirm,
         confirmedCaseToday: confirmToday,
@@ -84,17 +106,16 @@ export default {
         deathToday: deathToday,
         recovered: recover,
         recoveredToday: recoveredToday,
-        // totalQuarantine:allQuarantine,
-        // totalQuantineToday:allHospitalToday,
-        // totalHospital:allHospital,
-        // allHospitalActive:allHospitalActive,
-        // allHospitalToday:allHospitalToday,
-        // totalHospitalToday:allHospitalToday,
-        // allQuantineActive:allQuantineActive,
-        // allQuantineToday:allQuantineToday,
+        totalHospital,
+        totalHospitalization,
+        totalPeopleInHospitalization,
+        totalQuarantine,
+        totalAffectedLocation,
+        totalPeopleInQuarantine
       };
       return dataForBoxes;
     },
+
     getAllDistrictForMap: async (_, {}, { PersonalInfo }) => {
       let today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -216,8 +237,13 @@ export default {
             },
             value: { $sum: 1 },
           },
-        },
+        },{
+          
+            $sort:{"currentState.recoveredAt":1}
+          
+        }
       ]);
+
       let deathAt = await PersonalInfo.aggregate([
         {
           $group: {
@@ -228,6 +254,7 @@ export default {
             },
             value: { $sum: 1 },
           },
+        
         },
       ]);
       // console.log(confirm);

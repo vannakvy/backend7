@@ -20,10 +20,9 @@ type DataForPersonalInfo{
 }
   type Hospitalization {
     id:ID
-    in:Boolean
    date_in: Date
    date_out: Date
-   out_status:String,
+
    personalInfo:PersonalInfo!,
    hospitalInfo:HospitalInfo!,
    others:String,
