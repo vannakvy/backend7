@@ -140,6 +140,7 @@ export default gql`
     vaccinated: Int
     travelHistory:TravelHistoryInput
     relation:String,
+    illness:String
   }
   type PersonalInfoResponse {
     success: Boolean
