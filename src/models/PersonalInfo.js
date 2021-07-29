@@ -38,13 +38,16 @@ const PersonalInfoShema = mongoose.Schema({
     },
     illness:String,
     sampleTest:[{
-        resonForTesting:String,
+        reasonForTesting:String,
         date: {type: Date, required: true,default:new Date()},
         times:{type: Number, required: true,default:0},
         location:String,
         result:{type:Boolean,required: true, default:false},
         symptom:String,
         symptomStart:Date,
+        labFormCompletedBy:String,
+        specimentType:String,
+        laboratory:String,
         other:{
             type:String,
             default:"",
@@ -81,7 +84,6 @@ const PersonalInfoShema = mongoose.Schema({
 },{
     timestamps: true
 })
-
 
 PersonalInfoShema.plugin(Paginate)
 

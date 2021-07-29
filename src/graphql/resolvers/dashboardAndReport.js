@@ -1,6 +1,11 @@
 import moment from "moment";
 export default {
   Query: {
+
+    // @Desc get data for the box 
+    // Access auth 
+      
+
     //@Desc getAllProvinces
     //@Access auth
 
@@ -16,7 +21,6 @@ export default {
       let recoveredToday = 0;
       let deathToday = 0;
   
-
       if (district === "" || district === "ករំីណីទាំងអស់") {
         confirm = await PersonalInfo.countDocuments({
           "currentState.confirm": true,
@@ -184,6 +188,39 @@ export default {
         return array;
       };
 
+      const data = await PersonalInfo.aggregate([
+        {
+          $project: {
+            district: 1,
+            confirm: {
+              $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
+             { $gte: [ "$currentState.confirmedAt",today] }] }, 1,0 ]
+            },
+            recovered: {
+              $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
+             { $gte: [ "$currentState.confirmedAt",today] }] }, 1,0 ]
+            },
+            death: {
+              $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
+             { $gte: [ "$currentState.confirmedAt",today] }] }, 1,0 ]
+            },
+          },
+        },
+        {
+          $group: {
+            _id: {
+                      month: { $month: "$currentState.recoveredAt" },
+                      day: { $dayOfMonth: "$currentState.recoveredAt" },
+                      year: { $year: "$currentState.recoveredAt" },
+                    },
+            confirm: { $sum: "$confirm" },
+            recovered: { $sum: "$recovered" },
+            death: { $sum: "$death" },
+          },
+        },
+      ]);
+
+
       // const convert =(arr)=>{
       //   let limit = 15;
       //   var result = {};
@@ -215,49 +252,49 @@ export default {
       //    return array;
       // }
 
-      let confirm = await PersonalInfo.aggregate([
-        {
-          $group: {
-            _id: {
-              month: { $month: "$currentState.confirmedAt" },
-              day: { $dayOfMonth: "$currentState.confirmedAt" },
-              year: { $year: "$currentState.confirmedAt" },
-            },
-            value: { $sum: 1 },
-          },
-        },
-      ]);
-      let recovered = await PersonalInfo.aggregate([
-        {
-          $group: {
-            _id: {
-              month: { $month: "$currentState.recoveredAt" },
-              day: { $dayOfMonth: "$currentState.recoveredAt" },
-              year: { $year: "$currentState.recoveredAt" },
-            },
-            value: { $sum: 1 },
-          },
-        },{
+      // let confirm = await PersonalInfo.aggregate([
+      //   {
+      //     $group: {
+      //       _id: {
+      //         month: { $month: "$currentState.confirmedAt" },
+      //         day: { $dayOfMonth: "$currentState.confirmedAt" },
+      //         year: { $year: "$currentState.confirmedAt" },
+      //       },
+      //       value: { $sum: 1 },
+      //     },
+      //   },
+      // ]);
+      // let recovered = await PersonalInfo.aggregate([
+      //   {
+      //     $group: {
+      //       _id: {
+      //         month: { $month: "$currentState.recoveredAt" },
+      //         day: { $dayOfMonth: "$currentState.recoveredAt" },
+      //         year: { $year: "$currentState.recoveredAt" },
+      //       },
+      //       value: { $sum: 1 },
+      //     },
+      //   },{
           
-            $sort:{"currentState.recoveredAt":1}
+      //       $sort:{"currentState.recoveredAt":1}
           
-        }
-      ]);
+      //   }
+      // ]);
 
-      let deathAt = await PersonalInfo.aggregate([
-        {
-          $group: {
-            _id: {
-              month: { $month: "$currentState.deathAt" },
-              day: { $dayOfMonth: "$currentState.deathAt" },
-              year: { $year: "$currentState.deathAt" },
-            },
-            value: { $sum: 1 },
-          },
+      // let deathAt = await PersonalInfo.aggregate([
+      //   {
+      //     $group: {
+      //       _id: {
+      //         month: { $month: "$currentState.deathAt" },
+      //         day: { $dayOfMonth: "$currentState.deathAt" },
+      //         year: { $year: "$currentState.deathAt" },
+      //       },
+      //       value: { $sum: 1 },
+      //     },
         
-        },
-      ]);
-      // console.log(confirm);
+      //   },
+      // ]);
+   
 
       return {
         cases: convert(confirm),

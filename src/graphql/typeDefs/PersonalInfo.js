@@ -4,7 +4,12 @@ export default gql`
   extend type Query {
     allPersonalInfos: [PersonalInfo!]!
     getPersonalInfoById(id: ID!): PersonalInfo!
-   
+    getConfirmedPersonalInfoByInterviewWithPagination(
+      interview:Boolean, 
+      page: Int!
+      limit: Int!
+      keyword: String
+      ): PaginateResponse!
     getPersonalInfoWithPagination(
       page: Int!
       limit: Int!
@@ -17,7 +22,6 @@ export default gql`
       caseId:ID!
     ): PaginateResponse!
   }
-
   extend type Mutation {
     createPersonalInfo(newInfo: PersonalInfoInput!): PersonalInfoResponse
     recordSampleTest(sampleTest:SampleTestInput!,personalInfoId:ID!):PersonalInfoResponse!
@@ -26,8 +30,10 @@ export default gql`
       id: ID!
     ): PersonalInfoResponse
     deletePersonalInfo(id: ID!): PersonalInfoResponse
+    deleteSampleTest(personalInfoId:ID!,sampleTestId:ID!):PersonalInfoResponse
+    updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse
   }
-
+ 
   type PersonalInfo {
     englishName:String,
     patientId:String
@@ -59,9 +65,9 @@ export default gql`
     sampleTest:[SampleTest]
     travelHistory:TravelHistory
     illness:String,
+    covidVariant:String,
   }
   type currentStatus{
-        covidVariant:String,
         confirm:Boolean,
         confirmedAt:Date,
         recovered:Boolean,
@@ -77,8 +83,11 @@ export default gql`
     result:Boolean,
     symptom:String,
     other:String,
-    resonForTesting:String,
+    reasonForTesting:String,
     symptomStart:Date,
+    labFormCompletedBy:String,
+    specimentType:String,
+    laboratory:String
   }
   type TravelHistory{
         arriveDate:Date,
@@ -95,16 +104,19 @@ export default gql`
         toCountry:String,
     },
   input SampleTestInput{
-    resonForTesting:String,
+    reasonForTesting:String,
     date: Date,
     times:Int,
     location:String,
     result:Boolean,
     symptom:String,
     other:String,
+    symptomStart:Date,
+    labFormCompletedBy:String,
+    specimentType:String,
+    laboratory:String
   }
   input currentStatusInput{
-    covidVariant:String,
         confirm:Boolean,
         confirmedAt:Date,
         recovered:Boolean,
@@ -115,6 +127,7 @@ export default gql`
 
   
   input PersonalInfoInput {
+    covidVariant:String,
     englishName:String,
     patientId:String
     currentState:currentStatusInput
