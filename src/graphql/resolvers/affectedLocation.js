@@ -20,7 +20,7 @@ export default {
 
         allAffectedLocations:async(_,{},{AffectedLocation})=>{
             const affectedLocations = await AffectedLocation.find({}).populate("case personalInfo");
-            console.log(affectedLocations);
+         
             return affectedLocations;
         },
         //@Desc Getting all AffectedLocations  with pagination 
@@ -47,7 +47,7 @@ export default {
               };
 
               const affectedLocations = await AffectedLocation.paginate(query, options);
-              console.log()
+            
               return affectedLocations;
         },
         //@Desc getting the AffectedLocation by id

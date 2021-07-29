@@ -66,7 +66,8 @@ const QuarantineLabels = {
       //@Desc create new Quarantine
       //@access auth
       createQuarantineInfo: async (_, { newQuarantineInfo }, { QuarantineInfo }) => {
-       console.log(newQuarantineInfo);
+     
+        
         try {
           const isExisted = await QuarantineInfo.findOne({
             locationName: newQuarantineInfo.locationName,

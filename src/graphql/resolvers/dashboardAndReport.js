@@ -36,6 +36,9 @@ export default {
         today.setHours(0, 0, 0, 0); // set to 0:00
         let tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
+
+
+        
         confirmToday = await PersonalInfo.countDocuments({
           "currentState.confirmedAt": { $gte: today, $lt: tomorrow },
         });
@@ -110,13 +113,14 @@ export default {
         deathToday: deathToday,
         recovered: recover,
         recoveredToday: recoveredToday,
-        totalHospital,
-        totalHospitalization,
-        totalPeopleInHospitalization,
-        totalQuarantine,
-        totalAffectedLocation,
-        totalPeopleInQuarantine
+        // totalHospital,
+        // totalHospitalization,
+        // totalPeopleInHospitalization,
+        // totalQuarantine,
+        // totalAffectedLocation,
+        // totalPeopleInQuarantine
       };
+      console.log(dataForBoxes)
       return dataForBoxes;
     },
 

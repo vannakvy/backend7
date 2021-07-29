@@ -48,7 +48,8 @@ export default {
     };
 
       const quarantines = await Quarantine.paginate(query, options);
-      console.log(quarantines)
+     
+      
       return quarantines;
     },
     //@Desc getting the Quarantine by id
@@ -91,7 +92,8 @@ export default {
     // };
 
       const quarantines = await Quarantine.paginate({}, options);
-      console.log(quarantines)
+   
+      
       return quarantines;
     },
     //@Desc getting the Quarantine by id
@@ -165,7 +167,8 @@ export default {
             message: "Quarantine updated not successfully",
           };
         }
-        console.log(isUpdated);
+       
+        
         return {
           success: true,
           message: "Quarantine updated successfully !",

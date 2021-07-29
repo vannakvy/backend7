@@ -44,17 +44,14 @@ export default {
                   { province: { $regex: keyword, $options: "i" } },
                 ],
               };
-            
-
               const hospitalInfos = await HospitalInfo.paginate(query, options);
-              console.log(hospitalInfos)
               return hospitalInfos;
         },
 
         //@Desc getting the Hospitalization by id
         //@access auth
 
-        getHospitalInfoById:async(_  ,{id},{HospitalInfo})=>{
+        getHospitalInfoById:async(_ ,{id},{HospitalInfo})=>{
             const hospitalInfos = await HospitalInfo.findById(id);
             return hospitalInfos
         },
@@ -101,7 +98,8 @@ export default {
         //@access admin 
 
         deleteHospitalInfo:async(_,{id},{HospitalInfo})=>{
-            console.log(HospitalInfo)
+     
+            
         
             try {
                 const deletedHos = await HospitalInfo.findByIdAndDelete(id);

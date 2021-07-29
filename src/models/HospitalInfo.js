@@ -18,7 +18,7 @@ const HospitalInfoSchema = mongoose.Schema({
         others:String,
         tel:String
     },
-})
+},{timestamps: true})
 
 HospitalInfoSchema.plugin(Paginate) 
 

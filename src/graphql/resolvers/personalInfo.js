@@ -47,7 +47,6 @@ export default {
                 {"currentState.confirm":true},
                 { "interviewed":interview},
             ]
-    
         }
         const personalInfos = await PersonalInfo.paginate(query, options);
         return personalInfos;
@@ -240,7 +239,8 @@ export default {
             $pull: { sampleTest: { _id: sampleTestId } },
           }
         );
-        console.log(a, "ddd");
+    
+        
         return {
           success: true,
           message: "Deleted Successfully",

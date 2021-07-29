@@ -20,7 +20,8 @@ export default {
 
         allHospitalizations:async(_,{},{Hospitalization})=>{
             const hospitalizations = await Hospitalization.find({}).populate("personalInfo hospitalInfo");
-            console.log(hospitalizations)
+            
+            
             return hospitalizations;
         },
         //@Desc Getting all Hospitalizations  with pagination 
@@ -89,7 +90,8 @@ export default {
         },
         getHospitalizationByPersonalInfo:async(_,{personalId},{Hospitalization,Quarantine})=>{
             const hospitalization = await Hospitalization.findOne({"personalInfo":personalId}).populate("hospitalInfo personalInfo");
-            console.log(hospitalization)
+         
+            
             const quarantine = await Quarantine.findOne({"personalInfo":personalId}).populate("quarantineInfo personalInfo");
     
             return {
@@ -157,7 +159,7 @@ export default {
         //@access auth
 
         updateHospitalization:async(_,{id,updatedHospitalization},{Hospitalization})=>{
-            console.log(updatedHospitalization)
+           
             try {
                 const isUpdated = await Hospitalization.findByIdAndUpdate(id,updatedHospitalization);
                 if(!isUpdated){

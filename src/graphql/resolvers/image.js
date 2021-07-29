@@ -23,7 +23,7 @@ export default {
         );
 
         serverFile = serverFile.replace(" ", "_");
-        console.log(serverFile)
+   
         let writeStream = await createWriteStream(serverFile);
         await stream.pipe(writeStream);
 

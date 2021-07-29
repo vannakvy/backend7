@@ -56,10 +56,13 @@ export default {
       { page, limit, keyword = "" },
       { User }
     ) => {
-      console.log(typeof keyword);
+
+      
       let key = keyword.toString();
-      console.log("key");
-      console.log(page, limit);
+   
+      
+      
+      
       const options = {
         page: page || 1,
         limit: limit || 10,
@@ -114,7 +117,8 @@ export default {
         throw new ApolloError("The password is not correct");
       }
       user = await serializeUser(user);
-      console.log(user);
+
+      
       // Issue Token
       let token = await issueAuthToken(user);
       return {
@@ -130,12 +134,14 @@ export default {
      */
     addRole: async (_, { userId, role }, { User }) => {
       try {
-        console.log(role)
+       
+        
         let user = await User.findById(userId);
         
         if (user) {
           const search =(role) => user.roles.find(element => element.role === role);
-         console.log(search())
+         
+          
           if (search()) {
             return {
               message: "this role is already exist",
@@ -365,7 +371,8 @@ export default {
           user.firstName = firstName;
           user.lastName = lastName;
           await user.save();
-          console.log("working");
+    
+          
           return {
             success: true,
             message: "User account detail updated successfully",

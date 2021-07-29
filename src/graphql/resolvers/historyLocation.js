@@ -25,7 +25,8 @@ export default {
 
         getHistoryLocationByPersonalInfoId:async(_  ,{personalId},{HistoryLocation})=>{
             const historyLocations = await HistoryLocation.find({"personalInfo":personalId}).populate("case personalInfo affectedLocationId");
-            console.log(historyLocations,"ddg")
+           
+            
             return  historyLocations
         },
     },
