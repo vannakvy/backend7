@@ -23,10 +23,13 @@ type AllProvince{
     totalHospitalization:Int,
     totalPeopleInHospitalization:Int,
     totalQuarantine:Int,
-    totalAffectedLocation:Int,
+    affectedLocation:Int,
     totalPeopleInQuarantine:Int
+    totalAffectedLocationOn:Int
+    totalAffectedLocationClose:Int
     
 }
+
 
 # create a scalar type linked from customerReserver 
 # this is for helping us with object type that have dynamic key 

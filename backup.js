@@ -104,3 +104,24 @@
       //     })
       //    return array;
       // }
+
+
+            //Hospital for the box in the dashboard 
+
+   
+  //    let totalPeopleInHospitalization = await Hospitalization.countDocuments({         
+  //     $and: [
+  //   { "in": true },
+  //   { "date_out": null },
+  // ],})
+
+  
+  // Quarantine for the box in tghe dashboard 
+    //  let totalQuarantine = await QuarantineInfo.countDocuments({})
+    //  let totalAffectedLocation = await AffectedLocation.countDocuments({})
+    //  let totalPeopleInQuarantine = await Quarantine.countDocuments({         
+    //     $and: [
+    //   { "in": true },
+    //   { "date_out": null },
+    // ],})
+// console.log(totalHospital,totalHospitalization,totalPeopleInHospitalization,totalQuarantine,totalAffectedLocation,totalPeopleInQuarantine)

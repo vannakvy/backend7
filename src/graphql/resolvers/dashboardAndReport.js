@@ -5,7 +5,6 @@ export default {
     // @Desc get data for the box 
     // Access auth 
       
-
     //@Desc getAllProvinces
     //@Access auth
 
@@ -20,9 +19,20 @@ export default {
       let confirmToday = 0;
       let recoveredToday = 0;
       let deathToday = 0;
-      let totalQuarantine = 0;
-      let quarantineToday = 0;
-  
+   
+
+      let totalHospital = await HospitalInfo.countDocuments({})
+      let totalQuarantine = await QuarantineInfo.countDocuments({})
+      let totalAffectedLocation = await AffectedLocation.countDocuments({})
+      let totalAffectedLocationClose = await AffectedLocation.countDocuments({
+        $and: [{ openAt: {$eq: null} }, { closeAt: {$ne: null} }],
+      });
+      let totalAffectedLocationOn = await AffectedLocation.countDocuments({
+        $and: [{ openAt: {$ne: null} }, { closeAt: {$ne: null} }],
+      });
+      
+
+
       if (district === "" || district === "ករំីណីទាំងអស់") {
         confirm = await PersonalInfo.countDocuments({
           "currentState.confirm": true,
@@ -98,25 +108,7 @@ export default {
         });
       }
 
-      //Hospital for the box in the dashboard 
-     let totalHospital = await HospitalInfo.countDocuments({})
-     let totalHospitalization = await Hospitalization.countDocuments({})
-  //    let totalPeopleInHospitalization = await Hospitalization.countDocuments({         
-  //     $and: [
-  //   { "in": true },
-  //   { "date_out": null },
-  // ],})
 
-  
-  // Quarantine for the box in tghe dashboard 
-    //  let totalQuarantine = await QuarantineInfo.countDocuments({})
-    //  let totalAffectedLocation = await AffectedLocation.countDocuments({})
-    //  let totalPeopleInQuarantine = await Quarantine.countDocuments({         
-    //     $and: [
-    //   { "in": true },
-    //   { "date_out": null },
-    // ],})
-// console.log(totalHospital,totalHospitalization,totalPeopleInHospitalization,totalQuarantine,totalAffectedLocation,totalPeopleInQuarantine)
     
       let dataForBoxes = {
         confirmedCase: confirm,
@@ -125,12 +117,14 @@ export default {
         deathToday: deathToday,
         recovered: recover,
         recoveredToday: recoveredToday,
-        // totalHospital,
-        // totalHospitalization,
+        totalHospital:totalHospital,
+        totalQuarantine:totalQuarantine,
+        affectedLocation:totalAffectedLocation,
+        totalAffectedLocationOn:totalAffectedLocationOn,
+        totalAffectedLocationClose:totalAffectedLocationClose
         // totalPeopleInHospitalization,
         // totalQuarantine,
         // totalAffectedLocation,
-      
       };
       return dataForBoxes;
     },
