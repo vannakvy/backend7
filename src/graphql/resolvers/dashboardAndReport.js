@@ -36,9 +36,6 @@ export default {
         today.setHours(0, 0, 0, 0); // set to 0:00
         let tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
-
-
-        
         confirmToday = await PersonalInfo.countDocuments({
           "currentState.confirmedAt": { $gte: today, $lt: tomorrow },
         });
@@ -52,7 +49,6 @@ export default {
         confirm = await PersonalInfo.countDocuments({
           $and: [{ "currentState.confirm": true }, { district: district }],
         });
-
         recover = await PersonalInfo.countDocuments({
           $and: [{ "currentState.recovered": true }, { district: district }],
         });
@@ -120,7 +116,6 @@ export default {
         // totalAffectedLocation,
         // totalPeopleInQuarantine
       };
-      console.log(dataForBoxes)
       return dataForBoxes;
     },
 
@@ -173,6 +168,7 @@ export default {
 
     //@Desc getting all the data and group for the graph
 
+
     getDataForGrap: async (_, {}, { PersonalInfo }) => {
       const convert = (e) => {
         let array = [];
@@ -191,39 +187,6 @@ export default {
         });
         return array;
       };
-
-      const data = await PersonalInfo.aggregate([
-        {
-          $project: {
-            district: 1,
-            confirm: {
-              $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
-             { $gte: [ "$currentState.confirmedAt",today] }] }, 1,0 ]
-            },
-            recovered: {
-              $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
-             { $gte: [ "$currentState.confirmedAt",today] }] }, 1,0 ]
-            },
-            death: {
-              $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
-             { $gte: [ "$currentState.confirmedAt",today] }] }, 1,0 ]
-            },
-          },
-        },
-        {
-          $group: {
-            _id: {
-                      month: { $month: "$currentState.recoveredAt" },
-                      day: { $dayOfMonth: "$currentState.recoveredAt" },
-                      year: { $year: "$currentState.recoveredAt" },
-                    },
-            confirm: { $sum: "$confirm" },
-            recovered: { $sum: "$recovered" },
-            death: { $sum: "$death" },
-          },
-        },
-      ]);
-
 
       // const convert =(arr)=>{
       //   let limit = 15;
@@ -256,49 +219,43 @@ export default {
       //    return array;
       // }
 
-      // let confirm = await PersonalInfo.aggregate([
-      //   {
-      //     $group: {
-      //       _id: {
-      //         month: { $month: "$currentState.confirmedAt" },
-      //         day: { $dayOfMonth: "$currentState.confirmedAt" },
-      //         year: { $year: "$currentState.confirmedAt" },
-      //       },
-      //       value: { $sum: 1 },
-      //     },
-      //   },
-      // ]);
-      // let recovered = await PersonalInfo.aggregate([
-      //   {
-      //     $group: {
-      //       _id: {
-      //         month: { $month: "$currentState.recoveredAt" },
-      //         day: { $dayOfMonth: "$currentState.recoveredAt" },
-      //         year: { $year: "$currentState.recoveredAt" },
-      //       },
-      //       value: { $sum: 1 },
-      //     },
-      //   },{
-          
-      //       $sort:{"currentState.recoveredAt":1}
-          
-      //   }
-      // ]);
-
-      // let deathAt = await PersonalInfo.aggregate([
-      //   {
-      //     $group: {
-      //       _id: {
-      //         month: { $month: "$currentState.deathAt" },
-      //         day: { $dayOfMonth: "$currentState.deathAt" },
-      //         year: { $year: "$currentState.deathAt" },
-      //       },
-      //       value: { $sum: 1 },
-      //     },
-        
-      //   },
-      // ]);
-   
+      let confirm = await PersonalInfo.aggregate([
+        {
+          $group: {
+            _id: {
+              month: { $month: "$currentState.confirmedAt" },
+              day: { $dayOfMonth: "$currentState.confirmedAt" },
+              year: { $year: "$currentState.confirmedAt" },
+            },
+            value: { $sum: 1 },
+          },
+        },
+      ]);
+      let recovered = await PersonalInfo.aggregate([
+        {
+          $group: {
+            _id: {
+              month: { $month: "$currentState.recoveredAt" },
+              day: { $dayOfMonth: "$currentState.recoveredAt" },
+              year: { $year: "$currentState.recoveredAt" },
+            },
+            value: { $sum: 1 },
+          },
+        },
+      ]);
+      let deathAt = await PersonalInfo.aggregate([
+        {
+          $group: {
+            _id: {
+              month: { $month: "$currentState.deathAt" },
+              day: { $dayOfMonth: "$currentState.deathAt" },
+              year: { $year: "$currentState.deathAt" },
+            },
+            value: { $sum: 1 },
+          },
+        },
+      ]);
+     
 
       return {
         cases: convert(confirm),
@@ -392,5 +349,22 @@ export default {
       ]);
 
     },
+
+getDataForBarGraphTotal:async(_,{},{PersonalInfo})=>{
+ const  confirm = await PersonalInfo.countDocuments({
+    $and: [{ "currentState.confirm": true }],
+  });
+  const recovered = await PersonalInfo.countDocuments({
+    $and: [{ "currentState.recovered": true }],
+  });
+ const  deaths = await PersonalInfo.countDocuments({
+    $and: [{ "currentState.death": true }],
+  });
+  return {
+    confirm,
+    recovered,
+    deaths
+  }
+}
   },
 };

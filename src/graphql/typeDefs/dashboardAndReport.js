@@ -8,7 +8,7 @@ extend type Query {
     getAllDistrictForMap:[AllProvince!]!
     getDataForGrap: GraphResponse
     getDataForReport:AllProvince
-  
+    getDataForBarGraphTotal:BarGraphTotal
 }
 
 type AllProvince{
@@ -36,6 +36,11 @@ type AllProvince{
 #     recovered:[JSON]
 #     deaths:[JSON]
 # }+
+type BarGraphTotal {
+    confirm:Int,
+    recovered:Int,
+    deaths:Int
+}
 
 scalar JSON
 type GraphResponse{
