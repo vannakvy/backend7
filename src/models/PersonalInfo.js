@@ -32,6 +32,7 @@ const PersonalInfoShema = mongoose.Schema({
         type: Boolean,
         default: false
     },
+    interviewedAt:Date,
     vaccinated:{
         type:Number,
         default:0

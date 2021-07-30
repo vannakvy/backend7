@@ -61,6 +61,7 @@ export default gql`
     createdAt: Date
     updatedAt: Date
     interviewed: Boolean
+    interviewedAt:Date
     currentState: currentStatus
     sampleTest:[SampleTest]
     travelHistory:TravelHistory
@@ -127,6 +128,7 @@ export default gql`
 
   
   input PersonalInfoInput {
+    interviewedAt:Date
     covidVariant:String,
     englishName:String,
     patientId:String

@@ -19,6 +19,11 @@ export default {
       let confirmToday = 0;
       let recoveredToday = 0;
       let deathToday = 0;
+
+      let today = new Date();
+      today.setHours(0, 0, 0, 0); // set to 0:00
+      let tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
    
 
       let totalHospital = await HospitalInfo.countDocuments({})
@@ -30,8 +35,8 @@ export default {
       let totalAffectedLocationOn = await AffectedLocation.countDocuments({
         $and: [{ openAt: {$ne: null} }, { closeAt: {$ne: null} }],
       });
-      
 
+     
 
       if (district === "" || district === "ករំីណីទាំងអស់") {
         confirm = await PersonalInfo.countDocuments({
@@ -44,10 +49,7 @@ export default {
           "currentState.death": true,
         });
         // const confirmToday = await PersonalInfo.countDocuments({"currentState.confirm":true,"currentState.confirmedAt": new Date() });
-        let today = new Date();
-        today.setHours(0, 0, 0, 0); // set to 0:00
-        let tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
+     
         confirmToday = await PersonalInfo.countDocuments({
           "currentState.confirmedAt": { $gte: today, $lt: tomorrow },
         });
@@ -106,10 +108,13 @@ export default {
             { district: district },
           ],
         });
+
+
+        //  
       }
 
 
-    
+
       let dataForBoxes = {
         confirmedCase: confirm,
         confirmedCaseToday: confirmToday,
@@ -121,11 +126,13 @@ export default {
         totalQuarantine:totalQuarantine,
         affectedLocation:totalAffectedLocation,
         totalAffectedLocationOn:totalAffectedLocationOn,
-        totalAffectedLocationClose:totalAffectedLocationClose
+        totalAffectedLocationClose:totalAffectedLocationClose,
+        totalAffectedLocationNew:totalAffectedLocationNew
         // totalPeopleInHospitalization,
         // totalQuarantine,
         // totalAffectedLocation,
       };
+      console.log(dataForBoxes)
       return dataForBoxes;
     },
 
@@ -177,8 +184,6 @@ export default {
     },
 
     //@Desc getting all the data and group for the graph
-
-
     getDataForGrap: async (_, {}, { PersonalInfo }) => {
       const convert = (e) => {
         let array = [];
@@ -237,13 +242,29 @@ export default {
         },
       ]);
      
-
       return {
         cases: convert(confirm),
         recovered: convert(recovered),
         deaths: convert(deathAt),
       };
     },
+
+    getDataForBarGraphTotal:async(_,{},{PersonalInfo})=>{
+      const  confirm = await PersonalInfo.countDocuments({
+         $and: [{ "currentState.confirm": true }],
+       });
+       const recovered = await PersonalInfo.countDocuments({
+         $and: [{ "currentState.recovered": true }],
+       });
+      const  deaths = await PersonalInfo.countDocuments({
+         $and: [{ "currentState.death": true }],
+       });
+       return {
+         confirm,
+         recovered,
+         deaths
+       }
+     },
     // @Desc getting the data for report
     //auth and private
     getDataForReport: async (_, { start, end }, { PersonalInfo }) => {
@@ -330,21 +351,123 @@ export default {
       ]);
     },
 
-getDataForBarGraphTotal:async(_,{},{PersonalInfo})=>{
- const  confirm = await PersonalInfo.countDocuments({
-    $and: [{ "currentState.confirm": true }],
-  });
-  const recovered = await PersonalInfo.countDocuments({
-    $and: [{ "currentState.recovered": true }],
-  });
- const  deaths = await PersonalInfo.countDocuments({
-    $and: [{ "currentState.death": true }],
-  });
-  return {
-    confirm,
-    recovered,
-    deaths
-  }
+    //for resport 
+ affectedLocationReport: async(_,{},{AffectedLocation})=>{
+
+        let today = new Date();
+        today.setHours(0, 0, 0, 0); // set to 0:00
+        let tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+// ទីតាំពាក់ព័ន
+//1
+     let totalAffectedLocation = await AffectedLocation.countDocuments({});
+//2
+    let totalAffectedLocationToday = await AffectedLocation.countDocuments({
+    "createdAt": { $gte: today, $lt: tomorrow },
+    });
+//3
+    let totalAffectedLocationNotClosed = await AffectedLocation.countDocuments({
+      $and: [{ openAt: {$eq: null} }, { closeAt: {$eq: null} }],
+    });
+//4
+    let totalAffectedLocationOn = await AffectedLocation.countDocuments({
+      $and: [
+        { openAt: {$ne: null} },
+        { closeAt: {$eq: null}},
+        { openAt:{ $gte: today, $lt: tomorrow }} ],
+    });
+//5 
+let closedLocation = await AffectedLocation.countDocuments({
+  $and: [{ openAt: {$eq: null} }, { closeAt: {$ne: null} }],
+});
+//6
+let closedLocationToday = await AffectedLocation.countDocuments({
+  $and: [
+    { closeAt: {$eq: null}},
+    { openAt: {$ne: null} },
+    { closeAt:{ $gte: today, $lt: tomorrow }} ],
+});
+
+//7
+let openedLocation = await AffectedLocation.countDocuments({
+  $and: [{ openAt: {$ne: null} }, { closeAt: {$ne: null} }],
+});
+//8
+let openedLocationToday = await AffectedLocation.countDocuments({
+  $and: [
+    { closeAt: {$ne: null}},
+    { openAt: {$ne: null} },
+    { openAt:{ $gte: today, $lt: tomorrow }} ],
+});
+//9 
+let coorporateLocation = await AffectedLocation.countDocuments({
+  $and: [{ coorporate: {$eq: false} } ],
+});
+//10
+let coorporateLocationToday = await AffectedLocation.countDocuments({
+  $and: [
+    { coorporate: {$ne: null} },
+    { createdAt:{ $gte: today, $lt: tomorrow }} ],
+});
+
+return {
+  totalAffectedLocation,
+  totalAffectedLocationToday,
+  totalAffectedLocationNotClosed,
+  totalAffectedLocationOn,
+  closedLocation,
+  coorporateLocation,
+  coorporateLocationToday,
+  openedLocation,
+  openedLocationToday,
+  closedLocationToday
 }
+ },
+
+ interviewForReport:async(_,{},{PersonalInfo})=>{
+   //1
+    let totolInterviewed = await PersonalInfo.countDocuments({
+      $and: [{ interviewed: {$eq: true} }],
+    })
+    const data = await PersonalInfo.aggregate([
+      {
+        $project: {
+          nationality: 1,
+      //For Deaths
+      // womenDeathsToday: {
+      //   { $gte: [ "$currentState.confirm",today],1,0} ]
+      // },
+
+      // womenDeathsToday: {
+      //   $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
+      //   { $gte: [ "$currentState.confirmedAt",today] }] }, 1,0 ]
+      // },
+     
+    //   womenDeaths: {
+    //     $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
+    //     { $eq: [ "$currentState.death",true] }] }, 1,0 ]
+    // },
+      //
+        },
+      },
+      {
+        $group: {
+          _id: "$district",
+          menConfirmToday: { $sum: "$menConfirmToday" },
+        },
+      },
+    ]);
+ }
   },
 };
+
+
+// let totalAffectedLocationNew = await AffectedLocation.countDocuments({
+//   "createdAt": { $gte: today, $lt: tomorrow },
+// });
+// let totalAffectedLocationNew = await AffectedLocation.countDocuments({
+//   "createdAt": { $gte: today, $lt: tomorrow },
+// });
+
+
+

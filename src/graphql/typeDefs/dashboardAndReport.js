@@ -9,6 +9,8 @@ extend type Query {
     getDataForGrap: GraphResponse
     getDataForReport:AllProvince
     getDataForBarGraphTotal:BarGraphTotal
+    affectedLocationReport:Int
+    interviewForReport:Int
 }
 
 type AllProvince{
