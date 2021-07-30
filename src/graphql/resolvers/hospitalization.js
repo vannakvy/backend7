@@ -71,8 +71,9 @@ export default {
           $and:[{
             $or: [
                 { others: { $regex: keyword, $options: "i" } },
+                { personalInfo: { $regex: keyword, $options: "i" } },
               ],
-            },
+            },  
             { hospitalInfo: { $eq: hospitalId.toString() } },
           ]
       };

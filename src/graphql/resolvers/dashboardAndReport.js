@@ -20,6 +20,8 @@ export default {
       let confirmToday = 0;
       let recoveredToday = 0;
       let deathToday = 0;
+      let totalQuarantine = 0;
+      let quarantineToday = 0;
   
       if (district === "" || district === "ករំីណីទាំងអស់") {
         confirm = await PersonalInfo.countDocuments({
@@ -45,7 +47,14 @@ export default {
         deathToday = await PersonalInfo.countDocuments({
           "currentState.deathAt": { $gte: today, $lt: tomorrow },
         });
+
+        deathToday = await PersonalInfo.countDocuments({
+          "currentState.deathAt": { $gte: today, $lt: tomorrow },
+        });
+
+
       } else {
+
         confirm = await PersonalInfo.countDocuments({
           $and: [{ "currentState.confirm": true }, { district: district }],
         });
@@ -80,26 +89,33 @@ export default {
             { district: district },
           ],
         });
+
+        quarantineToday = await Quarantine.countDocuments({
+          $and: [
+            { "date_in": { $ne: null }},
+            { district: district },
+          ],
+        });
       }
 
       //Hospital for the box in the dashboard 
      let totalHospital = await HospitalInfo.countDocuments({})
      let totalHospitalization = await Hospitalization.countDocuments({})
-     let totalPeopleInHospitalization = await Hospitalization.countDocuments({         
-      $and: [
-    { "in": true },
-    { "date_out": null },
-  ],})
+  //    let totalPeopleInHospitalization = await Hospitalization.countDocuments({         
+  //     $and: [
+  //   { "in": true },
+  //   { "date_out": null },
+  // ],})
 
   
   // Quarantine for the box in tghe dashboard 
-     let totalQuarantine = await QuarantineInfo.countDocuments({})
-     let totalAffectedLocation = await AffectedLocation.countDocuments({})
-     let totalPeopleInQuarantine = await Quarantine.countDocuments({         
-        $and: [
-      { "in": true },
-      { "date_out": null },
-    ],})
+    //  let totalQuarantine = await QuarantineInfo.countDocuments({})
+    //  let totalAffectedLocation = await AffectedLocation.countDocuments({})
+    //  let totalPeopleInQuarantine = await Quarantine.countDocuments({         
+    //     $and: [
+    //   { "in": true },
+    //   { "date_out": null },
+    // ],})
 // console.log(totalHospital,totalHospitalization,totalPeopleInHospitalization,totalQuarantine,totalAffectedLocation,totalPeopleInQuarantine)
     
       let dataForBoxes = {
@@ -114,7 +130,7 @@ export default {
         // totalPeopleInHospitalization,
         // totalQuarantine,
         // totalAffectedLocation,
-        // totalPeopleInQuarantine
+      
       };
       return dataForBoxes;
     },
@@ -188,36 +204,7 @@ export default {
         return array;
       };
 
-      // const convert =(arr)=>{
-      //   let limit = 15;
-      //   var result = {};
-      //   for (var i = 0; i < limit; i++) {
-
-      //     if(arr[i]._id.month !== null) {
-      //       let a = `${arr[i]._id.month}`
-      //       console.log(a)
-      //       result[a] = arr[i].confirm;
-      //     }
-
-      //   }
-      //   console.log(result,"fff")
-      //   return result;
-      // }
-
-      //   const convert = (e) => {
-      //     let array = {}
-      //     let limitDate = 4
-      //     e.map(load => {
-      //         var y =`${load._id.month}/${load._id.day}/${load._id.year}`
-      //         if (load._id.month !== null) {
-      //             if (new Date(y).getDate() > new Date().getDate() - limitDate && new Date(y).getDate() >= 0) {
-      //                 let x = { [y]: load.confirm }
-      //                 array = {...array, ...x}
-      //             }
-      //         }
-      //     })
-      //    return array;
-      // }
+   
 
       let confirm = await PersonalInfo.aggregate([
         {
@@ -347,7 +334,6 @@ export default {
           },
         },
       ]);
-
     },
 
 getDataForBarGraphTotal:async(_,{},{PersonalInfo})=>{
