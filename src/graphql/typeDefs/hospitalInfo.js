@@ -35,7 +35,7 @@ export default gql`
     createdAt: Date
     updatedAt: Date
     personInCharge: PersonInCharge
-    
+    locationType: String
   }
 
   input HospitalInfoInput {
@@ -48,6 +48,7 @@ export default gql`
     lat: Float
     other:String
     personInCharge:PersonInChargeInput
+    locationType: String
   }
 
   type HospitalInfoResponse {

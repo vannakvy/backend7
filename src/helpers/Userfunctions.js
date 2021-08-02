@@ -16,6 +16,7 @@ export const issueAuthToken = async (jwtPayload) => {
     });
     return `Bearer ${token}`;
 };
+
 export const serializeUser = user => pick(user, [
     'id',
     'email',

@@ -4,13 +4,13 @@ import image from './image';
 import personalInfo from './personalInfo';
 import customReserver from './customReserver';
 import cases from './cases'
-import hospitalization from './hospitalization';
-import quarantine from './quarantine';
+// import hospitalization from './hospitalization';
+// import quarantine from './quarantine';
 import quarantineInfo from './quarantineInfo'
 import hospitalInfo from './hospitalInfo';
 import dashboardAndReport from './dashboardAndReport';
 import affectedLocation from './affectedLocation';
-import historyLocation from './historyLocation';
+// import historyLocation from './historyLocation';
 
 export default [
     user,
@@ -18,13 +18,13 @@ export default [
     customReserver,
     personalInfo,
     cases,
-    hospitalization,
+    // hospitalization,
     quarantineInfo,
     hospitalInfo,
-    quarantine,
+    // quarantine,
     dashboardAndReport,
     affectedLocation,
-    historyLocation
+    // historyLocation
 ]  
 
 

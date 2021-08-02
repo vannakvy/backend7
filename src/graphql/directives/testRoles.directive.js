@@ -33,7 +33,6 @@ export class AuthDirective extends SchemaDirectiveVisitor {
         const requiredRole =
           field._requiredAuthRole ||
           objectType._requiredAuthRole;
-  console.log(requiredRole,"ddd")
         if (! requiredRole) {
           return resolve.apply(this, args);
         }

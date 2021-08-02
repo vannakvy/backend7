@@ -11,6 +11,9 @@ const QuarantineInfoSchema = mongoose.Schema({
     lat: Number,
     other:String,
     capacity:{type:Number,required:true,default:0},
+    locationType:String,
+    //ប្រភេទ ពលករ​ សហគមន៍
+    forPeopleType:String,
     personInCharge:{
         firstName:String,
         lastName:String,
@@ -23,7 +26,6 @@ const QuarantineInfoSchema = mongoose.Schema({
 })
 
 QuarantineInfoSchema.plugin(Paginate)
-
 const QuarantineInfo = mongoose.model("QuarantineInfo",QuarantineInfoSchema)
 
 export default QuarantineInfo

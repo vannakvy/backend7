@@ -5,24 +5,24 @@ import PersonalInfo from './PersonalInfo';
 import Case from './Case'
 import quarantineInfo from './quarantineInfo';
 import hospitalInfo from './hospitalInfo';
-import quantine  from './quantine';
-import hospitalization from './hospitalization';
+// import quantine  from './quantine';
+// import hospitalization from './hospitalization';
 import dashboardAndReport from './dashboardAndReport';
 import affectedLocation from './affectedLocation'
-import historyLocation from './historyLocation';
+// import historyLocation from './historyLocation';
 export default [
     user,
     image,
-    baseDefs,
+    baseDefs,   
     PersonalInfo,
     Case,
     quarantineInfo,
     hospitalInfo,
-    quantine,
-    hospitalization,
+    // quantine,
+    // hospitalization,
     dashboardAndReport,
     affectedLocation,
-    historyLocation
+    // historyLocation
 ];
 
  

@@ -15,13 +15,12 @@ export default gql`
 
   type AffectedLocation {
         id:ID!
-        affectedLocationName:String
+        locationName:String
         village:String
         commune:String
         district:String
         province:String
         other:String
-        open:Boolean
         openAt:Date 
         closeAt:Date
         long:Float
@@ -30,22 +29,23 @@ export default gql`
         infected:Boolean
         createdAt:Date 
         updatedAt:Date
+        locationType:String
   }
 
   input AffectedLocationInput {
-        affectedLocationName:String
+        locationName:String
         village:String
         commune:String
         district:String
         province:String
         other:String
-        open:Boolean
         openAt:Date 
         closeAt:Date
         long:Float
         lat:Float
         coorporate:Boolean
         infected:Boolean
+        locationType:String
   }
   type AffectedLocationResponse {
       success: Boolean 

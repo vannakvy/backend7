@@ -28,6 +28,8 @@ export default gql`
         personInCharge:PersonInCharge
         other:String
         vaccinated:Int
+        locationType:String
+        forPeopleType:String
   }
 
   input QuarantineInfoInput {
@@ -42,6 +44,8 @@ export default gql`
         capacity:Int
         personInCharge:PersonInChargeInput
         vaccinated:Int
+        locationType:String
+        forPeopleType:String
   }
   type QuarantineInfoResponse {
       success: Boolean 

@@ -3,13 +3,13 @@ import Paginate from "mongoose-paginate-v2";
 
 const AffectedLocationSchema = mongoose.Schema(
   {
-    affectedLocationName: String,
+    locationName: String,
+    locationType:String,
     village: String,
     commune: String,
     district: String,
     province: String,
     other: String,
-    open: Boolean,
     openAt: {
       type: Date,
       default: null,

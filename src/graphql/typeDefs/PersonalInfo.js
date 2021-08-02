@@ -4,6 +4,16 @@ export default gql`
   extend type Query {
     allPersonalInfos: [PersonalInfo!]!
     getPersonalInfoById(id: ID!): PersonalInfo!
+    # for police
+    getPatientForInterviewWithPagination(page:Int, limit:Int, keyword:String,interview:Boolean,startDate:Date, endDate:Date): PaginateResponse!
+    getPeopleForQuarantineWithPagination(page:Int, limit:Int, keyword:String,active:String,startDate:Date, endDate:Date): PaginateResponse!
+    getAffectedPersonalListWithPagination(page:Int, limit:Int, keyword:String,patientId:ID!):PaginateResponse!
+ 
+    # for the doctor 
+    getPatientForHospitalPagination(page:Int, limit:Int, keyword:String,active:String,startDate:Date, endDate:Date): PaginateResponse!
+    getPeopleForSampleTestWithPagination(page:Int, limit:Int, keyword:String,startDate:Date, endDate:Date): PaginateResponse!
+  
+
     getConfirmedPersonalInfoByInterviewWithPagination(
       interview:Boolean, 
       page: Int!
@@ -23,7 +33,7 @@ export default gql`
     ): PaginateResponse!
   }
   extend type Mutation {
-    createPersonalInfo(newInfo: PersonalInfoInput!): PersonalInfoResponse
+    createPersonalInfo(newInfo: PersonalInfoInput!): PersonalInfoResponseWithData
     recordSampleTest(sampleTest:SampleTestInput!,personalInfoId:ID!):PersonalInfoResponse!
     updatePersonalInfo(
       updatedInfo: PersonalInfoInput!
@@ -32,6 +42,11 @@ export default gql`
     deletePersonalInfo(id: ID!): PersonalInfoResponse
     deleteSampleTest(personalInfoId:ID!,sampleTestId:ID!):PersonalInfoResponse
     updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse
+  # For police 
+  addHistoryWithin14days(createLocation:HistoryWithin14daysInput,personalInfoId:ID!):PersonalInfoResponse
+  addPeopleToQuarantine(newQuarantine:QuarantingInput,personalInfo:ID!):PersonalInfoResponse
+  # //delete  left 
+  # //update left 
   }
  
   type PersonalInfo {
@@ -43,6 +58,7 @@ export default gql`
     age: Int
     gender: String
     tel: String
+    dob: Date
     nationality: String
     occupation: String
     idCard: String
@@ -64,9 +80,31 @@ export default gql`
     interviewedAt:Date
     currentState: currentStatus
     sampleTest:[SampleTest]
-    travelHistory:TravelHistory
-    illness:String,
+    travelOverCountryHistory:TravelOverCountryHistory
+    chronic:String,
     covidVariant:String,
+    hospitalizations:Hospitalizations
+    historyWithin14days:[HistoryWithin14days]
+    affectedFrom: AffectedFrom
+    quaranting:[Quarantings]
+  }
+  type Quarantings{
+        id:ID
+        coorporate:Boolean
+        date_in:Date,
+        date_out:Date,
+        personTypes:String,
+        out_status:String,
+        quarantineInfo:QuarantineInfo
+  }
+
+  input QuarantingInput{
+      coorporate:Boolean
+        date_in:Date,
+        date_out:Date,
+        personTypes:String,
+        out_status:String,
+        quarantineInfo:ID!
   }
   type currentStatus{
         confirm:Boolean,
@@ -80,7 +118,7 @@ export default gql`
     id:ID!
     date: Date,
     times:Int,
-    location:String,
+    testLocation:AffectedLocation,
     result:Boolean,
     symptom:String,
     other:String,
@@ -90,14 +128,14 @@ export default gql`
     specimentType:String,
     laboratory:String
   }
-  type TravelHistory{
+  type TravelOverCountryHistory{
         arriveDate:Date,
         fromCountry:String,
         reasonForComing:String,
         leavingDate:Date,
         toCountry:String,
     },
-    input TravelHistoryInput{
+    input TravelOverCountryHistoryInput{
         arriveDate:Date,
         fromCountry:String,
         reasonForComing:String,
@@ -108,7 +146,7 @@ export default gql`
     reasonForTesting:String,
     date: Date,
     times:Int,
-    location:String,
+    testLocation:ID!,
     result:Boolean,
     symptom:String,
     other:String,
@@ -128,16 +166,17 @@ export default gql`
 
   
   input PersonalInfoInput {
-    interviewedAt:Date
     covidVariant:String,
     englishName:String,
     patientId:String
     currentState:currentStatusInput
     firstName: String
     interviewed:Boolean
+    interviewedAt:Date
     lastName: String
     age: Int
-    case:ID!
+    case:ID
+    dob: Date
     direct: Boolean
     gender: String
     other:String
@@ -153,17 +192,78 @@ export default gql`
     relapse: Boolean
     relapseAt: Date
     vaccinated: Int
-    travelHistory:TravelHistoryInput
+    travelOverCountryHistoryHistory:TravelOverCountryHistoryInput
     relation:String,
-    illness:String
+    chronic:String
+    affectedFrom: AffectedFromInput
+    historyWithin14daysInput:HistoryWithin14daysInput
   }
   type PersonalInfoResponse {
     success: Boolean
     message: String
   }
-
+type PersonalInfoResponseWithData{
+  response : PersonalInfoResponse
+  personalInfo:PersonalInfo!
+}
   type PaginateResponse {
     paginator: Paginator
     personalInfos: [PersonalInfo!]!
   }
+
+
+
+  type HistoryWithin14days {
+    locationName: String
+    affectedLocation: AffectedLocation
+    date: Date
+    description: String
+    direct:Boolean
+  }
+
+  input HistoryWithin14daysInput {
+    locationName: String
+    affectedLocation: ID!
+    date: Date
+    description: String
+    direct:Boolean
+  }
+
+  type AffectedFrom{
+    patientId: PersonalInfo
+    relation:String
+    direct:Boolean
+    other:String
+  }
+
+  input AffectedFromInput{
+    patientId: ID!
+    relation: String
+    direct: Boolean
+    other:  String
+  }
+
+  type Hospitalizations{
+    date_in: Date
+    date_out: Date
+    hospitalName: String
+    hospitalInfo: HospitalInfo
+    covidVariant: String
+    coorporate: Boolean
+    description: String
+  }
+
+  input HospitalizationsInput{
+    date_in: Date
+    date_out: Date
+    hospitalName: String
+    hospitalInfo: ID!
+    covidVariant: String
+    coorporate: Boolean
+    description: String
+  }
+
+
+
 `;
+

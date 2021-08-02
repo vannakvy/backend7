@@ -18,10 +18,10 @@ const HospitalInfoSchema = mongoose.Schema({
         others:String,
         tel:String
     },
+    locationType:String,
 },{timestamps: true})
 
 HospitalInfoSchema.plugin(Paginate) 
 
 const HospitalInfo = mongoose.model("HospitalInfo",HospitalInfoSchema)
-
 export default HospitalInfo

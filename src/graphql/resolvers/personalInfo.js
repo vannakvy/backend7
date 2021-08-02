@@ -12,48 +12,201 @@ const PersonalInfoLabels = {
 
 export default {
   Query: {
+    //For Doctor
 
-    //@Desc get all the personalInfo that is confirmed  for interview 
-    // @Access Auth 
+    //@Desc get perfornal info for the Hospital
+    //@Access police
+
+    getPatientForHospitalPagination: async (_, {}, { PersonalInfo }) => {
+      const options = {
+        page: page || 1,
+        limit: limit || 20,
+        customLabels: PersonalInfoLabels,
+        sort: {
+          createdAt: -1,
+        },
+        //   populate: "case",
+      };
+      let query = {
+        $and: [
+          {
+            $or: [
+              { tel: { $regex: keyword, $options: "i" } },
+              { firstName: { $regex: keyword, $options: "i" } },
+              { lastName: { $regex: keyword, $options: "i" } },
+              { village: { $regex: keyword, $options: "i" } },
+              { commune: { $regex: keyword, $options: "i" } },
+              { disctrict: { $regex: keyword, $options: "i" } },
+              { province: { $regex: keyword, $options: "i" } },
+              { patientId: { $regex: keyword, $options: "i" } },
+              { idCard: { $regex: keyword, $options: "i" } },
+            ],
+          },
+          { "currentState.confirm": false },
+          { "quarantine.date_in": { $ne: null } },
+          { "quarantine.date_in": { $gte: startDate, $lt: endDate } },
+        ],
+      };
+      const personalInfos = await PersonalInfo.paginate(query, options);
+      return personalInfos;
+    },
+
+    // the police
+    //@Desc get perfornal info for the qurantine
+    //@Access police
+
+    getPeopleForQuarantineWithPagination: async (_, {}, { PersonalInfo }) => {
+      const options = {
+        page: page || 1,
+        limit: limit || 20,
+        customLabels: PersonalInfoLabels,
+        sort: {
+          createdAt: -1,
+        },
+        //   populate: "case",
+      };
+      let query = {
+        $and: [
+          {
+            $or: [
+              { tel: { $regex: keyword, $options: "i" } },
+              { firstName: { $regex: keyword, $options: "i" } },
+              { lastName: { $regex: keyword, $options: "i" } },
+              { village: { $regex: keyword, $options: "i" } },
+              { commune: { $regex: keyword, $options: "i" } },
+              { disctrict: { $regex: keyword, $options: "i" } },
+              { province: { $regex: keyword, $options: "i" } },
+              { patientId: { $regex: keyword, $options: "i" } },
+              { idCard: { $regex: keyword, $options: "i" } },
+            ],
+          },
+          { "currentState.confirm": false },
+          { "quarantine.date_in": { $ne: null } },
+          { "quarantine.date_in": { $gte: startDate, $lt: endDate } },
+        ],
+      };
+      const personalInfos = await PersonalInfo.paginate(query, options);
+      return personalInfos;
+    },
+
+    //@Desc get patient for interview \
+    //Access police
+
+    getPatientForInterviewWithPagination: async (
+      _,
+      { page, limit, keyword = "", interview, startDate, endDate },
+      { PersonalInfo }
+    ) => {
+      const options = {
+        page: page || 1,
+        limit: limit || 10,
+        customLabels: PersonalInfoLabels,
+        sort: {
+          createdAt: -1,
+        },
+        //   populate: "case",
+      };
+      let query = {
+        $and: [
+          {
+            $or: [
+              { firstName: { $regex: keyword, $options: "i" } },
+              { lastName: { $regex: keyword, $options: "i" } },
+              { village: { $regex: keyword, $options: "i" } },
+              { commune: { $regex: keyword, $options: "i" } },
+              { disctrict: { $regex: keyword, $options: "i" } },
+              { province: { $regex: keyword, $options: "i" } },
+              { patientId: { $regex: keyword, $options: "i" } },
+              { idCard: { $regex: keyword, $options: "i" } },
+            ],
+          },
+          { "currentState.confirm": true },
+          { interviewed: interview },
+          { "currentState.confirmedAt": { $gte: startDate, $lt: endDate } },
+        ],
+      };
+      const personalInfos = await PersonalInfo.paginate(query, options);
+      return personalInfos;
+    },
+    //Des
+
+    //@Desc get affected Personalist
+    //Access police
+
+    getAffectedPersonalListWithPagination: async (
+      _,
+      { page, limit, keyword = "", patientId },
+      { PersonalInfo }
+    ) => {
+      const options = {
+        page: page || 1,
+        limit: limit || 10,
+        customLabels: PersonalInfoLabels,
+        sort: {
+          createdAt: -1,
+        },
+        //   populate: "case",
+      };
+      let query = {
+        $and: [
+          {
+            $or: [
+              { firstName: { $regex: keyword, $options: "i" } },
+              { lastName: { $regex: keyword, $options: "i" } },
+              { village: { $regex: keyword, $options: "i" } },
+              { commune: { $regex: keyword, $options: "i" } },
+              { disctrict: { $regex: keyword, $options: "i" } },
+              { province: { $regex: keyword, $options: "i" } },
+              { patientId: { $regex: keyword, $options: "i" } },
+              { idCard: { $regex: keyword, $options: "i" } },
+            ],
+          },
+          { "currentState.confirm": false },
+          { "affectedFrom.patientId": patientId },
+        ],
+      };
+      const personalInfos = await PersonalInfo.paginate(query, options);
+      return personalInfos;
+    },
+
+    //@Desc get all the personalInfo that is confirmed  for interview
+    // @Access Auth
 
     getConfirmedPersonalInfoByInterviewWithPagination: async (
-        _,
-        { page, limit, keyword="",interview },
-        { PersonalInfo }
-      ) => {
-          
-        const options = {
-          page: page || 1,
-          limit: limit || 10,
-          customLabels: PersonalInfoLabels,
-          sort: {
-            createdAt: -1,
-          },
+      _,
+      { page, limit, keyword = "", interview },
+      { PersonalInfo }
+    ) => {
+      const options = {
+        page: page || 1,
+        limit: limit || 10,
+        customLabels: PersonalInfoLabels,
+        sort: {
+          createdAt: -1,
+        },
         //   populate: "case",
-        };
-        let query = {
-            $and:[
-                { $or: [
-                    { firstName: { $regex: keyword, $options: "i" } },
-                    { lastName: { $regex: keyword, $options: "i" } },
-                    { village: { $regex: keyword, $options: "i" } },
-                    { commune: { $regex: keyword, $options: "i" } },
-                    { disctrict: { $regex: keyword, $options: "i" } },
-                    { province: { $regex: keyword, $options: "i" } },
-                    { patientId: { $regex: keyword, $options: "i" } },
-                    { idCard: { $regex: keyword, $options: "i" } },
-                  ],
-                },
-                {"currentState.confirm":true},
-                { "interviewed":interview},
-            ]
-        }
-        const personalInfos = await PersonalInfo.paginate(query, options);
-        return personalInfos;
-      },
-
-
-
+      };
+      let query = {
+        $and: [
+          {
+            $or: [
+              { firstName: { $regex: keyword, $options: "i" } },
+              { lastName: { $regex: keyword, $options: "i" } },
+              { village: { $regex: keyword, $options: "i" } },
+              { commune: { $regex: keyword, $options: "i" } },
+              { disctrict: { $regex: keyword, $options: "i" } },
+              { province: { $regex: keyword, $options: "i" } },
+              { patientId: { $regex: keyword, $options: "i" } },
+              { idCard: { $regex: keyword, $options: "i" } },
+            ],
+          },
+          { "currentState.confirm": true },
+          { interviewed: interview },
+        ],
+      };
+      const personalInfos = await PersonalInfo.paginate(query, options);
+      return personalInfos;
+    },
 
     //@Desc getting all the persinal info
     //@access private
@@ -131,6 +284,7 @@ export default {
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
     },
+
     //@Desc getting the personalInfo by id
     //@access auth
 
@@ -140,39 +294,120 @@ export default {
     },
   },
   Mutation: {
-    //@Desc update the current State 
-    //@Access auth 
-    updateCurrentState:async(_,{personalInfoId,updateValue},{PersonalInfo})=>{
-        try {
-            const updated = await PersonalInfo.update(
-                { _id: personalInfoId },
-                { $set:
-                   {
-                     currentState: updateValue,
-                   }
-                }
-            )
-            if(!updated){
-                return {
-                    success : false,
-                    message: "Cannot this status "
-                }
-            }
-            return {
-                success : true,
-                message: "Updated successfully "
-            }
-        } catch (error) {
-            return {
-                success : false,
-                message: error.message
-            }
+    // For police
+    addPeopleToQuarantine: async (
+      _,
+      { personalInfo, newQuarantine },
+      { PersonalInfo }
+    ) => {
+     
+      try {
+        let isExisted = await PersonalInfo.findById(personalInfo);
+        if (!isExisted) {
+          return {
+            message: "មិនអាចបញ្ចូលបានទេព្រោះគ្មានបុគ្គលនេះទេ",
+            success: false,
+          };
         }
-    
+  
+        let a = await PersonalInfo.updateOne(
+          { _id: personalInfo },
+          {
+            $push: {
+              quaranting: {
+                $each: [newQuarantine],
+                // $sort: { score: 1 },
+                $slice: -5,
+              },
+            },
+          }
+        );
+console.log(a)
+        return {
+          message: "បញ្ចូលបានជោកជ័យ",
+          success: true,
+        };
+      } catch (error) {
+        return {
+          message: "មិនអាចបញ្ចូលបានទេ",
+          success: error.message,
+        };
+      }
     },
 
+    //@Desc add history within 14 days
+    //@Access police
+    addHistoryWithin14days: async (
+      _,
+      { createLocation, personalInfoId },
+      { PersonalInfo }
+    ) => {
+      try {
+        let isExisted = await PersonalInfo.findById(personalInfoId);
+        if (!isExisted) {
+          return {
+            message: "មិនអាចបញ្ចូលបានទេ",
+            success: false,
+          };
+        }
+     
 
+        await PersonalInfo.updateOne(
+          { _id: personalInfoId },
+          {
+            $push: {
+              historyWithin14days: {
+                $each: [createLocation],
+                $slice: -50,
+              },
+            },
+          }
+        );
+        return {
+          message: "បញ្ចូលបានជោកជ័យ",
+          success: true,
+        };
+      } catch (error) {
+        return {
+          message: "មិនអាចបញ្ចូលបានទេ",
+          success: error.message,
+        };
+      }
+    },
 
+    //@Desc update the current State
+    //@Access auth
+    updateCurrentState: async (
+      _,
+      { personalInfoId, updateValue },
+      { PersonalInfo }
+    ) => {
+      try {
+        const updated = await PersonalInfo.update(
+          { _id: personalInfoId },
+          {
+            $set: {
+              currentState: updateValue,
+            },
+          }
+        );
+        if (!updated) {
+          return {
+            success: false,
+            message: "Cannot this status ",
+          };
+        }
+        return {
+          success: true,
+          message: "Updated successfully ",
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
 
     //@Desc add Sample test to the hospitalization
     //@Access
@@ -239,8 +474,7 @@ export default {
             $pull: { sampleTest: { _id: sampleTestId } },
           }
         );
-    
-        
+
         return {
           success: true,
           message: "Deleted Successfully",
@@ -260,18 +494,27 @@ export default {
         const personalInfo = await info.save();
         if (!personalInfo) {
           return {
-            message: "Cannot create personal Info",
-            success: false,
+            response :{
+              message: "Cannot create personal Info",
+              success: false,
+            },
+            personalInfo:{}
           };
         }
         return {
-          message: "Personal info created successfully!",
-          success: true,
+          response :{
+            message: "Success",
+            success: true,
+          },
+          personalInfo:personalInfo
         };
       } catch (error) {
         return {
-          message: "Cannot create personal Please contact the admin",
-          success: false,
+          response :{
+            message: "Cannot create personal Info",
+            success: false,
+          },
+          personalInfo:personalInfo
         };
       }
     },
