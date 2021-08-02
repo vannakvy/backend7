@@ -8,7 +8,7 @@ export default gql`
         authUser: User! @isAuth(requires:ADMIN) 
         allUsers:[User!] @isAuth(requires:ADMIN) 
         getUserById(userId:String!):User! 
-        getUserWithPagination(page:Int,limit:Int,keyword:String):UserPaginator!
+        getUserWithPagination(page:Int,limit:Int,keyword:String):UserPaginator!  @isAuth(requires:ADMIN) 
     }
     extend type Mutation {
         registerUser(newUser: UserInput!): userResponse!

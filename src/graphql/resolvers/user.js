@@ -57,12 +57,10 @@ export default {
       { User }
     ) => {
 
+      console.log("hello ")
       
       let key = keyword.toString();
    
-      
-      
-      
       const options = {
         page: page || 1,
         limit: limit || 10,

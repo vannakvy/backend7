@@ -11,11 +11,9 @@ import {
 } from '../config';
 
 export const issueAuthToken = async (jwtPayload) => {
-  
     let token = await sign(jwtPayload, SECRET, {
-        expiresIn: 100
+        expiresIn: '24h'
     });
-
     return `Bearer ${token}`;
 };
 export const serializeUser = user => pick(user, [

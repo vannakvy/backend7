@@ -7,10 +7,14 @@ extend type Query {
     getAllProvince(district:String): AllProvince!
     getAllDistrictForMap:[AllProvince!]!
     getDataForGrap: GraphResponse
-    getDataForReport:AllProvince
     getDataForBarGraphTotal:BarGraphTotal
-    affectedLocationReport:Int
-    interviewForReport:Int
+    getDataForReport:[Report]
+    affectedLocationReport:AffectedData 
+    interviewForReport3Times:Inter
+    getDataForGrapBottom:GraphResponse
+}
+type Inter{
+    totalInterview:Int
 }
 
 type AllProvince{
@@ -29,7 +33,36 @@ type AllProvince{
     totalPeopleInQuarantine:Int
     totalAffectedLocationOn:Int
     totalAffectedLocationClose:Int
-    
+}
+
+type AffectedData{
+  totalAffectedLocation:Int,
+  totalAffectedLocationToday:Int,
+  totalAffectedLocationNotClosed:Int,
+  totalAffectedLocationOn:Int,
+  closedLocation:Int,
+  coorporateLocation:Int,
+  coorporateLocationToday:Int,
+  openedLocation:Int,
+  openedLocationToday:Int,
+  closedLocationToday:Int
+}
+type Report {
+        _id:String,
+        menConfirmToday:Int,
+       womenConfirmToday:Int,
+       menConfirm:Int,
+       womenConfirm:Int,
+       
+       menRecoveredToday:Int,
+       womenRecoveredToday:Int,
+       menRecovered:Int,
+       womenRecovered:Int,
+
+       menDeathsToday:Int,
+       womenDeathsToday:Int,
+       menDeaths:Int,
+       womenDeaths:Int,
 }
 
 

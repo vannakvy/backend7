@@ -13,11 +13,15 @@ export default gql`
           enum Roles {
             BASIC,
             ADMIN,
+            SUPPER,
             DEVELOPER,
             POLICE,
-            MARTMANAGER
+            DOCTOR,
+            OFFICER
+  
           }
-        
+          
+                                
         type Query {
             _:String
         }

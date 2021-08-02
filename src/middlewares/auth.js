@@ -21,7 +21,6 @@ const AuthMiddleware = async (req, res, next) => {
     const authHeader = req.get("Authorization");
 // console.log(authHeader,"ddddd")
 
-
     if (!authHeader) {
         req.isAuth = false;
         return next();
@@ -40,7 +39,9 @@ const AuthMiddleware = async (req, res, next) => {
     // Verify the extracted token
     let decodedToken;
     try {
+     
         decodedToken = verify(token, SECRET);
+      
     } catch (err) {
         req.isAuth = false;
         return next();
@@ -53,8 +54,9 @@ const AuthMiddleware = async (req, res, next) => {
     }
 
     // If the user has valid token then Find the user by decoded token's id
+    console.log(decodedToken.id)
     let authUser = await User.findById(decodedToken.id);
-  
+
     if (!authUser) {
         req.isAuth = false;
         return next();

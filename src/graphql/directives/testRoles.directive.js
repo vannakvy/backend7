@@ -29,19 +29,19 @@ export class AuthDirective extends SchemaDirectiveVisitor {
         // Get the required Role from the field first, falling back
         // to the objectType if no Role is required by the field:
         // let [_, {}, { user, isAuth,roles }] = args;
-      
+   
         const requiredRole =
           field._requiredAuthRole ||
           objectType._requiredAuthRole;
-
+  console.log(requiredRole,"ddd")
         if (! requiredRole) {
           return resolve.apply(this, args);
         }
-
+        // console.log(args[2].user,"dyd")
         const context = args[2];
         let user = context.user.roles; 
-    
-     
+      
+    console.log(args[2],"dge")
        let role = await user.map(b=>b.role)
       let has = role.includes(requiredRole);
     
