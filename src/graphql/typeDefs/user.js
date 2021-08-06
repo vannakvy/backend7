@@ -11,13 +11,13 @@ export default gql`
         getUserWithPagination(page:Int,limit:Int,keyword:String):UserPaginator!  @isAuth(requires:ADMIN) 
     }
     extend type Mutation {
-        registerUser(newUser: UserInput!): userResponse!
-        addRole(userId:ID!role:String!): userResponse!      
-        deleteRole(userId:ID!,roleId:ID!): userResponse!
-        loginUser(username: String!, password: String!):AuthUser!
-        deleteUser(userId:ID!):userResponse!
-        updateAccount(userId:ID!,password:String!,username:String!):userResponse!
-        updateUserDetail(userId:ID!,tel:String!,firstName:String!,lastName:String!,email:String!):userResponse!
+        registerUser(newUser: UserInput!): userResponse! @isAuth(requires:ADMIN) 
+        addRole(userId:ID!role:String!): userResponse! @isAuth(requires:ADMIN) 
+        deleteRole(userId:ID!,roleId:ID!): userResponse! @isAuth(requires:ADMIN) 
+        loginUser(username: String!, password: String!):AuthUser! 
+        deleteUser(userId:ID!):userResponse! @isAuth(requires:ADMIN) 
+        updateAccount(userId:ID!,password:String!,username:String!):userResponse! @isAuth(requires:ADMIN) 
+        updateUserDetail(userId:ID!,tel:String!,firstName:String!,lastName:String!,email:String!):userResponse! @isAuth(requires:ADMIN) 
         updateProfileImage(userId:ID!,image:String!):userResponse!
     }
 

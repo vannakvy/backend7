@@ -15,7 +15,7 @@ export default {
         // const data1 = await PersonalInfo.find({ sampleTest: { $elemMatch: {$and:[{"result": true },{ "currentState.deathAt": { $gte: startDate,$lt: endDate
         // }  }]}}})
 
-        console.log(startDate)
+      
 
         const data1 = await PersonalInfo.find({$and:[{"currentState.recovered": true },{ "currentState.recoveredAt": { $gte: startDate,$lt: endDate}  }] })
         const data2 = await PersonalInfo.find({$and:[{"currentState.death": true },{ "currentState.deathAt": { $gte: startDate,$lt: endDate}  }] })
@@ -37,64 +37,74 @@ export default {
     // @Desc all tested 
     // Access auth 
     getAllAllSampleTest:async(_,{},{PersonalInfo})=>{
-    // let data =  await PersonalInfo.aggregate([
-    //       {
-    //         $project: {
-    //             firstName: 1,
-    //             arraySize: { $cond: { if: { $isArray: "$sampleTest" }, then: { $size: "$sampleTest" }, else: 0} },
-    //             // arraySize: { $cond: [ $and: [{ if: { $isArray: "$sampleTest" }, then: { $size: "$sampleTest" }, else: 0}]]  }  
-    //         }
-    //       }
-    //   ] )
-      // $cond: [ {$and : [ { $eq: [ "$gender", "ប្រុស"] },
-      // { $gte: [ "$currentState.confirmedAt",today] }] }, 1,0 ]
-      let today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      console.log(today)
-
-      // { sampleTest: { $elemMatch: { date: { $gte: "2021-08-04T23:59:59.032Z", $lt: "2021-08-06T17:00:00.033Z" } } } }
-
-    let data =  await PersonalInfo.aggregate([
-        { "$match":{ "sampleTest.date": {$gte:today,$lt: "2021-08-06T17:00:00.033Z"} } },
-        // { "$project": {
-        //       "all": { "$size": "$sampleTest" }
-        // } },
+      // let data =  await PersonalInfo.aggregate([
+      //       {
+      //         $project: {
+      //             firstName: 1,
+      //             arraySize: { $cond: { if: { $isArray: "$sampleTest" }, then: { $size: "$sampleTest" }, else: 0} },
+      //             // arraySize: { $cond: [ $and: [{ if: { $isArray: "$sampleTest" }, then: { $size: "$sampleTest" }, else: 0}]]  }  
+      //         }
+      //       }
+      //   ] )
+        // $cond: [ {$and : [ { $eq: [ "$gender", "ប្រុស"] },
+        // { $gte: [ "$currentState.confirmedAt",today] }] }, 1,0 ]
+       
+        // new Date().setHours(00,00,00)
+        // let ddd = new Date()
+        // console.log(ddd.setHours(0,0,0))   
+        // console.log(new Date(new Date().setHours(23,59,59)) )
+      
+        // start = formatDate(startDate)+"T00:00:00.032Z"
+        // end = formatDate(endDate)+"T23:59:59.033Z"
+        let today = new Date();
+        today.setHours(0, 0, 0, 0);
+        let end = new Date();
+        end.setHours(23, 59, 59,59);
+        // end.setDate(start.getDate() + 1)
+    
+                
+        // { sampleTest: { $elemMatch: { date: { $gte: "2021-08-04T23:59:59.032Z", $lt: "2021-08-06T17:00:00.033Z" } } } }
+  
+      let data =  await PersonalInfo.aggregate([
+          { "$match":{ "sampleTest.date": {$gte:today,$lt:end} } },
+          // { "$project": {
+          //       "all": { "$size": "$sampleTest" }
+          // } },
+          { "$group": {
+              "_id": 1,
+              "count": {
+                  "$sum": 1
+              }
+          } }
+       ])
+  
+     
+  
+       let dataAll =  await PersonalInfo.aggregate([
+        // { "$match":{ "sampleTest.date": {$gte:today} } },
+        { "$project": {
+              "all": { "$size": "$sampleTest" }
+        } },
         { "$group": {
             "_id": 1,
             "count": {
-                "$sum": 1
+                "$sum": "$all"
             }
         } }
      ])
-
-
-
-     let dataAll =  await PersonalInfo.aggregate([
-      // { "$match":{ "sampleTest.date": {$gte:today} } },
-      { "$project": {
-            "all": { "$size": "$sampleTest" }
-      } },
-      { "$group": {
-          "_id": 1,
-          "count": {
-              "$sum": "$all"
-          }
-      } }
-   ])
-
-
-      let to = data.reduce(function(accumulator, currentValue) {
-        return accumulator + currentValue.count;
-      }, 0);
-      let al = dataAll.reduce(function(accumulator, currentValue) {
-        return accumulator + currentValue.count;
-      }, 0);
-      return {
-        today: to,
-        all:al
-      }
-    },
+  
+  
+        let to = data.reduce(function(accumulator, currentValue) {
+          return accumulator + currentValue.count;
+        }, 0);
+        let al = dataAll.reduce(function(accumulator, currentValue) {
+          return accumulator + currentValue.count;
+        }, 0);
+        return {
+          today: to,
+          all:al
+        }
+      },
       
     //@Desc getAllProvinces
     //@Access auth
@@ -104,8 +114,8 @@ export default {
       { district },
       { PersonalInfo, Quarantine, Hospitalization, AffectedLocation,HospitalInfo,QuarantineInfo}
     ) => {
-
-      console.log(district)
+     
+      
       let confirm = 0;
       let recover = 0;
       let death = 0;
@@ -342,7 +352,7 @@ export default {
     getDataForGrapBottom: async (_, {}, { PersonalInfo }) => {
       var now = new Date(); 
      let d = now.setDate(now.getDate() - 30);
-      console.log(d)
+   
 
       const convert = (e) => {
         let array = [];
@@ -361,7 +371,7 @@ export default {
             // }
           }
         });
-        console.log(labels)
+      
        let a =  array.sort(function(a, b){return new Date(a.x) - new Date(b.x)});
         return a;
       };
@@ -630,7 +640,7 @@ return {
     const totalInterview = await PersonalInfo.countDocuments({
       $and:[ { interviewed: {$eq: true} }]
     })
-    console.log(totalInterview)
+
     return totalInterview;
  }
   },

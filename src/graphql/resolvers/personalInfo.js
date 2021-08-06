@@ -99,8 +99,8 @@ export default {
       let start;
       let end;
      if(startDate !== null || endDate!==null){
-              start = formatDate(startDate)+"T00:00:00.032Z"
-              end = formatDate(endDate)+"T23:59:59.033Z"
+              start = formatDate(startDate)+"T00:00:00.00"
+              end = formatDate(endDate)+"T23:59:59.00"
 
               console.log(start.toString(),end.toString(),"datedddd")
 
@@ -159,7 +159,7 @@ export default {
             ],
           },
           // { "currentState.confirm": false },
-          { "sampleTest": { $ne: []} },
+          // { "sampleTest": { $ne: []} },
           // { "sampleTest.date": { $gte: startDate, $lt: endDate } },
           // { sampleTest: { $elemMatch: {  } }
         ],
@@ -494,12 +494,12 @@ deletePeopleFromQuarantine:async(_,{personalInfoId,quarantingId},{PersonalInfo})
       { personalInfoId, sampleTestId,sampleTest },
       { PersonalInfo }
     ) => {
-      console.log(sampleTest)
+    
       try {
  await PersonalInfo.findById(personalInfoId)
      
  await PersonalInfo.updateOne({"_id" : personalInfoId, "sampleTest._id" : sampleTestId},{$set : {"sampleTest":sampleTest}})
-    console.log(a)
+  
         return {
           success: true,
           message: "Update Successfully",
@@ -632,7 +632,7 @@ deletePeopleFromQuarantine:async(_,{personalInfoId,quarantingId},{PersonalInfo})
       { sampleTest, personalInfoId },
       { PersonalInfo }
     ) => {
-      console.log(sampleTest)
+ 
       try {
         const updatedData = await PersonalInfo.findByIdAndUpdate(
           personalInfoId,
@@ -665,7 +665,7 @@ deletePeopleFromQuarantine:async(_,{personalInfoId,quarantingId},{PersonalInfo})
       { PersonalInfo }
     ) => {
       try {
-        console.log(historyWithin14Id,personalInfoId)
+       
    
         let a = await PersonalInfo.updateOne(
           { _id: personalInfoId },
@@ -717,14 +717,26 @@ deletePeopleFromQuarantine:async(_,{personalInfoId,quarantingId},{PersonalInfo})
     //@Desc create new Personal Info
     //@access auth
     createPersonalInfo: async (_, { newInfo }, { PersonalInfo }) => {
-    
       try {
+        let firstNameExist = await PersonalInfo.findOne({"firstName":newInfo.firstName});
+        let lastName = await PersonalInfo.findOne({"lastName":newInfo.lastName});
+        let village = await PersonalInfo.findOne({"village":newInfo.village});
+        console.log(firstNameExist)
+        console.log(lastName)
+        console.log(village)
 
-let firstNameExist = await PersonalInfo.find({"firstName":newInfo.firstName});
-let lastNameExist = await PersonalInfo.find({"lastName":newInfo.lastName});
-// let tel = await PersonalInfo.find({"firstName":newInfo.tel});
-let village = await PersonalInfo.find({"village":newInfo.village});
-let commune = await PersonalInfo.find({"commune":newInfo.commune});
+if(firstNameExist && lastName && village){
+ console.log("not working")
+ return {
+   response :{
+    message: "សូមមេពិនិត្យឈ្មោះ ម្តងទៀតយើងពិនិតឃើញថាមាន ទិន្ន័យស្ទូន",
+    success: false,
+  },
+  personalInfo:{}
+
+}
+}
+
 
 
         const info = new PersonalInfo(newInfo);

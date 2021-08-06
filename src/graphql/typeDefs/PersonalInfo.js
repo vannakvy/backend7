@@ -40,20 +40,18 @@ export default gql`
       updatedInfo: PersonalInfoInput!
       id: ID!
     ): PersonalInfoResponse
-    deletePersonalInfo(id: ID!): PersonalInfoResponse
-    deleteSampleTest(personalInfoId:ID!,sampleTestId:ID!):PersonalInfoResponse
-    updateSampleTest(personalInfoId:ID!,sampleTestId:ID!,sampleTest:SampleTestInput):PersonalInfoResponse
+    deletePersonalInfo(id: ID!): PersonalInfoResponse @isAuth(requires:ADMIN) 
+    deleteSampleTest(personalInfoId:ID!,sampleTestId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
+    updateSampleTest(personalInfoId:ID!,sampleTestId:ID!,sampleTest:SampleTestInput):PersonalInfoResponse 
     updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse
 
 
   # For police 
   addHistoryWithin14days(createLocation:HistoryWithin14daysInput,personalInfoId:ID!):PersonalInfoResponse
-  deleteHistoryWithin14days(personalInfoId:ID!,historyWithin14Id:ID!):PersonalInfoResponse
+  deleteHistoryWithin14days(personalInfoId:ID!,historyWithin14Id:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
 
-  addPeopleToQuarantine(newQuarantine:QuarantingInput,personalInfo:ID!):PersonalInfoResponse
-  deletePeopleFromQuarantine(personalInfoId:ID!,quarantingId:ID!):PersonalInfoResponse
-
-
+  addPeopleToQuarantine(newQuarantine:QuarantingInput,personalInfo:ID!):PersonalInfoResponse 
+  deletePeopleFromQuarantine(personalInfoId:ID!,quarantingId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
 
   # //delete  left 
   # //update left 
