@@ -40,7 +40,7 @@ export class AuthDirective extends SchemaDirectiveVisitor {
         const context = args[2];
         let user = context.user.roles; 
       
-    console.log(args[2],"dge")
+
        let role = await user.map(b=>b.role)
       let has = role.includes(requiredRole);
     

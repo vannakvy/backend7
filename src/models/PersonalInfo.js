@@ -38,33 +38,41 @@ const PersonalInfoShema = mongoose.Schema({
         default: false
     },
     interviewedAt:Date,
-    vaccinated:{
-        type:Number,
-        default:0
-    },
+
+
+    vaccination:[{
+        times:{
+            type:Number,
+            default:0
+        },
+        date:Date,
+        vaccineType:String,
+        vacinatedAt:String,
+    }],
     //ជំងឺប្រចាំកាយ
     chronic:String,
     sampleTest:[{
+        covidVariant:String,
         specimentType:String,
         reasonForTesting:String,
         date: {type: Date, required: true,default:new Date()},
         times:{type: Number, required: true,default:0},
-        Testlocation:{
-            type: mongoose.Schema.Types.ObjectId,
-            ref:'AffectedLocation'
-        },
+        testLocation:String,
         result:{type:Boolean,required: true, default:false},
+        resultDate:Date,
         symptom:String,
         symptomStart:Date,
         labFormCompletedBy:String,
         laboratory:String,
+        testType:String,
         other:{
             type:String,
             default:"",
         },
        }],
-     
        historyWithin14days:[{
+        lat:Number,
+        long:Number,
         locationName:String,
         affectedLocation:{
             type: mongoose.Schema.Types.ObjectId,
@@ -77,13 +85,13 @@ const PersonalInfoShema = mongoose.Schema({
             default: false
         }
        }],
-    
        quaranting:[
            {
         coorporate:{
             type:Boolean,
             default:true,
         },
+        locationType:String,
         date_in:Date,
         date_out:Date,
         personTypes:String,
@@ -92,23 +100,26 @@ const PersonalInfoShema = mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'QuarantineInfo'
         },
+        long:Number,
+        lat:Number,
+        locationName:String
        
        }],    
-   
-
     affectedFrom:{
-        patientId:{
-            type:mongoose.Schema.Types.ObjectId,
-            ref:'PersonalInfo'
-        },
+        date:Date,
+        patientName:String,
+        patientCode:String,
         relation:String,
         direct: {
             type:Boolean,
             default:true
         },
-        ohter:String
+        otherAffect:String
     },
     hospitalization:[{
+        long:Number,
+        lat:Number,
+        hospitalName:String,
         date_in:Date,
         date_out:Date,
         hospitalName:String,
@@ -123,7 +134,8 @@ const PersonalInfoShema = mongoose.Schema({
         },
         description:String
     }],
-    currentStatus:{
+    currentState:{
+        covidVariant:String,
         confirm:{
             type:Boolean,
             default: false
@@ -143,8 +155,7 @@ const PersonalInfoShema = mongoose.Schema({
 },{
     timestamps: true
 })
-
 PersonalInfoShema.plugin(Paginate)
 const PersonalInfo = mongoose.model("PersonalInfo",PersonalInfoShema);
-
 export default PersonalInfo;
+

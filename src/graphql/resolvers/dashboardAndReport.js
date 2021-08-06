@@ -1,9 +1,100 @@
 import moment from "moment";
+import PersonalInfo from "../typeDefs/PersonalInfo";
 export default {
   Query: {
 
-    // @Desc get data for the box 
+
+    //@Desc get all positive confirm and death 
+
+    getPeopeleConfirmRecoverAndDeath:async(_,{startDate, endDate},{PersonalInfo})=>{
+      // console.log(startDate)
+      // console.log(endDate)
+      // console.log(new Date().setHours(0,0,0,0))
+      // console.log(new Date().setHours(59,59,59,59))
+
+        // const data1 = await PersonalInfo.find({ sampleTest: { $elemMatch: {$and:[{"result": true },{ "currentState.deathAt": { $gte: startDate,$lt: endDate
+        // }  }]}}})
+
+        console.log(startDate)
+
+        const data1 = await PersonalInfo.find({$and:[{"currentState.recovered": true },{ "currentState.recoveredAt": { $gte: startDate,$lt: endDate}  }] })
+        const data2 = await PersonalInfo.find({$and:[{"currentState.death": true },{ "currentState.deathAt": { $gte: startDate,$lt: endDate}  }] })
+        const data3 = await PersonalInfo.find({ sampleTest: { $elemMatch: {$and:[{"result": true },{ "resultDate": { $gte: startDate,$lt: endDate
+        }  }]}}})
+        
+       const  reportData ={
+            recovered : data1,
+            death:data2,
+            confirm:data3
+          }
+
+          return reportData
+        
+    },
+
+    
+    // "$gte": new Date("2014-08-01"), "$lt": new Date("2014-08-02")
+    // @Desc all tested 
     // Access auth 
+    getAllAllSampleTest:async(_,{},{PersonalInfo})=>{
+    // let data =  await PersonalInfo.aggregate([
+    //       {
+    //         $project: {
+    //             firstName: 1,
+    //             arraySize: { $cond: { if: { $isArray: "$sampleTest" }, then: { $size: "$sampleTest" }, else: 0} },
+    //             // arraySize: { $cond: [ $and: [{ if: { $isArray: "$sampleTest" }, then: { $size: "$sampleTest" }, else: 0}]]  }  
+    //         }
+    //       }
+    //   ] )
+      // $cond: [ {$and : [ { $eq: [ "$gender", "ប្រុស"] },
+      // { $gte: [ "$currentState.confirmedAt",today] }] }, 1,0 ]
+      let today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      console.log(today)
+
+      // { sampleTest: { $elemMatch: { date: { $gte: "2021-08-04T23:59:59.032Z", $lt: "2021-08-06T17:00:00.033Z" } } } }
+
+    let data =  await PersonalInfo.aggregate([
+        { "$match":{ "sampleTest.date": {$gte:today,$lt: "2021-08-06T17:00:00.033Z"} } },
+        // { "$project": {
+        //       "all": { "$size": "$sampleTest" }
+        // } },
+        { "$group": {
+            "_id": 1,
+            "count": {
+                "$sum": 1
+            }
+        } }
+     ])
+
+
+
+     let dataAll =  await PersonalInfo.aggregate([
+      // { "$match":{ "sampleTest.date": {$gte:today} } },
+      { "$project": {
+            "all": { "$size": "$sampleTest" }
+      } },
+      { "$group": {
+          "_id": 1,
+          "count": {
+              "$sum": "$all"
+          }
+      } }
+   ])
+
+
+      let to = data.reduce(function(accumulator, currentValue) {
+        return accumulator + currentValue.count;
+      }, 0);
+      let al = dataAll.reduce(function(accumulator, currentValue) {
+        return accumulator + currentValue.count;
+      }, 0);
+      return {
+        today: to,
+        all:al
+      }
+    },
       
     //@Desc getAllProvinces
     //@Access auth
@@ -38,8 +129,6 @@ export default {
       let totalAffectedLocationOn = await AffectedLocation.countDocuments({
         $and: [{ openAt: {$ne: null} }, { closeAt: {$ne: null} }],
       });
-
-     
       if (district === "" || district === "ករំីណីទាំងអស់") {
         confirm = await PersonalInfo.countDocuments({
           "currentState.confirm": true,
@@ -67,7 +156,6 @@ export default {
         });
 
       } else {
-
         confirm = await PersonalInfo.countDocuments({
           $and: [{ "currentState.confirm": true }, { district: district }],
         });

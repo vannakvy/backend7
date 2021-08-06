@@ -65,26 +65,27 @@ export default {
         createAffectedLocation:async(_,{newAffectedLocation},{AffectedLocation})=>{
             try {
                
-                const isExisted = await AffectedLocation.find({affectedLocationName:newAffectedLocation.affectedLocationName});
-               
-                if(isExisted==[]){
-                    return{
-                        message:"The AffectedLocation with this name is already exist",
-                        success: false,
-                        id:null
-                    }
-                }
+                // const isExisted = await AffectedLocation.find({locationName:newAffectedLocation.locationName});
+                // console.log(locationName)
+                // if(isExisted==[]){
+                //     return{
+                //         message:"The AffectedLocation with this name is already exist",
+                //         success: false,
+                //         affectedLocation:{}
+                //     }
+                // }
                 const affectedLocations = new AffectedLocation(newAffectedLocation);
                 const isCreated = await affectedLocations.save();
+                console.log(isCreated)
                 if(!isCreated){
                     return {
                         message:"Cannot create AffectedLocation",
                         success: false,
-                        affectedLocation: null
+                        affectedLocation: {}
                     }
                 }
                 return {
-                    message:"AffectedLocation created successfully!",
+                    message:"affectedLocation created successfully!",
                     success: true,
                     affectedLocation: isCreated
                 }
@@ -103,7 +104,6 @@ export default {
         deleteAffectedLocation:async(_,{id},{AffectedLocation})=>{
             try {
                 const deletedInfo = await AffectedLocation.findByIdAndDelete(id);
-               
                 if(!deletedInfo){
                     return {
                         success: false,

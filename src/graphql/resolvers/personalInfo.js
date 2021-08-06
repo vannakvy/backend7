@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 const PersonalInfoLabels = {
   docs: "personalInfos",
   limit: "perPage",
@@ -10,9 +12,163 @@ const PersonalInfoLabels = {
   totalPages: "totalPages",
 };
 
+function formatDate(date) {
+    var d = new Date(moment.parseZone(date).format("YYYY-MM-DD")),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [year, month, day].join('-') ;
+}
+
 export default {
   Query: {
     //For Doctor
+    excelExport: async (_, { startDate, endDate }, { PersonalInfo }) => {
+    
+
+      // const allData = PersonalInfo.find({}).limit(500);
+
+  //  let d =  await PersonalInfo.countDocuments(
+  //       { sampleTest: { $elemMatch: { result: false } }}
+  //    )
+
+  const allData = await PersonalInfo.find( {$and: [{ sampleTest: { $elemMatch: { date: { $gte: new Date("2021-08-05T00:00:00"), $lt: new Date("2021-08-05T59:00:00") } } } },{commune:"ចារឈូក"}]})
+  
+
+
+      return allData;
+    },
+
+    // getPeopleForSampleTestWithPagination: async (_, {page,limit,keyword,startDate,endDate}, { PersonalInfo,roles }) => {
+    //   const options = {
+    //     page: page || 1,
+    //     limit: limit || 300,
+    //     customLabels: PersonalInfoLabels,
+    //     sort: {
+    //       createdAt: 1,
+    //     },
+    //     //   populate: "case",
+    //   };
+    //   let query;
+    //   let start;
+    //   let end;
+    //  if(startDate !== null || endDate!==null){
+    //           start = startDate
+    //           end = endDate 
+
+    //           // console.log(startDate.toString(),endDate.toString())
+              
+    //           if(start.toString() === end.toString()){
+    //               start  = new Date(start)
+    //               start.setHours(0, 0, 0, 0)
+    //               end = new Date(start)
+    //               end.setDate(start.getDate() + 1)
+
+    //           }
+    //      query = {
+    //        $and: [
+    //          { sampleTest: { $elemMatch: { date: { $gte: new Date("2021-08-05T00:00:00"), $lt: new Date("2021-08-05T59:00:00") } } } },{commune:"ចារឈូក"}
+    //        ],
+    //      };
+    //     }
+ 
+    // const personalInfos = await PersonalInfo.paginate(query, options);
+    // return personalInfos;
+    // },
+    // allPersonalInfosForExcel:async 
+    //@Desc get perfornal info for the Hospital
+    //@Access police
+
+    getPeopleForSampleTestWithPagination: async (_, {page,limit,keyword,startDate,endDate}, { PersonalInfo,roles }) => {
+      const options = {
+        page: page || 1,
+        limit: limit || 25,
+        customLabels: PersonalInfoLabels,
+        sort: {
+          createdAt: 1,
+        },
+        //   populate: "case",
+      };
+      let query;
+      let start;
+      let end;
+     if(startDate !== null || endDate!==null){
+              start = formatDate(startDate)+"T00:00:00.032Z"
+              end = formatDate(endDate)+"T23:59:59.033Z"
+
+              console.log(start.toString(),end.toString(),"datedddd")
+
+              // console.log(startDate.toString(),endDate.toString())
+              
+              // if(start.toString() === end.toString()){
+              //     start  = new Date(start)
+              //     start.setHours(0, 0, 0, 0)
+              //     end = new Date(start)
+              //     end.setDate(start.getDate() + 1)
+              //     console.log("test")
+              // }
+         query = {
+           $and: [
+             {
+               $or: [
+                 { patientId: { $regex: keyword, $options: "i" } },
+                 { englishName: { $regex: keyword, $options: "i" } },
+                 { firstName: { $regex: keyword, $options: "i" } },
+                 { lastName: { $regex: keyword, $options: "i" } },
+                 { village: { $regex: keyword, $options: "i" } },
+                 { commune: { $regex: keyword, $options: "i" } },
+                 { disctrict: { $regex: keyword, $options: "i" } },
+                 { province: { $regex: keyword, $options: "i" } },
+                 { patientId: { $regex: keyword, $options: "i" } },
+                 { idCard: { $regex: keyword, $options: "i" } },
+                 { tel: { $regex: keyword, $options: "i" } },
+               ],
+             },
+             // { "currentState.confirm": false },
+             { "sampleTest": { $ne: []} },
+            //  { "district": { $ne: []} },
+             // { "sampleTest.date": { $gte: startDate, $lt: endDate } },
+             // { sampleTest: { $elemMatch: {  } }
+            //  2021-08-05T17:00:00.032Z 2021-08-06T16:59:59.033Z date
+             { sampleTest: { $elemMatch: { date: { $gte: start, $lt: end } } } }
+           ],
+         };
+        
+    }else{
+      query = {
+        $and: [
+          {
+            $or: [
+              { patientId: { $regex: keyword, $options: "i" } },
+              { englishName: { $regex: keyword, $options: "i" } },
+              { firstName: { $regex: keyword, $options: "i" } },
+              { lastName: { $regex: keyword, $options: "i" } },
+              { village: { $regex: keyword, $options: "i" } },
+              { commune: { $regex: keyword, $options: "i" } },
+              { disctrict: { $regex: keyword, $options: "i" } },
+              { province: { $regex: keyword, $options: "i" } },
+              { patientId: { $regex: keyword, $options: "i" } },
+              { idCard: { $regex: keyword, $options: "i" } },
+              { tel: { $regex: keyword, $options: "i" } },
+            ],
+          },
+          // { "currentState.confirm": false },
+          { "sampleTest": { $ne: []} },
+          // { "sampleTest.date": { $gte: startDate, $lt: endDate } },
+          // { sampleTest: { $elemMatch: {  } }
+        ],
+      };
+    }
+
+    const personalInfos = await PersonalInfo.paginate(query, options);
+    return personalInfos;
+    },
 
     //@Desc get perfornal info for the Hospital
     //@Access police
@@ -31,6 +187,7 @@ export default {
         $and: [
           {
             $or: [
+              { englishName: { $regex: keyword, $options: "i" } },
               { tel: { $regex: keyword, $options: "i" } },
               { firstName: { $regex: keyword, $options: "i" } },
               { lastName: { $regex: keyword, $options: "i" } },
@@ -55,7 +212,8 @@ export default {
     //@Desc get perfornal info for the qurantine
     //@Access police
 
-    getPeopleForQuarantineWithPagination: async (_, {}, { PersonalInfo }) => {
+    getPeopleForQuarantineWithPagination: async (_, {quarantineInfoId, limit,page,keyword}, { PersonalInfo }) => {
+
       const options = {
         page: page || 1,
         limit: limit || 20,
@@ -69,6 +227,7 @@ export default {
         $and: [
           {
             $or: [
+              { englishName: { $regex: keyword, $options: "i" } },
               { tel: { $regex: keyword, $options: "i" } },
               { firstName: { $regex: keyword, $options: "i" } },
               { lastName: { $regex: keyword, $options: "i" } },
@@ -80,16 +239,17 @@ export default {
               { idCard: { $regex: keyword, $options: "i" } },
             ],
           },
-          { "currentState.confirm": false },
-          { "quarantine.date_in": { $ne: null } },
-          { "quarantine.date_in": { $gte: startDate, $lt: endDate } },
+          { "quaranting.quarantineInfo": {$eq:quarantineInfoId} },
+          // { "currentState.confirm": { $eq: quarantineInfoId } },
+          // { "quarantine.date_in": { $ne: null } },
+          // { "quarantine.date_in": { $gte: startDate, $lt: endDate } },
         ],
       };
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
     },
 
-    //@Desc get patient for interview \
+    //@Desc get patient for interview 
     //Access police
 
     getPatientForInterviewWithPagination: async (
@@ -110,6 +270,7 @@ export default {
         $and: [
           {
             $or: [
+              { englishName: { $regex: keyword, $options: "i" } },
               { firstName: { $regex: keyword, $options: "i" } },
               { lastName: { $regex: keyword, $options: "i" } },
               { village: { $regex: keyword, $options: "i" } },
@@ -122,10 +283,11 @@ export default {
           },
           { "currentState.confirm": true },
           { interviewed: interview },
-          { "currentState.confirmedAt": { $gte: startDate, $lt: endDate } },
+          // { "currentState.confirmedAt": { $gte: startDate, $lt: endDate } },
         ],
       };
       const personalInfos = await PersonalInfo.paginate(query, options);
+  
       return personalInfos;
     },
     //Des
@@ -151,6 +313,7 @@ export default {
         $and: [
           {
             $or: [
+              { englishName: { $regex: keyword, $options: "i" } },
               { firstName: { $regex: keyword, $options: "i" } },
               { lastName: { $regex: keyword, $options: "i" } },
               { village: { $regex: keyword, $options: "i" } },
@@ -161,17 +324,15 @@ export default {
               { idCard: { $regex: keyword, $options: "i" } },
             ],
           },
-          { "currentState.confirm": false },
-          { "affectedFrom.patientId": patientId },
+          { "currentState.confirm": true },
+          { "affectedFrom.patientCode": patientId },
         ],
       };
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
     },
-
     //@Desc get all the personalInfo that is confirmed  for interview
     // @Access Auth
-
     getConfirmedPersonalInfoByInterviewWithPagination: async (
       _,
       { page, limit, keyword = "", interview },
@@ -190,6 +351,7 @@ export default {
         $and: [
           {
             $or: [
+              { englishName: { $regex: keyword, $options: "i" } },
               { firstName: { $regex: keyword, $options: "i" } },
               { lastName: { $regex: keyword, $options: "i" } },
               { village: { $regex: keyword, $options: "i" } },
@@ -230,11 +392,14 @@ export default {
         sort: {
           createdAt: -1,
         },
-        populate: "case",
+        // populate: "case",
       };
 
       let query = {
         $or: [
+          { tel: { $regex: keyword, $options: "i" } },
+          { idCard: { $regex: keyword, $options: "i" } },
+          { englishName: { $regex: keyword, $options: "i" } },
           { firstName: { $regex: keyword, $options: "i" } },
           { lastName: { $regex: keyword, $options: "i" } },
           { village: { $regex: keyword, $options: "i" } },
@@ -244,6 +409,7 @@ export default {
         ],
       };
       const personalInfos = await PersonalInfo.paginate(query, options);
+      
       return personalInfos;
     },
 
@@ -269,6 +435,9 @@ export default {
         $and: [
           {
             $or: [
+              { tel: { $regex: keyword, $options: "i" } },
+              { idCard: { $regex: keyword, $options: "i" } },
+              { englishName: { $regex: keyword, $options: "i" } },
               { firstName: { $regex: keyword, $options: "i" } },
               { lastName: { $regex: keyword, $options: "i" } },
               { village: { $regex: keyword, $options: "i" } },
@@ -289,18 +458,66 @@ export default {
     //@access auth
 
     getPersonalInfoById: async (_, { id }, { PersonalInfo }) => {
-      const persoanalInfo = await PersonalInfo.findById(id).populate("case");
+      const persoanalInfo = await PersonalInfo.findOne({_id:id});
       return persoanalInfo;
     },
   },
+
   Mutation: {
+//@Decs Delete the people from the quranrantine 
+//@Access 
+
+deletePeopleFromQuarantine:async(_,{personalInfoId,quarantingId},{PersonalInfo})=>{
+  try {
+    let a = await PersonalInfo.updateOne(
+      { _id: personalInfoId },
+      {
+        $pull: { quaranting: { quarantineInfo: quarantingId } },
+      }
+    );
+    return {
+      success: true,
+      message: "Deleted Successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+},
+    //@Desc update simple test 
+    //@access doctor
+
+    updateSampleTest: async (
+      _,
+      { personalInfoId, sampleTestId,sampleTest },
+      { PersonalInfo }
+    ) => {
+      console.log(sampleTest)
+      try {
+ await PersonalInfo.findById(personalInfoId)
+     
+ await PersonalInfo.updateOne({"_id" : personalInfoId, "sampleTest._id" : sampleTestId},{$set : {"sampleTest":sampleTest}})
+    console.log(a)
+        return {
+          success: true,
+          message: "Update Successfully",
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: "cannot update the sample test please contact the admin for help",
+        };
+      }
+    },
+
     // For police
     addPeopleToQuarantine: async (
       _,
       { personalInfo, newQuarantine },
       { PersonalInfo }
     ) => {
-     
       try {
         let isExisted = await PersonalInfo.findById(personalInfo);
         if (!isExisted) {
@@ -322,7 +539,6 @@ export default {
             },
           }
         );
-console.log(a)
         return {
           message: "បញ្ចូលបានជោកជ័យ",
           success: true,
@@ -410,13 +626,13 @@ console.log(a)
     },
 
     //@Desc add Sample test to the hospitalization
-    //@Access
-
+    //@Access goglobal
     recordSampleTest: async (
       _,
       { sampleTest, personalInfoId },
       { PersonalInfo }
     ) => {
+      console.log(sampleTest)
       try {
         const updatedData = await PersonalInfo.findByIdAndUpdate(
           personalInfoId,
@@ -428,15 +644,6 @@ console.log(a)
             message: "មិនទាន់មានអ្នកកំណត់ត្រានេះទេ",
           };
         }
-        if (sampleTest.result === true) {
-          await PersonalInfo.findByIdAndUpdate(personalInfoId, {
-            $set: {
-              "currentState.confirm": true,
-              "currentState.confirmedAt": sampleTest.date,
-            },
-          });
-        }
-
         return {
           success: true,
           message: "ជោគជ័យ",
@@ -445,6 +652,36 @@ console.log(a)
         return {
           success: false,
           message: error.message,
+        };
+      }
+    },
+
+     // @Desc delete History within 14 days
+    // @auth
+
+    deleteHistoryWithin14days: async (
+      _,
+      { personalInfoId, historyWithin14Id },
+      { PersonalInfo }
+    ) => {
+      try {
+        console.log(historyWithin14Id,personalInfoId)
+   
+        let a = await PersonalInfo.updateOne(
+          { _id: personalInfoId },
+          {
+            $pull: { historyWithin14days: { _id: historyWithin14Id } },
+          }
+        );
+
+        return {
+          success: true,
+          message: "Deleted Successfully",
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: "cannot delete please ask admin",
         };
       }
     },
@@ -458,16 +695,7 @@ console.log(a)
       { PersonalInfo }
     ) => {
       try {
-        //    let a =    await  PersonalInfo.update(
-        //             { '_id': personalInfoId},
-        //             { $pull: { sampleTest: { "_id": sampleTestId } } },
-        //             false, // Upsert
-        //             true, // Multi
-        //         );
-        //         console.log(a)
-
-        // let  a = await PersonalInfo.findOneAndUpdate({"_id":personalInfoId}, { $pull: {sampleTest: sampleTestId} })
-        // let a =await PersonalInfo.updateOne( {id: personalInfoId}, { $pullAll: {id: [sampleTestId] } } )
+   
         let a = await PersonalInfo.updateOne(
           { _id: personalInfoId },
           {
@@ -489,9 +717,19 @@ console.log(a)
     //@Desc create new Personal Info
     //@access auth
     createPersonalInfo: async (_, { newInfo }, { PersonalInfo }) => {
+    
       try {
+
+let firstNameExist = await PersonalInfo.find({"firstName":newInfo.firstName});
+let lastNameExist = await PersonalInfo.find({"lastName":newInfo.lastName});
+// let tel = await PersonalInfo.find({"firstName":newInfo.tel});
+let village = await PersonalInfo.find({"village":newInfo.village});
+let commune = await PersonalInfo.find({"commune":newInfo.commune});
+
+
         const info = new PersonalInfo(newInfo);
-        const personalInfo = await info.save();
+        const personalInfo = await info.save()
+        console.log(personalInfo)
         if (!personalInfo) {
           return {
             response :{
@@ -503,7 +741,7 @@ console.log(a)
         }
         return {
           response :{
-            message: "Success",
+            message: "success",
             success: true,
           },
           personalInfo:personalInfo
@@ -556,7 +794,6 @@ console.log(a)
             message: "Personal Info updated not successfully",
           };
         }
-
         return {
           success: true,
           message: "Cannot update this record please contact the admin",

@@ -2,18 +2,18 @@ import { gql } from "apollo-server-express";
 
 export default gql`
   extend type Query {
+    excelExport(startDate:Date, endDate:Date): [PersonalInfo!]!
     allPersonalInfos: [PersonalInfo!]!
+    allPersonalInfosForExcel: [PersonalInfo!]!
     getPersonalInfoById(id: ID!): PersonalInfo!
     # for police
     getPatientForInterviewWithPagination(page:Int, limit:Int, keyword:String,interview:Boolean,startDate:Date, endDate:Date): PaginateResponse!
-    getPeopleForQuarantineWithPagination(page:Int, limit:Int, keyword:String,active:String,startDate:Date, endDate:Date): PaginateResponse!
+    getPeopleForQuarantineWithPagination(page:Int, limit:Int, keyword:String,quarantineInfoId:ID!): PaginateResponse!
     getAffectedPersonalListWithPagination(page:Int, limit:Int, keyword:String,patientId:ID!):PaginateResponse!
- 
     # for the doctor 
     getPatientForHospitalPagination(page:Int, limit:Int, keyword:String,active:String,startDate:Date, endDate:Date): PaginateResponse!
     getPeopleForSampleTestWithPagination(page:Int, limit:Int, keyword:String,startDate:Date, endDate:Date): PaginateResponse!
   
-
     getConfirmedPersonalInfoByInterviewWithPagination(
       interview:Boolean, 
       page: Int!
@@ -35,16 +35,26 @@ export default gql`
   extend type Mutation {
     createPersonalInfo(newInfo: PersonalInfoInput!): PersonalInfoResponseWithData
     recordSampleTest(sampleTest:SampleTestInput!,personalInfoId:ID!):PersonalInfoResponse!
+
     updatePersonalInfo(
       updatedInfo: PersonalInfoInput!
       id: ID!
     ): PersonalInfoResponse
     deletePersonalInfo(id: ID!): PersonalInfoResponse
     deleteSampleTest(personalInfoId:ID!,sampleTestId:ID!):PersonalInfoResponse
+    updateSampleTest(personalInfoId:ID!,sampleTestId:ID!,sampleTest:SampleTestInput):PersonalInfoResponse
     updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse
+
+
   # For police 
   addHistoryWithin14days(createLocation:HistoryWithin14daysInput,personalInfoId:ID!):PersonalInfoResponse
+  deleteHistoryWithin14days(personalInfoId:ID!,historyWithin14Id:ID!):PersonalInfoResponse
+
   addPeopleToQuarantine(newQuarantine:QuarantingInput,personalInfo:ID!):PersonalInfoResponse
+  deletePeopleFromQuarantine(personalInfoId:ID!,quarantingId:ID!):PersonalInfoResponse
+
+
+
   # //delete  left 
   # //update left 
   }
@@ -68,12 +78,11 @@ export default gql`
     district: String
     province: String
     case:Case
-    relation:String,
     direct: Boolean
     other:String
     relapse: Boolean
     relapseAt: Date
-    vaccinated: Int
+    vaccination: [Vaccination]
     createdAt: Date
     updatedAt: Date
     interviewed: Boolean
@@ -83,10 +92,23 @@ export default gql`
     travelOverCountryHistory:TravelOverCountryHistory
     chronic:String,
     covidVariant:String,
-    hospitalizations:Hospitalizations
+    hospitalizations:[Hospitalizations]
     historyWithin14days:[HistoryWithin14days]
     affectedFrom: AffectedFrom
     quaranting:[Quarantings]
+  }
+
+  type Vaccination{
+    date:Date
+    times:Int 
+    vaccineType:String
+    vacinatedAt:String
+  }
+  input VaccinationInput{
+    date:Date
+    times:Int 
+    vaccineType:String
+    vacinatedAt:String
   }
   type Quarantings{
         id:ID
@@ -96,15 +118,22 @@ export default gql`
         personTypes:String,
         out_status:String,
         quarantineInfo:QuarantineInfo
+        locationType:String
+        locationName:String,
+        long:Float,
+        lat:Float
   }
-
   input QuarantingInput{
-      coorporate:Boolean
+        locationType:String
+        coorporate:Boolean
         date_in:Date,
         date_out:Date,
         personTypes:String,
         out_status:String,
         quarantineInfo:ID!
+        locationName:String,
+        lat:Float
+        long:Float
   }
   type currentStatus{
         confirm:Boolean,
@@ -112,13 +141,15 @@ export default gql`
         recovered:Boolean,
         recoveredAt:Date,
         death:Boolean,
-        deathAt:Date
+        deathAt:Date,
+        covidVariant:String
+        reasonForDeath:String
   }
   type SampleTest{
     id:ID!
     date: Date,
     times:Int,
-    testLocation:AffectedLocation,
+    testLocation:String,
     result:Boolean,
     symptom:String,
     other:String,
@@ -126,7 +157,10 @@ export default gql`
     symptomStart:Date,
     labFormCompletedBy:String,
     specimentType:String,
-    laboratory:String
+    laboratory:String,
+    covidVariant:String,
+    resultDate:Date,
+    testType:String
   }
   type TravelOverCountryHistory{
         arriveDate:Date,
@@ -143,10 +177,11 @@ export default gql`
         toCountry:String,
     },
   input SampleTestInput{
+    covidVariant:String,
     reasonForTesting:String,
     date: Date,
     times:Int,
-    testLocation:ID!,
+    testLocation:String,
     result:Boolean,
     symptom:String,
     other:String,
@@ -154,6 +189,8 @@ export default gql`
     labFormCompletedBy:String,
     specimentType:String,
     laboratory:String
+    resultDate:Date
+    testType:String
   }
   input currentStatusInput{
         confirm:Boolean,
@@ -162,6 +199,8 @@ export default gql`
         recoveredAt:Date,
         death:Boolean,
         deathAt:Date
+        reasonForDeath:String,
+        covidVariant:String
   }
 
   
@@ -191,12 +230,12 @@ export default gql`
     province: String
     relapse: Boolean
     relapseAt: Date
-    vaccinated: Int
-    travelOverCountryHistoryHistory:TravelOverCountryHistoryInput
-    relation:String,
     chronic:String
+    travelOverCountryHistoryHistory:TravelOverCountryHistoryInput
     affectedFrom: AffectedFromInput
     historyWithin14daysInput:HistoryWithin14daysInput
+    vaccination:VaccinationInput
+    sampleTest:SampleTestInput
   }
   type PersonalInfoResponse {
     success: Boolean
@@ -211,10 +250,11 @@ type PersonalInfoResponseWithData{
     personalInfos: [PersonalInfo!]!
   }
 
-
-
   type HistoryWithin14days {
+    id:ID!
     locationName: String
+    lat:Float 
+    long:Float
     affectedLocation: AffectedLocation
     date: Date
     description: String
@@ -225,24 +265,28 @@ type PersonalInfoResponseWithData{
     locationName: String
     affectedLocation: ID!
     date: Date
+    lat:Float 
+    long:Float
     description: String
     direct:Boolean
   }
-
   type AffectedFrom{
-    patientId: PersonalInfo
+    date:Date
+    patientName:String
+    patientCode: String
     relation:String
     direct:Boolean
-    other:String
+    otherAffect:String
   }
 
   input AffectedFromInput{
-    patientId: ID!
+    date:Date
+    patientName:String
+    patientCode: String
     relation: String
     direct: Boolean
-    other:  String
+    otherAffect:  String
   }
-
   type Hospitalizations{
     date_in: Date
     date_out: Date
@@ -251,6 +295,8 @@ type PersonalInfoResponseWithData{
     covidVariant: String
     coorporate: Boolean
     description: String
+    long:Float,
+    lat:Float,
   }
 
   input HospitalizationsInput{
@@ -261,9 +307,7 @@ type PersonalInfoResponseWithData{
     covidVariant: String
     coorporate: Boolean
     description: String
+    long:Float,
+    lat:Float,
   }
-
-
-
 `;
-

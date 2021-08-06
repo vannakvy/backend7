@@ -211,7 +211,7 @@ export default {
         if (user) {
           return {
             success: false,
-            message: "This user is already exist",
+            message: "មិនអាចបង្កើតបានទេ ",
           };
         }
 

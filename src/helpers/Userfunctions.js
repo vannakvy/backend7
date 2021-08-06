@@ -12,7 +12,7 @@ import {
 
 export const issueAuthToken = async (jwtPayload) => {
     let token = await sign(jwtPayload, SECRET, {
-        expiresIn: '24h'
+        expiresIn: '1d'
     });
     return `Bearer ${token}`;
 };

@@ -35,7 +35,6 @@ const QuarantineLabels = {
           },
           // populate: "customer",
         };
-  
         let query = {
           $or: [
             { locationName: { $regex: keyword, $options: "i" } },
@@ -45,9 +44,7 @@ const QuarantineLabels = {
             { province: { $regex: keyword, $options: "i" } },
           ],
         };
-  
         const quarantines = await QuarantineInfo.paginate(query, options);
-  
         return quarantines;
       },
       //@Desc getting the Quarantine by id
@@ -66,8 +63,6 @@ const QuarantineLabels = {
       //@Desc create new Quarantine
       //@access auth
       createQuarantineInfo: async (_, { newQuarantineInfo }, { QuarantineInfo }) => {
-     
-        
         try {
           const isExisted = await QuarantineInfo.findOne({
             locationName: newQuarantineInfo.locationName,

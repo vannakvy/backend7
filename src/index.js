@@ -41,9 +41,9 @@ const server = new ApolloServer({
   context: ({ req }) => {
     const isAuth = req.isAuth
     const user = req.user
-    // console.log(isAuth)
+    const roles = req.role
     // console.log(user)
-    return { req,isAuth,user, pubsub, ...AppModels };
+    return { req,roles,isAuth,user, pubsub, ...AppModels };
   },
   subscriptions: {
     path: "/graphql",
@@ -78,6 +78,8 @@ const startApp = async () => {
     });
   }
 };
+
+// $and:[{commune:"ចាឈូក"},{sampleTest: { $elemMatch: { date: { $gte: "2021-08-05T00:00:00.000+00:00", $lt: "2021-08-05T00:00:00.000+00:00" } } }}]
 
 // Invoke Start Application Function
 startApp();
