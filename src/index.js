@@ -80,7 +80,6 @@ const startApp = async () => {
 };
 
 // $and:[{commune:"ចាឈូក"},{sampleTest: { $elemMatch: { date: { $gte: "2021-08-05T00:00:00.000+00:00", $lt: "2021-08-05T00:00:00.000+00:00" } } }}]
-
 // Invoke Start Application Function
 startApp();
 

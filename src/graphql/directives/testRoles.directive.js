@@ -36,16 +36,13 @@ export class AuthDirective extends SchemaDirectiveVisitor {
         if (! requiredRole) {
           return resolve.apply(this, args);
         }
-        // console.log(args[2].user,"dyd")
         const context = args[2];
-        let user = context.user.roles; 
-      
 
-       let role = await user.map(b=>b.role)
-      let has = role.includes(requiredRole);
-    
+        let roles = context.roles
+      let has = roles.includes(requiredRole);
+    console.log(has)
         if (!has) {
-          throw new Error("You are not allow to get this result");
+          throw new Error("អ្នកមិនត្រូវបានអនុញ្ញាតិអោយប្រត្តិបត្តិការនេះទេ​ សូមទាក់ទងផ្នែក IT");
         }
         return resolve.apply(this, args);
       };

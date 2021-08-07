@@ -6,6 +6,7 @@ export class IsAuthDirective extends SchemaDirectiveVisitor {
     const { resolve = defaultFieldResolver } = field;
     field.resolve = async function (...args) {
       let [_, {}, {next, user, isAuth,roles }] = args;
+      console.log(roles)
       
       if (isAuth) {
         const result = await resolve.apply(this, args);

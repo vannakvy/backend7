@@ -159,6 +159,9 @@ export default gql`
     covidVariant:String,
     resultDate:Date,
     testType:String
+    formFillerName:String,
+    labFormCompletedByTel:String,
+    formFillerTel:String,
   }
   type TravelOverCountryHistory{
         arriveDate:Date,
@@ -189,6 +192,9 @@ export default gql`
     laboratory:String
     resultDate:Date
     testType:String
+    formFillerName:String,
+    formFillerTel:String,
+    labFormCompletedByTel:String,
   }
   input currentStatusInput{
         confirm:Boolean,

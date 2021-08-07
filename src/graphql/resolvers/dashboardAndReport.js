@@ -7,15 +7,6 @@ export default {
     //@Desc get all positive confirm and death 
 
     getPeopeleConfirmRecoverAndDeath:async(_,{startDate, endDate},{PersonalInfo})=>{
-      // console.log(startDate)
-      // console.log(endDate)
-      // console.log(new Date().setHours(0,0,0,0))
-      // console.log(new Date().setHours(59,59,59,59))
-
-        // const data1 = await PersonalInfo.find({ sampleTest: { $elemMatch: {$and:[{"result": true },{ "currentState.deathAt": { $gte: startDate,$lt: endDate
-        // }  }]}}})
-
-      
 
         const data1 = await PersonalInfo.find({$and:[{"currentState.recovered": true },{ "currentState.recoveredAt": { $gte: startDate,$lt: endDate}  }] })
         const data2 = await PersonalInfo.find({$and:[{"currentState.death": true },{ "currentState.deathAt": { $gte: startDate,$lt: endDate}  }] })
@@ -34,36 +25,18 @@ export default {
 
     
     // "$gte": new Date("2014-08-01"), "$lt": new Date("2014-08-02")
-    // @Desc all tested 
+
+
+    // @Desc get totalSampleTest and today sample test 
     // Access auth 
     getAllAllSampleTest:async(_,{},{PersonalInfo})=>{
-      // let data =  await PersonalInfo.aggregate([
-      //       {
-      //         $project: {
-      //             firstName: 1,
-      //             arraySize: { $cond: { if: { $isArray: "$sampleTest" }, then: { $size: "$sampleTest" }, else: 0} },
-      //             // arraySize: { $cond: [ $and: [{ if: { $isArray: "$sampleTest" }, then: { $size: "$sampleTest" }, else: 0}]]  }  
-      //         }
-      //       }
-      //   ] )
-        // $cond: [ {$and : [ { $eq: [ "$gender", "ប្រុស"] },
-        // { $gte: [ "$currentState.confirmedAt",today] }] }, 1,0 ]
-       
-        // new Date().setHours(00,00,00)
-        // let ddd = new Date()
-        // console.log(ddd.setHours(0,0,0))   
-        // console.log(new Date(new Date().setHours(23,59,59)) )
-      
-        // start = formatDate(startDate)+"T00:00:00.032Z"
-        // end = formatDate(endDate)+"T23:59:59.033Z"
+
         let today = new Date();
         today.setHours(0, 0, 0, 0);
         let end = new Date();
         end.setHours(23, 59, 59,59);
         // end.setDate(start.getDate() + 1)
-    
-                
-        // { sampleTest: { $elemMatch: { date: { $gte: "2021-08-04T23:59:59.032Z", $lt: "2021-08-06T17:00:00.033Z" } } } }
+     
   
       let data =  await PersonalInfo.aggregate([
           { "$match":{ "sampleTest.date": {$gte:today,$lt:end} } },

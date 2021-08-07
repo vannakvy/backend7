@@ -104,15 +104,7 @@ export default {
 
               console.log(start.toString(),end.toString(),"datedddd")
 
-              // console.log(startDate.toString(),endDate.toString())
-              
-              // if(start.toString() === end.toString()){
-              //     start  = new Date(start)
-              //     start.setHours(0, 0, 0, 0)
-              //     end = new Date(start)
-              //     end.setDate(start.getDate() + 1)
-              //     console.log("test")
-              // }
+       
          query = {
            $and: [
              {
@@ -131,7 +123,7 @@ export default {
                ],
              },
              // { "currentState.confirm": false },
-             { "sampleTest": { $ne: []} },
+            //  { "sampleTest": { $ne: []} },
             //  { "district": { $ne: []} },
              // { "sampleTest.date": { $gte: startDate, $lt: endDate } },
              // { sampleTest: { $elemMatch: {  } }
@@ -499,7 +491,6 @@ deletePeopleFromQuarantine:async(_,{personalInfoId,quarantingId},{PersonalInfo})
  await PersonalInfo.findById(personalInfoId)
      
  await PersonalInfo.updateOne({"_id" : personalInfoId, "sampleTest._id" : sampleTestId},{$set : {"sampleTest":sampleTest}})
-  
         return {
           success: true,
           message: "Update Successfully",
@@ -705,7 +696,7 @@ deletePeopleFromQuarantine:async(_,{personalInfoId,quarantingId},{PersonalInfo})
 
         return {
           success: true,
-          message: "Deleted Successfully",
+          message: "មិនអាច លុបបានទេ",
         };
       } catch (error) {
         return {
@@ -718,30 +709,19 @@ deletePeopleFromQuarantine:async(_,{personalInfoId,quarantingId},{PersonalInfo})
     //@access auth
     createPersonalInfo: async (_, { newInfo }, { PersonalInfo }) => {
       try {
-        let firstNameExist = await PersonalInfo.findOne({"firstName":newInfo.firstName});
-        let lastName = await PersonalInfo.findOne({"lastName":newInfo.lastName});
-        let village = await PersonalInfo.findOne({"village":newInfo.village});
-        console.log(firstNameExist)
-        console.log(lastName)
-        console.log(village)
-
-if(firstNameExist && lastName && village){
- console.log("not working")
+        let exist = await PersonalInfo.findOne({$and:[{"firstName":newInfo.firstName},{"lastName":newInfo.lastName},{"village":newInfo.village}]});
+if(exist){
  return {
    response :{
     message: "សូមមេពិនិត្យឈ្មោះ ម្តងទៀតយើងពិនិតឃើញថាមាន ទិន្ន័យស្ទូន",
     success: false,
   },
   personalInfo:{}
-
+  }
 }
-}
-
-
 
         const info = new PersonalInfo(newInfo);
         const personalInfo = await info.save()
-        console.log(personalInfo)
         if (!personalInfo) {
           return {
             response :{

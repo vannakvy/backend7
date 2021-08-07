@@ -52,6 +52,7 @@ const PersonalInfoShema = mongoose.Schema({
     //ជំងឺប្រចាំកាយ
     chronic:String,
     sampleTest:[{
+        formFillerName:String,
         covidVariant:String,
         specimentType:String,
         reasonForTesting:String,
@@ -63,8 +64,10 @@ const PersonalInfoShema = mongoose.Schema({
         symptom:String,
         symptomStart:Date,
         labFormCompletedBy:String,
+        labFormCompletedByTel:String,
         laboratory:String,
         testType:String,
+        formFillerTel:String,
         other:{
             type:String,
             default:"",
