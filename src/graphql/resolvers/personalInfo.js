@@ -45,43 +45,7 @@ export default {
       return allData;
     },
 
-    // getPeopleForSampleTestWithPagination: async (_, {page,limit,keyword,startDate,endDate}, { PersonalInfo,roles }) => {
-    //   const options = {
-    //     page: page || 1,
-    //     limit: limit || 300,
-    //     customLabels: PersonalInfoLabels,
-    //     sort: {
-    //       createdAt: 1,
-    //     },
-    //     //   populate: "case",
-    //   };
-    //   let query;
-    //   let start;
-    //   let end;
-    //  if(startDate !== null || endDate!==null){
-    //           start = startDate
-    //           end = endDate 
 
-    //           // console.log(startDate.toString(),endDate.toString())
-              
-    //           if(start.toString() === end.toString()){
-    //               start  = new Date(start)
-    //               start.setHours(0, 0, 0, 0)
-    //               end = new Date(start)
-    //               end.setDate(start.getDate() + 1)
-
-    //           }
-    //      query = {
-    //        $and: [
-    //          { sampleTest: { $elemMatch: { date: { $gte: new Date("2021-08-05T00:00:00"), $lt: new Date("2021-08-05T59:00:00") } } } },{commune:"ចារឈូក"}
-    //        ],
-    //      };
-    //     }
- 
-    // const personalInfos = await PersonalInfo.paginate(query, options);
-    // return personalInfos;
-    // },
-    // allPersonalInfosForExcel:async 
     //@Desc get perfornal info for the Hospital
     //@Access police
 
@@ -273,7 +237,7 @@ export default {
               { idCard: { $regex: keyword, $options: "i" } },
             ],
           },
-          { "currentState.confirm": true },
+          { sampleTest: { $elemMatch: { result: true } } },
           { interviewed: interview },
           // { "currentState.confirmedAt": { $gte: startDate, $lt: endDate } },
         ],
