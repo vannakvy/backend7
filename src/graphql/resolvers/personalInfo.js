@@ -81,14 +81,21 @@ export default {
       let end;
       let testLocationQuery = {};
       if (testLocation !== null) {
-        testLocationQuery = {
-          sampleTest: {
-            $elemMatch: {
-              $or: [{ testLocation: testLocation }, { testLocation: null }],
+        if(testLocation===""){
+          testLocationQuery = {
+            sampleTest: {
+              $elemMatch: {
+                $or: [{ testLocation: testLocation }, { testLocation: null }],
+              },
             },
-          },
-        };
+          };
+        }else{
+          testLocationQuery = {sampleTest: {$elemMatch: {testLocation: testLocation }}}
+        }
+      
       }
+
+
       if (startDate !== null || endDate !== null) {
         start = formatDate(startDate) + "T00:00:00.00";
         end = formatDate(endDate) + "T23:59:59.00";
@@ -383,19 +390,27 @@ export default {
       };
 
       let current = {};
+      let current1 = {};
+      let current2 = {};
 
       switch (currentState) {
         case "វិជ្ជមាន":
           current = { "currentState.confirm": true}
+          current1 = { "currentState.recovered": false}
+          current2 = { "currentState.death": false}
           break;
         case "ជាសះស្បើយ":
           current = { "currentState.recovered": true}
+          current1 = {}
+          current2 = { "currentState.death": false}
           break;
         case "ស្លាប់":
           current = { "currentState.death": true}
           break;
         case "អវិជ្ជមាន":
           current = { "currentState.confirm": false}
+          current1 = { "currentState.recovered": false}
+          current2 = { "currentState.death": false}
           break;
       default:
         current = {}
@@ -418,6 +433,8 @@ export default {
             ],
           },
           current,
+          current1,
+          current2
         ],
       };
       const personalInfos = await PersonalInfo.paginate(query, options);
