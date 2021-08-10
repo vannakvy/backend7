@@ -761,7 +761,7 @@ export default {
       { PersonalInfo }
     ) => {
       try {
-        const updated = await PersonalInfo.update(
+        const updated = await PersonalInfo.updateOne(
           { _id: personalInfoId },
           {
             $set: {
