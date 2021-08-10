@@ -58,7 +58,8 @@ const PersonalInfoShema = mongoose.Schema({
         reasonForTesting:String,
         date: {type: Date, required: true,default:new Date()},
         times:{type: Number, required: true,default:0},
-        testLocation:String,
+        testLocation:{type:String,
+        default:""},
         result:{type:Boolean,required: true, default:false},
         resultDate:Date,
         symptom:String,
@@ -119,7 +120,7 @@ const PersonalInfoShema = mongoose.Schema({
         },
         otherAffect:String
     },
-    hospitalization:[{
+    hospitalizations:[{
         long:Number,
         lat:Number,
         hospitalName:String,

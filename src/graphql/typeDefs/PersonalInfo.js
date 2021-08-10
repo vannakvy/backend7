@@ -4,6 +4,7 @@ export default gql`
   extend type Query {
     excelExport(startDate:Date, endDate:Date): [PersonalInfo!]!
     allPersonalInfos: [PersonalInfo!]!
+    getSampleTestLocation: [SampleTestLocation]
     allPersonalInfosForExcel: [PersonalInfo!]!
     getPersonalInfoById(id: ID!): PersonalInfo!
     # for police
@@ -11,8 +12,8 @@ export default gql`
     getPeopleForQuarantineWithPagination(page:Int, limit:Int, keyword:String,quarantineInfoId:ID!): PaginateResponse!
     getAffectedPersonalListWithPagination(page:Int, limit:Int, keyword:String,patientId:ID!):PaginateResponse!
     # for the doctor 
-    getPatientForHospitalPagination(page:Int, limit:Int, keyword:String,active:String,startDate:Date, endDate:Date): PaginateResponse!
-    getPeopleForSampleTestWithPagination(page:Int, limit:Int, keyword:String,startDate:Date, endDate:Date): PaginateResponse!
+    getPatientForHospitalWithPagination(page:Int, limit:Int, keyword:String,startDate:Date, endDate:Date,hospitalId:ID!): PaginateResponse!
+    getPeopleForSampleTestWithPagination(page:Int, limit:Int, keyword:String,startDate:Date, endDate:Date,testLocation:String): PaginateResponse!
   
     getConfirmedPersonalInfoByInterviewWithPagination(
       interview:Boolean, 
@@ -23,7 +24,10 @@ export default gql`
     getPersonalInfoWithPagination(
       page: Int!
       limit: Int!
-      keyword: String
+      keyword: String,
+      currentState:String,
+      startDate:Date,
+      endDate:Date
     ): PaginateResponse!
     getPersonalInfoByCaseWithPagination(
       page: Int!
@@ -35,7 +39,6 @@ export default gql`
   extend type Mutation {
     createPersonalInfo(newInfo: PersonalInfoInput!): PersonalInfoResponseWithData
     recordSampleTest(sampleTest:SampleTestInput!,personalInfoId:ID!):PersonalInfoResponse!
-
     updatePersonalInfo(
       updatedInfo: PersonalInfoInput!
       id: ID!
@@ -43,18 +46,25 @@ export default gql`
     deletePersonalInfo(id: ID!): PersonalInfoResponse @isAuth(requires:ADMIN) 
     deleteSampleTest(personalInfoId:ID!,sampleTestId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
     updateSampleTest(personalInfoId:ID!,sampleTestId:ID!,sampleTest:SampleTestInput):PersonalInfoResponse 
-    updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse
+    updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse @isAuth(requires:ADMIN) 
 
 
   # For police 
-  addHistoryWithin14days(createLocation:HistoryWithin14daysInput,personalInfoId:ID!):PersonalInfoResponse
+  addHistoryWithin14days(createLocation:HistoryWithin14daysInput,personalInfoId:ID!):PersonalInfoResponse 
   deleteHistoryWithin14days(personalInfoId:ID!,historyWithin14Id:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
 
   addPeopleToQuarantine(newQuarantine:QuarantingInput,personalInfo:ID!):PersonalInfoResponse 
   deletePeopleFromQuarantine(personalInfoId:ID!,quarantingId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
 
+  addPatientToHospital(newHospitalization:HospitalizationsInput,personalInfoId:ID!):PersonalInfoResponse 
+  deletePatientFromHospital(personalInfoId:ID!,hospitalId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
+
   # //delete  left 
   # //update left 
+  }
+
+  type SampleTestLocation{
+    _id:String
   }
  
   type PersonalInfo {
@@ -95,7 +105,6 @@ export default gql`
     affectedFrom: AffectedFrom
     quaranting:[Quarantings]
   }
-
   type Vaccination{
     date:Date
     times:Int 
@@ -314,4 +323,9 @@ type PersonalInfoResponseWithData{
     long:Float,
     lat:Float,
   }
+
+  # type PersonalInfoResponeWithData{
+  #   response:PersonalInfoResponse,
+  #   hospitalInfo
+  # }
 `;

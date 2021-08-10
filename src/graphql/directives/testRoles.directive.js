@@ -37,10 +37,10 @@ export class AuthDirective extends SchemaDirectiveVisitor {
           return resolve.apply(this, args);
         }
         const context = args[2];
-
-        let roles = context.roles
+        
+      let roles = context.roles
+      console.log(roles)
       let has = roles.includes(requiredRole);
-    console.log(has)
         if (!has) {
           throw new Error("អ្នកមិនត្រូវបានអនុញ្ញាតិអោយប្រត្តិបត្តិការនេះទេ​ សូមទាក់ទងផ្នែក IT");
         }

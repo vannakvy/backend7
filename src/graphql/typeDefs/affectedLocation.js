@@ -3,7 +3,7 @@ import {gql} from 'apollo-server-express'
 export default gql`
   extend type Query {
     allAffectedLocations:[AffectedLocation!]!
-    getAffectedLocationWithPagination(page:Int!, limit:Int!, keyword:String):AffectedLocationPaginator!
+    getAffectedLocationWithPagination(page:Int!, limit:Int!, keyword:String,startDate:Date, endDate:Date):AffectedLocationPaginator!
     getAffectedLocationById(id:ID!):AffectedLocation!
   }
 

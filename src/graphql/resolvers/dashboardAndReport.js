@@ -36,7 +36,6 @@ export default {
         let end = new Date();
         end.setHours(23, 59, 59,59);
         // end.setDate(start.getDate() + 1)
-     
   
       let data =  await PersonalInfo.aggregate([
           { "$match":{ "sampleTest.date": {$gte:today,$lt:end} } },
@@ -562,6 +561,7 @@ let coorporateLocationToday = await AffectedLocation.countDocuments({
     { createdAt:{ $gte: today, $lt: tomorrow }} ],
 });
 
+
 return {
   totalAffectedLocation,
   totalAffectedLocationToday,
@@ -610,9 +610,15 @@ return {
     //   },
     // ]);
 
-    const totalInterview = await PersonalInfo.countDocuments({
-      $and:[ { interviewed: {$eq: true} }]
-    })
+    const totalInterview = await PersonalInfo.aggregate([
+      {   $group : {
+        _id : "currentState.confirmAt",
+        count: { $sum: 1 }
+     }}
+    ] 
+      // $and:[ { interviewed: {$eq: false} }]
+    )
+    console.log(totalInterview)
 
     return totalInterview;
  }

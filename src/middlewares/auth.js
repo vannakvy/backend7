@@ -26,7 +26,6 @@ const AuthMiddleware = async (req, res, next) => {
     // Extract the token and check for token
     // console.log(authHeader)
     const token = authHeader.split(" ")[1];
-
     if (!token || token === "") {
         req.isAuth = false;
         return next();
@@ -41,9 +40,8 @@ const AuthMiddleware = async (req, res, next) => {
         // console.log("running")
     } catch (err) {
         req.isAuth = false;
-        return next();
+         return next()
     }
-
     // If decoded token is null then set authentication of the request false
     if (!decodedToken) {
         req.isAuth = false;
@@ -53,23 +51,17 @@ const AuthMiddleware = async (req, res, next) => {
     // If the user has valid token then Find the user by decoded token's id
     // console.log(decodedToken.id)
     let authUser = await User.findById(decodedToken.id);
-
     if (!authUser) {
         req.isAuth = false;
         return next();
     }
 
-
-   
-   
     req.isAuth = true;
     req.user = authUser;
-
     let roles = req.user.roles
     let newRoles = roles.map(role=>role.role)
     req.role = newRoles
-
-   
+    
     return next();
 }
 

@@ -1,4 +1,4 @@
-
+import moment from 'moment'
 const AffectedLocationLabels = {
     docs: "affectedLocations",
     limit: "perPage",
@@ -10,6 +10,21 @@ const AffectedLocationLabels = {
     totalDocs: "totalDocs",
     totalPages: "totalPages",
   };
+
+    function formatDate(date) {
+        var d = new Date(moment.parseZone(date).format("YYYY-MM-DD")),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+
+        if (month.length < 2) 
+            month = '0' + month;
+        if (day.length < 2) 
+            day = '0' + day;
+
+        return [year, month, day].join('-') ;
+    }
+
 
 export default {
     Query:{
@@ -25,7 +40,7 @@ export default {
         },
         //@Desc Getting all AffectedLocations  with pagination 
         //@access auth
-        getAffectedLocationWithPagination:async(_,{page,limit,keyword},{AffectedLocation})=>{
+        getAffectedLocationWithPagination:async(_,{page,limit,keyword, startDate, endDate},{AffectedLocation})=>{
             const options = {
                 page: page || 1,
                 limit: limit || 10,
@@ -35,19 +50,34 @@ export default {
                 },
                 // populate: "case personalInfo",
               };
+                
+                
+                var openAtSet = {};
+                // let start;
+                // let end;
+                if(startDate !== null || endDate !== null){
+                    let start = formatDate(startDate)+"T00:00:00.00";
+                    let end = formatDate(endDate)+"T23:59:59.00";
+                    openAtSet = { "openAt": { $gte: start, $lt: end } }
+                }
 
-              let query = {
-                $or: [
-                    { effectedLocationName: { $regex: keyword, $options: "i" } },
-                  { village: { $regex: keyword, $options: "i" } },
-                  { commune: { $regex: keyword, $options: "i" } },
-                  { district: { $regex: keyword, $options: "i" } },
-                  { province: { $regex: keyword, $options: "i" } },
-                ],
-              };
+                let query = {
+                    $and:[
+                        {
+                        $or: [
+                            { locationName: { $regex: keyword, $options: "i" } },
+                            { village: { $regex: keyword, $options: "i" } },
+                            { commune: { $regex: keyword, $options: "i" } },
+                            { district: { $regex: keyword, $options: "i" } },
+                            { province: { $regex: keyword, $options: "i" } },
+                            ],
+                        },openAtSet,
+                    ]
+                };
+                
 
-              const affectedLocations = await AffectedLocation.paginate(query, options);
-            
+            const affectedLocations = await AffectedLocation.paginate(query, options);
+            console.log(affectedLocations)
               return affectedLocations;
         },
         //@Desc getting the AffectedLocation by id

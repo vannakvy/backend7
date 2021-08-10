@@ -46,7 +46,7 @@ const server = new ApolloServer({
     return { req,roles,isAuth,user, pubsub, ...AppModels };
   },
   subscriptions: {
-    path: "/graphql",
+    path: "/graphqls",
     onConnect: async (connectionParams, webSocket, context) => {
       console.log("connection");
     },
