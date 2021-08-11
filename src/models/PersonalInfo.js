@@ -131,7 +131,7 @@ const PersonalInfoShema = mongoose.Schema({
             type:mongoose.Schema.Types.ObjectId,
             ref:"HospitalInfo"
         },
-        covidVarariant:String,
+        covidVariant:String,
         coorporate:{
             type:Boolean,
             default:true

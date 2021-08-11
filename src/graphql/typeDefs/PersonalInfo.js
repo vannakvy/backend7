@@ -59,6 +59,9 @@ export default gql`
   addPatientToHospital(newHospitalization:HospitalizationsInput,personalInfoId:ID!):PersonalInfoResponse 
   deletePatientFromHospital(personalInfoId:ID!,hospitalId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
 
+  addVaccination(vaccination:VaccinationInput,personalInfoId:ID!):PersonalInfoResponse 
+  deleteVaccination(personalInfoId:ID!,vaccinationId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
+
   # //delete  left 
   # //update left 
   }
@@ -106,6 +109,7 @@ export default gql`
     quaranting:[Quarantings]
   }
   type Vaccination{
+    id:ID
     date:Date
     times:Int 
     vaccineType:String
@@ -301,6 +305,7 @@ type PersonalInfoResponseWithData{
     otherAffect:  String
   }
   type Hospitalizations{
+    id:ID
     date_in: Date
     date_out: Date
     hospitalName: String

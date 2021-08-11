@@ -40,6 +40,7 @@ const server = new ApolloServer({
   uploads: true,
   context: ({ req }) => {
     const isAuth = req.isAuth
+    console.log(isAuth)
     const user = req.user
     const roles = req.role
     // console.log(user)

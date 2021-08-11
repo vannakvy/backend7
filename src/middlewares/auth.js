@@ -10,6 +10,8 @@ import {
     verify
 } from 'jsonwebtoken';
 
+import {AuthenticationError} from 'apollo-server-express'
+
 /**
  * Custom User Authentication Middleware
  * Which Finds the user from the database using the request token 
@@ -18,6 +20,7 @@ const AuthMiddleware = async (req, res, next) => {
     // Extract Authorization Header
     const authHeader = req.get("Authorization");
 // console.log(authHeader,"ddddd")
+
     if (!authHeader) {
         req.isAuth = false;
         return next();
@@ -36,10 +39,10 @@ const AuthMiddleware = async (req, res, next) => {
     try {
         // console.log(token)
         decodedToken = verify(token, SECRET);
-        console.log("yes")
         // console.log("running")
     } catch (err) {
         req.isAuth = false;
+        // res.status(401)
          return next()
     }
     // If decoded token is null then set authentication of the request false
@@ -61,7 +64,6 @@ const AuthMiddleware = async (req, res, next) => {
     let roles = req.user.roles
     let newRoles = roles.map(role=>role.role)
     req.role = newRoles
-    
     return next();
 }
 

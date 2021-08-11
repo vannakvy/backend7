@@ -27,7 +27,11 @@ function formatDate(date) {
 
 export default {
   Query: {
+
+ 
     //For Doctor
+
+    
 
     //@Desc Get location of the sample test
     //@Access Auth
@@ -99,6 +103,7 @@ export default {
       if (startDate !== null || endDate !== null) {
         start = formatDate(startDate) + "T00:00:00.00";
         end = formatDate(endDate) + "T23:59:59.00";
+        console.log(start,end)
         query = {
           $and: [
             {
@@ -195,7 +200,6 @@ export default {
         ],
       };
       const personalInfos = await PersonalInfo.paginate(query, options);
-      console.log(personalInfos);
       return personalInfos;
     },
 
@@ -493,6 +497,36 @@ export default {
   },
 
   Mutation: {
+    //@Desc add Vaccination 
+    //@ACCESS 
+    addVaccination: async (
+      _,
+      { vaccination, personalInfoId },
+      { PersonalInfo }
+    ) => {
+      try {
+        const updatedData = await PersonalInfo.findByIdAndUpdate(
+          personalInfoId,
+          { $push: { vaccination: vaccination } }
+        );
+        if (!updatedData) {
+          return {
+            success: false,
+            message: "មិនទាន់មានអ្នកកំណត់ត្រានេះទេ",
+          };
+        }
+
+        return {
+          success: true,
+          message: "ជោគជ័យ",
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
     //@Desc Delete the patient from hospital
     //Access admin
 
@@ -502,12 +536,14 @@ export default {
       { PersonalInfo }
     ) => {
       try {
+  
         let a = await PersonalInfo.updateOne(
           { _id: personalInfoId },
           {
-            $pull: { hospitalizations: { hospitalInfo: hospitalId } },
+            $pull: { hospitalizations: { _id: hospitalId } },
           }
         );
+      
         return {
           success: true,
           message: "លុបបានជោគជ័យ",
@@ -625,7 +661,6 @@ export default {
           personalInfoId,
           { $push: { hospitalizations: newHospitalization } }
         );
-        console.log(updatedData);
         if (!updatedData) {
           return {
             success: false,
@@ -633,18 +668,7 @@ export default {
           };
         }
 
-        // let a = await PersonalInfo.updateOne(
-        //   { _id: personalInfo },
-        //   {
-        //     $push: {
-        //       hospitalizations: {
-        //         $each: [newHospitalization],
-        //         // $sort: { score: 1 },
-        //         $slice: -5,
-        //       },
-        //     },
-        //   }
-        // );
+    
 
         return {
           message: "បញ្ចូលបានជោកជ័យ",
@@ -659,7 +683,6 @@ export default {
     },
 
     // deletePatientFromHospital
-
     // For police
     addPeopleToQuarantine: async (
       _,
@@ -862,6 +885,36 @@ export default {
       }
     },
 
+    //@Desc delete the hospital from the the persoanl info
+    //@access auth admin 
+        // @Desc delete sample Test
+    // @auth
+
+    // deleteHospitalFromPersonalInfo: async (
+    //   _,
+    //   { personalInfoId, hospitalId },
+    //   { PersonalInfo }
+    // ) => {
+    //   try {
+    //     let a = await PersonalInfo.updateOne(
+    //       { _id: personalInfoId },
+    //       {
+    //         $pull: { hospitalizations: { _id: hospitalId } },
+    //       }
+    //     );
+
+    //     return {
+    //       success: true,
+    //       message: "មិនអាច លុបបានទេ",
+    //     };
+    //   } catch (error) {
+    //     return {
+    //       success: false,
+    //       message: error.message,
+    //     };
+    //   }
+    // },
+
     // @Desc delete sample Test
     // @auth
 
@@ -889,6 +942,35 @@ export default {
         };
       }
     },
+
+    //@Desc delete the vacination from the personalInfo
+    //@Access admin deleteVaccination
+    deleteVaccination: async (
+      _,
+      { personalInfoId, vaccinationId },
+      { PersonalInfo }
+    ) => {
+      try {
+        let a = await PersonalInfo.updateOne(
+          { _id: personalInfoId },
+          {
+            $pull: { vaccination: { _id: vaccinationId } },
+          }
+        );
+
+        return {
+          success: true,
+          message: "មិនអាច លុបបានទេ",
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
+
+
     //@Desc create new Personal Info
     //@access auth
     createPersonalInfo: async (_, { newInfo }, { PersonalInfo }) => {
