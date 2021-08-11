@@ -46,7 +46,7 @@ export default gql`
     deletePersonalInfo(id: ID!): PersonalInfoResponse @isAuth(requires:ADMIN) 
     deleteSampleTest(personalInfoId:ID!,sampleTestId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
     updateSampleTest(personalInfoId:ID!,sampleTestId:ID!,sampleTest:SampleTestInput):PersonalInfoResponse 
-    updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse @isAuth(requires:ADMIN) 
+    updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse  
 
 
   # For police 
