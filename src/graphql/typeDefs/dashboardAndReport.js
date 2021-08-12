@@ -10,12 +10,11 @@ extend type Query {
     getAllDistrictForMap:[AllProvince!]!
     getDataForGrap: GraphResponse
     getDataForBarGraphTotal:BarGraphTotal
-    getDataForReport:[Report]
+    getDataForReport(startDate:String,endDate:String):[Report]
     affectedLocationReport:AffectedData 
     interviewForReport3Times:Inter
     getDataForGrapBottom:GraphResponse
 }
-
 type reportData{
     recovered:[PersonalInfo!]!
     death:[PersonalInfo!]!

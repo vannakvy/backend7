@@ -10,6 +10,5 @@ export const hasRole =(roles, requiredRole)=>{
         if(role.role == requiredRole){
             return true
         } 
-        
     });
 }

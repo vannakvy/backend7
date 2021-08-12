@@ -10,17 +10,14 @@ export default {
 
         const data1 = await PersonalInfo.find({$and:[{"currentState.recovered": true },{ "currentState.recoveredAt": { $gte: startDate,$lt: endDate}  }] })
         const data2 = await PersonalInfo.find({$and:[{"currentState.death": true },{ "currentState.deathAt": { $gte: startDate,$lt: endDate}  }] })
-        const data3 = await PersonalInfo.find({ sampleTest: { $elemMatch: {$and:[{"result": true },{ "resultDate": { $gte: startDate,$lt: endDate
-        }  }]}}})
+        const data3 = await PersonalInfo.find({$and:[{"currentState.confirm": true },{ "currentState.confirmedAt": { $gte: startDate,$lt: endDate}  }] })
         
        const  reportData ={
             recovered : data1,
             death:data2,
             confirm:data3
           }
-
           return reportData
-        
     },
 
     
@@ -98,10 +95,11 @@ export default {
       let sampleTest =[];
       let sampleTestToday=0;
 
-      let today = new Date();
-      today.setHours(0, 0, 0, 0); // set to 0:00
-      let tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
+      let tod = new Date();
+      let today = moment(tod).startOf('day').format()
+      let torow = new Date(tod);
+      torow.setDate(torow.getDate() + 1);
+      let tomorrow = moment(torow).startOf('day').format()
    
 
       let totalHospital = await HospitalInfo.countDocuments({})
@@ -158,13 +156,7 @@ export default {
           $and: [{ "currentState.death": true }, { district: district }],
         });
         //   // const confirmToday = await PersonalInfo.countDocuments({"currentState.confirm":true,"currentState.confirmedAt": new Date() });
-        let tod = new Date();
-        let today = moment(tod).startOf('day').format()
-        let torow = new Date(tod);
-        torow.setDate(torow.getDate() + 1);
-        let tomorrow = moment(torow).startOf('day').format()
-        
-
+     
 
         confirmToday = await PersonalInfo.countDocuments({
           $and: [
@@ -193,7 +185,9 @@ export default {
           ],
         });
 
-        console.log(sampleTestToday,today, tomorrow)
+        // console.log(sampleTestToday,today, tomorrow)
+
+
 
       // let ssd =   await PersonalInfo.aggregate([
       //     // { "$match":{ "district": {$gte:today,$lt:tomorrow}}},
@@ -284,7 +278,7 @@ export default {
         },
       ]);
 
-      console.log(data)
+    
 
       return data;
     },
@@ -395,7 +389,6 @@ export default {
             value: { $sum: 1 },
           },
         },
-      
       ]);
       let recovered = await PersonalInfo.aggregate([
         {
@@ -449,13 +442,16 @@ export default {
      },
 
 
-
-
     // @Desc getting the data for report
     //auth and private
-    getDataForReport: async (_, { start, end }, { PersonalInfo }) => {
-      let today = new Date();
-      today.setHours(0, 0, 0, 0);
+    getDataForReport: async (_, {}, { PersonalInfo }) => {
+      let today = moment(startDate).startOf('day').format()
+      let torow = new Date(endDate);
+      torow.setDate(torow.getDate() + 1);
+      let tomorrow = moment(torow).startOf('day').format()
+
+      // console.log(startDate,endDate)
+
       const data = await PersonalInfo.aggregate([
         {
           $project: {
@@ -540,14 +536,20 @@ export default {
     },
 
     //for resport 
+
+    //@Desc get locations 
+    //@auth 
  affectedLocationReport: async(_,{},{AffectedLocation})=>{
-        let today = new Date();
-        today.setHours(0, 0, 0, 0); // set to 0:00
-        let tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
+
+      let tod = new Date();
+      let today = moment(tod).startOf('day').format()
+      let torow = new Date(tod);
+      torow.setDate(torow.getDate() + 1);
+      let tomorrow = moment(torow).startOf('day').format()
 // ទីតាំពាក់ព័ន
 //1
      let totalAffectedLocation = await AffectedLocation.countDocuments({});
+
 //2
     let totalAffectedLocationToday = await AffectedLocation.countDocuments({
     "createdAt": { $gte: today, $lt: tomorrow },
@@ -613,8 +615,6 @@ return {
  },
 
  interviewForReport3Times:async(_,{},{PersonalInfo})=>{
-    
-
     const totalInterview = await PersonalInfo.aggregate([
       {   $group : {
         _id : "currentState.confirmAt",
@@ -623,8 +623,6 @@ return {
     ] 
       // $and:[ { interviewed: {$eq: false} }]
     )
-
-
     const test2 = await PersonalInfo.aggregate([
       {$match:{interviewed:false}},
       {   $group : {
@@ -633,11 +631,11 @@ return {
      }}
     ])
     ////
-
-    let today = new Date();
-    today.setHours(0, 0, 0, 0); // set to 0:00
-    let tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    let tod = new Date();
+    let today = moment(tod).startOf('day').format()
+    let torow = new Date(tod);
+    torow.setDate(torow.getDate() + 1);
+    let tomorrow = moment(torow).startOf('day').format()
     const data = await PersonalInfo.aggregate([
       {
         $project: {
@@ -648,21 +646,19 @@ return {
           },
           interviewTotal: {
             $cond: [ { $eq: [ "$interviewed", true] }, 1,0]},
-    
         },
       },
       {
         $group: {
           _id: "$interviewed",
-          today: { $sum: "$interviewedToday" },
+          today: { $sum: "$interviewedToday"},
           interviewTotal: { $sum: "$interviewTotal" },
         },
       },
     ]);
     ///
-    console.log(data)
-    console.log(test2)
-console.log(totalInterview)
+
+// console.log(totalInterview)
     return totalInterview;
  }
   },

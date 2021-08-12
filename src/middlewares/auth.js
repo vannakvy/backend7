@@ -10,7 +10,7 @@ import {
     verify
 } from 'jsonwebtoken';
 
-import {AuthenticationError} from 'apollo-server-express'
+// import {AuthenticationError} from 'apollo-server-express'
 
 /**
  * Custom User Authentication Middleware

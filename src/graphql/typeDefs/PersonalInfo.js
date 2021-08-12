@@ -4,6 +4,7 @@ export default gql`
   extend type Query {
     excelExport(startDate:Date, endDate:Date): [PersonalInfo!]!
     allPersonalInfos: [PersonalInfo!]!
+    allPersonalInfosForThatNegative: [PersonalInfo!]!
     getSampleTestLocation: [SampleTestLocation]
     allPersonalInfosForExcel: [PersonalInfo!]!
     getPersonalInfoById(id: ID!): PersonalInfo!
@@ -13,7 +14,7 @@ export default gql`
     getAffectedPersonalListWithPagination(page:Int, limit:Int, keyword:String,patientId:ID!):PaginateResponse!
     # for the doctor 
     getPatientForHospitalWithPagination(page:Int, limit:Int, keyword:String,startDate:Date, endDate:Date,hospitalId:ID!): PaginateResponse!
-    getPeopleForSampleTestWithPagination(page:Int, limit:Int, keyword:String,startDate:Date, endDate:Date,testLocation:String): PaginateResponse!
+    getPeopleForSampleTestWithPagination(page:Int, limit:Int, keyword:String,startDate:String, endDate:String,testLocation:String): PaginateResponse!
   
     getConfirmedPersonalInfoByInterviewWithPagination(
       interview:Boolean, 
@@ -48,7 +49,9 @@ export default gql`
     updateSampleTest(personalInfoId:ID!,sampleTestId:ID!,sampleTest:SampleTestInput):PersonalInfoResponse 
     updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse  
 
+    updateAffectedFrom(personalInfoId:ID!,updateValue:AffectedFromInput):PersonalInfoResponse  
 
+    
   # For police 
   addHistoryWithin14days(createLocation:HistoryWithin14daysInput,personalInfoId:ID!):PersonalInfoResponse 
   deleteHistoryWithin14days(personalInfoId:ID!,historyWithin14Id:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 

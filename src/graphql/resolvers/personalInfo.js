@@ -71,6 +71,12 @@ export default {
       { page, limit, keyword, startDate, endDate, testLocation },
       { PersonalInfo, roles }
     ) => {
+  
+    // console.log(startDate.toLocaleString(),"dd")
+    // console.log(endDate.toLocaleString(),"ddend")
+    // let a =  moment(startDate, "YYYY-MM-DD").add(new Date().getTimezoneOffset(),'minute').format('DD-MM-YYYY HH:mm')
+      // console.log(moment(startDate).format('LLL').format('DD-MM-YYYY HH:mm'))
+
       const options = {
         page: page || 1,
         limit: limit || 25,
@@ -103,7 +109,9 @@ export default {
       if (startDate !== null || endDate !== null) {
         start = formatDate(startDate) + "T00:00:00.00";
         end = formatDate(endDate) + "T23:59:59.00";
-        console.log(start,end)
+    
+        // start = startDate;
+        // end = endDate;
         query = {
           $and: [
             {
@@ -322,7 +330,8 @@ export default {
               { idCard: { $regex: keyword, $options: "i" } },
             ],
           },
-          { "currentState.confirm": true },
+          // { "currentState.confirm": true },
+          { "currentState.confirm": false },
           { "affectedFrom.patientCode": patientId },
         ],
       };
@@ -373,9 +382,18 @@ export default {
     //
 
     allPersonalInfos: async (_, {}, { PersonalInfo }) => {
-      const personalInfos = await PersonalInfo.find({}).populate("case");
+      const personalInfos = await PersonalInfo.find({});
       return personalInfos;
     },
+
+    //@Desc get all the personal info that are not yet a patient 
+    //@Access auth
+    allPersonalInfosForThatNegative: async (_, {}, { PersonalInfo }) => {
+      const personalInfos = await PersonalInfo.find({"currentState.confirm":false})
+     
+      return personalInfos;
+    },
+
     //@Desc Getting all the persoanl Info with pagination
     //@access auth
     getPersonalInfoWithPagination: async (
@@ -590,8 +608,7 @@ export default {
       { personalInfoId, sampleTestId, sampleTest },
       { PersonalInfo }
     ) => {
-      console.log(sampleTest);
-
+   
       try {
         await PersonalInfo.findById(personalInfoId);
         await PersonalInfo.findOneAndUpdate(
@@ -789,6 +806,40 @@ export default {
           {
             $set: {
               currentState: updateValue,
+            },
+          }
+        );
+        if (!updated) {
+          return {
+            success: false,
+            message: "Cannot this status ",
+          };
+        }
+        return {
+          success: true,
+          message: "Updated successfully ",
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
+
+      //@Desc update the current State
+    //@Access auth
+    updateAffectedFrom: async (
+      _,
+      { personalInfoId, updateValue },
+      { PersonalInfo }
+    ) => {
+      try {
+        const updated = await PersonalInfo.updateOne(
+          { _id: personalInfoId },
+          {
+            $set: {
+              affectedFrom: updateValue,
             },
           }
         );
