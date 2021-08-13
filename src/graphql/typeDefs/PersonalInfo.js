@@ -65,6 +65,9 @@ export default gql`
   addVaccination(vaccination:VaccinationInput,personalInfoId:ID!):PersonalInfoResponse 
   deleteVaccination(personalInfoId:ID!,vaccinationId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
 
+
+  updateTestLocation(query:String,update:String):String
+
   # //delete  left 
   # //update left 
   }

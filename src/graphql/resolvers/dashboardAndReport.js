@@ -503,57 +503,78 @@ console.log(sampleTest, sampleTestToday)
       let torow = new Date(today);
       torow.setDate(torow.getDate() + 1);
       let tomorrow = moment(torow).startOf('day').format()
-  console.log(today)
+  // console.log(today)
       // console.log(startDate,endDate)
-
+const men = await PersonalInfo.countDocuments({"gender":"ប្រុស"})
+console.log(men)
       const data = await PersonalInfo.aggregate([
         {
           $project: {
             district: 1,
-            menConfirmToday: {
-              $cond: [ { $eq: [ "$gender", "ប្រុស"] },0,1]
-            },
+            // menConfirmToday: {
 
-            womenConfirmToday: {
-              $cond:[ { $eq: [ "$gender", "ស្រី"] }, 0,1 ]
-            },
-             menConfirm: {
-              $cond: [ { $eq: [ "$gender", "ប្រុស"] }, 0,1 ]
-            },
-            womenConfirm: {
-              $cond: [ { $eq: [ "$gender", "ស្រី"] }, 0,1 ]
-          },
+            //   $cond: [ {$and:[ { $eq: [ "$gender", "ប្រុស"] },{ $gte: [ "$confirmedAt", today] },]},1,0]
+            // },
+            menConfirmToday:{  $cond: [
+              {$and: [
+                  {$eq: ["$currentState.confirm", true]},
+                  // {$eq: ["gender", "ប្រុស"]},
+                  // {$lte: ["$day", new Date(2014, 0, 8)]}
+              ]}, 
+              1, 
+              0
+          ]}
 
-          //For Recovery
-          menRecoveredToday: {
-            $cond:  [ { $eq: [ "$gender", "ប្រុស"] },
-          0,1]
-          },
-          womenRecoveredToday: {
-            $cond:  [ { $eq: [ "$gender", "ស្រី"] },
-          0,1 ]
-          },
-           menRecovered: {
-            $cond: [ { $eq: [ "$gender", "ប្រុស"] },
-            0,1 ]
-          },
-          womenRecovered: {
-            $cond: [ { $eq: [ "$gender", "ស្រី"] }, 0,1 ]
-        },
+            // "menConfirmToday": {
+            //   "$cond": {
+            // "if": {
+            //   "$eq": ["$gender", "ប្រុស"],
+            //   "$eq": ["$confirm", true],
+            // },
+            // "then": 1,
+            // "else": 0
+            //   }
+            // }
+      //       womenConfirmToday: {
+      //         $cond:[ { $eq: [ "$gender", "ស្រី"] }, 0,1 ]
+      //       },
+      //        menConfirm: {
+      //         $cond: [ { $eq: [ "$gender", "ប្រុស"] }, 0,1 ]
+      //       },
+      //       womenConfirm: {
+      //         $cond: [ { $eq: [ "$gender", "ស្រី"] }, 0,1 ]
+      //     },
 
-        //For Deaths
-        menDeathsToday: {
-          $cond:  [ { $eq: [ "$gender", "ប្រុស"] },0,1 ]
-        },
-        womenDeathsToday: {
-          $cond:  [ { $eq: [ "$gender", "ស្រី"] },, 0,1 ]
-        },
-         menDeaths: {
-          $cond: [ { $eq: [ "$gender", "ប្រុស"] }, 0,1 ]
-        },
-        womenDeaths: {
-          $cond:  [ { $eq: [ "$gender", "ស្រី"] }, 0,1 ]
-      },
+      //     //For Recovery
+      //     menRecoveredToday: {
+      //       $cond:  [ { $eq: [ "$gender", "ប្រុស"] },
+      //     0,1]
+      //     },
+      //     womenRecoveredToday: {
+      //       $cond:  [ { $eq: [ "$gender", "ស្រី"] },
+      //     0,1 ]
+      //     },
+      //      menRecovered: {
+      //       $cond: [ { $eq: [ "$gender", "ប្រុស"] },
+      //       0,1 ]
+      //     },
+      //     womenRecovered: {
+      //       $cond: [ { $eq: [ "$gender", "ស្រី"] }, 0,1 ]
+      //   },
+
+      //   //For Deaths
+      //   menDeathsToday: {
+      //     $cond:  [ { $eq: [ "$gender", "ប្រុស"] },0,1 ]
+      //   },
+      //   womenDeathsToday: {
+      //     $cond:  [ { $eq: [ "$gender", "ស្រី"] },, 0,1 ]
+      //   },
+      //    menDeaths: {
+      //     $cond: [ { $eq: [ "$gender", "ប្រុស"] }, 0,1 ]
+      //   },
+      //   womenDeaths: {
+      //     $cond:  [ { $eq: [ "$gender", "ស្រី"] }, 0,1 ]
+      // },
         //
           },
         },
@@ -561,19 +582,19 @@ console.log(sampleTest, sampleTestToday)
           $group: {
             _id: "$district",
             menConfirmToday: { $sum: "$menConfirmToday" },
-           womenConfirmToday: { $sum: "$womenConfirmToday" },
-           menConfirm: { $sum: "$menConfirm" },
-           womenConfirm: { $sum: "$womenConfirm" },
+          //  womenConfirmToday: { $sum: "$womenConfirmToday" },
+          //  menConfirm: { $sum: "$menConfirm" },
+          //  womenConfirm: { $sum: "$womenConfirm" },
            
-           menRecoveredToday: { $sum: "$menConfirmToday" },
-           womenRecoveredToday: { $sum: "$womenRecoveredToday" },
-           menRecovered: { $sum: "$menRecovered" },
-           womenRecovered: { $sum: "$womenRecovered" },
+          //  menRecoveredToday: { $sum: "$menConfirmToday" },
+          //  womenRecoveredToday: { $sum: "$womenRecoveredToday" },
+          //  menRecovered: { $sum: "$menRecovered" },
+          //  womenRecovered: { $sum: "$womenRecovered" },
 
-           menDeathsToday: { $sum: "$menDeathsToday" },
-           womenDeathsToday: { $sum: "$womenDeathsToday" },
-           menDeaths: { $sum: "$menDeaths" },
-           womenDeaths: { $sum: "$womenDeaths" },
+          //  menDeathsToday: { $sum: "$menDeathsToday" },
+          //  womenDeathsToday: { $sum: "$womenDeathsToday" },
+          //  menDeaths: { $sum: "$menDeaths" },
+          //  womenDeaths: { $sum: "$womenDeaths" },
           },
         },
       ]);

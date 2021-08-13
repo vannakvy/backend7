@@ -82,7 +82,7 @@ export default {
         limit: limit || 25,
         customLabels: PersonalInfoLabels,
         sort: {
-          createdAt: 1,
+          createdAt: -1,
         },
         //   populate: "case",
       };
@@ -419,7 +419,7 @@ export default {
           tomorrow = moment(torow).startOf('day').format();
       }
 
-      console.log(today,tomorrow,"date", currentState)
+   
 
       let dateQuery = {}
       let current = {};
@@ -634,7 +634,7 @@ export default {
     ) => {
    
       try {
-        await PersonalInfo.findById(personalInfoId);
+      
         await PersonalInfo.findOneAndUpdate(
           { _id: personalInfoId, "sampleTest._id": sampleTestId },
           {
@@ -689,6 +689,20 @@ export default {
           message: error.message,
         };
       }
+    },
+//@Desc update the rabish data
+    updateTestLocation:async(_,{query,update},{PersonalInfo})=>{
+      await PersonalInfo.updateMany(
+        { "sampleTest.testLocation": query},
+        {
+          $set: {
+ 
+            "sampleTest.$.testLocation": update,
+          },
+        }
+      );
+      return "success"
+
     },
 
     // For police
