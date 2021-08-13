@@ -20,12 +20,10 @@ const AuthMiddleware = async (req, res, next) => {
     // Extract Authorization Header
     const authHeader = req.get("Authorization");
 // console.log(authHeader,"ddddd")
-
     if (!authHeader) {
         req.isAuth = false;
         return next();
     }
-
     // Extract the token and check for token
     // console.log(authHeader)
     const token = authHeader.split(" ")[1];
@@ -33,7 +31,6 @@ const AuthMiddleware = async (req, res, next) => {
         req.isAuth = false;
         return next();
     }
- 
     // Verify the extracted token
     let decodedToken;
     try {
@@ -42,8 +39,7 @@ const AuthMiddleware = async (req, res, next) => {
         // console.log("running")
     } catch (err) {
         req.isAuth = false;
-        // res.status(401)
-         return next()
+        res.status(401)
     }
     // If decoded token is null then set authentication of the request false
     if (!decodedToken) {
@@ -66,5 +62,4 @@ const AuthMiddleware = async (req, res, next) => {
     req.role = newRoles
     return next();
 }
-
 export default AuthMiddleware;

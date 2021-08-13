@@ -398,7 +398,7 @@ export default {
     //@access auth
     getPersonalInfoWithPagination: async (
       _,
-      { page, limit, keyword, currentState, startDate, endDate },
+      { page, limit, keyword, currentState, startDate,endDate },
       { PersonalInfo }
     ) => {
       const options = {
@@ -410,7 +410,18 @@ export default {
         },
         // populate: "case",
       };
+      let today = "";
+      let tomorrow = "";
+      if(startDate !==null || endDate !==null){
+          today = moment(startDate).startOf('day').format();
+          let torow = new Date(endDate);
+          torow.setDate(torow.getDate() + 1);
+          tomorrow = moment(torow).startOf('day').format();
+      }
 
+      console.log(today,tomorrow,"date", currentState)
+
+      let dateQuery = {}
       let current = {};
       let current1 = {};
       let current2 = {};
@@ -420,25 +431,36 @@ export default {
           current = { "currentState.confirm": true}
           current1 = { "currentState.recovered": false}
           current2 = { "currentState.death": false}
+            if(today!==""){
+              dateQuery = {"currentState.confirmedAt":{$gte:today,$lt:tomorrow}}
+            }
           break;
         case "ជាសះស្បើយ":
           current = { "currentState.recovered": true}
           current1 = {}
           current2 = { "currentState.death": false}
+            if(today!==""){
+              dateQuery = {"currentState.recoveredAt":{$gte:today,$lt:tomorrow}}
+            }
           break;
         case "ស្លាប់":
           current = { "currentState.death": true}
+            if(today!==""){
+              dateQuery = {"currentState.deathAt":{$gte:today,$lt:tomorrow}}
+            }
           break;
         case "អវិជ្ជមាន":
           current = { "currentState.confirm": false}
           current1 = { "currentState.recovered": false}
           current2 = { "currentState.death": false}
+          
           break;
       default:
-        current = {}
+          current = {}
+          dateQuery={}
           break;
       }
-
+      console.log(dateQuery,"qee")
       let query = {
         $and: [
           {
@@ -456,7 +478,9 @@ export default {
           },
           current,
           current1,
-          current2
+          current2,
+          dateQuery
+          // {'currentState.confirmedAt': {$gte: '2021-08-13T00:00:00+07:00',$lt: '2021-08-14T00:00:00+07:00'}}
         ],
       };
       const personalInfos = await PersonalInfo.paginate(query, options);

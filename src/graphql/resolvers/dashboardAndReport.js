@@ -33,12 +33,15 @@ export default {
         let end = new Date();
         end.setHours(23, 59, 59,59);
         // end.setDate(start.getDate() + 1)
-  
+     let district = "សៀមរាប"
+
+     let query = {};
+
+
       let data =  await PersonalInfo.aggregate([
+        // { "$match":{ "district": district } },
           { "$match":{ "sampleTest.date": {$gte:today,$lt:end} } },
-          // { "$project": {
-          //       "all": { "$size": "$sampleTest" }
-          // } },
+         
           { "$group": {
               "_id": 1,
               "count": {
@@ -47,31 +50,20 @@ export default {
           } }
        ])
   
-     
-  
        let dataAll =  await PersonalInfo.aggregate([
-        // { "$match":{ "sampleTest.date": {$gte:today} } },
+        // { "$match":{ "district": district } },
         { "$project": {
               "all": { "$size": "$sampleTest" }
         } },
-        { "$group": {
-            "_id": 1,
-            "count": {
-                "$sum": "$all"
-            }
-        } }
+        { "$group": {"_id": 1,"count": {"$sum": "$all"}},
+  
+      },
+     
      ])
-  
-  
-        let to = data.reduce(function(accumulator, currentValue) {
-          return accumulator + currentValue.count;
-        }, 0);
-        let al = dataAll.reduce(function(accumulator, currentValue) {
-          return accumulator + currentValue.count;
-        }, 0);
+
         return {
-          today: to,
-          all:al
+          today: data[0].count,
+          all:dataAll[0].count
         }
       },
       
@@ -92,14 +84,17 @@ export default {
       let recoveredToday = 0;
       let deathToday = 0;
       let quarantineToday=0;
-      let sampleTest =[];
+      let sampleTest =0;
       let sampleTestToday=0;
+      let dataToday=[];
+      let dataAll=[];
 
-      let tod = new Date();
-      let today = moment(tod).startOf('day').format()
-      let torow = new Date(tod);
-      torow.setDate(torow.getDate() + 1);
-      let tomorrow = moment(torow).startOf('day').format()
+
+
+      let today = new Date();
+      today.setHours(0, 0, 0, 0);
+      let tomorrow = new Date();
+      tomorrow.setHours(23, 59, 59,59);
    
 
       let totalHospital = await HospitalInfo.countDocuments({})
@@ -112,13 +107,37 @@ export default {
         $and: [{ openAt: {$ne: null} }, { closeAt: {$ne: null} }],
       });
 
+
       
       if (district === "" || district === "ករំីណីទាំងអស់") {
-        sampleTestToday = await PersonalInfo.countDocuments({
-          $and: [
-            { sampleTest:{ $elemMatch:{ date:{ $gte: today, $lt: tomorrow } }}},
-          ],
-        });
+
+         dataAll =  await PersonalInfo.aggregate([
+          // { "$match":{ "district": district } },
+          { "$project": {
+                "all": { "$size": "$sampleTest" }
+          } },
+          { "$group": {"_id": 1,"count": {"$sum": "$all"}},
+          
+          },
+          
+          ])   
+     
+
+
+       dataToday =  await PersonalInfo.aggregate([
+        // { "$match":{ "district": district } },
+          { "$match":{ "sampleTest.date": {$gte:today,$lt:tomorrow} } },
+         
+          { "$group": {
+              "_id": 1,
+              "count": {
+                  "$sum": 1
+              }
+          } }
+       ])
+     
+
+
 
         confirm = await PersonalInfo.countDocuments({
           "currentState.confirm": true,
@@ -146,6 +165,7 @@ export default {
         });
 
       } else {
+
         confirm = await PersonalInfo.countDocuments({
           $and: [{ "currentState.confirm": true }, { district: district }],
         });
@@ -185,34 +205,69 @@ export default {
           ],
         });
 
-        // console.log(sampleTestToday,today, tomorrow)
+
+        dataAll =  await PersonalInfo.aggregate([
+          { "$match":{ "district": district } },
+          { "$project": {
+                "all": { "$size": "$sampleTest" }
+          } },
+          { "$group": {"_id": 1,"count": {"$sum": "$all"}},
+          
+          },
+          
+          ])
+
+        
+       
+      
+
+      dataToday =  await PersonalInfo.aggregate([
+        { "$match":{ "district": district } },
+          { "$match":{ "sampleTest.date": {$gte:today,$lt:tomorrow} } },
+          // { "$project": {
+          //       "all": { "$size": "$sampleTest" }
+          // } },
+          { "$group": {
+              "_id": 1,
+              "count": {
+                  "$sum": 1
+              }
+          } }
+        ])
 
 
+      //  if(dataToday ===[]){
+      //    console.log("dataToday =0")
+      //    sampleTestToday =0
+      //  }else{
+      //   sampleTestToday = dataToday[0].count
+      //  }
 
-      // let ssd =   await PersonalInfo.aggregate([
-      //     // { "$match":{ "district": {$gte:today,$lt:tomorrow}}},
-      //     { "$match":{ "district": {$eq:district}}},
-      //     { "$match":{ "sampleTest": {$gte:today}}},
-      //     { "$project": {
-      //           "all": { "$size": "$sampleTest" }
-      //     } },
-      //     { "$group": {
-      //         "_id": 1,
-      //         "count": {
-      //             "$sum": "$all"
-      //         }
-      //     } }
-      //  ])
-         
+      //  if(dataAll ===[]){
+      //   sampleTest =0
+      //   console.log("dataAll =0")
+      // }else{
+      //  sampleTest = dataAll[0].count
+      // }
+       
+    
+        
       }
 
-      // let to = sampleTestToday.reduce(function(accumulator, currentValue) {
-      //   return accumulator + currentValue.count;
-      // }, 0);
+if(dataAll.length!==0){
+  sampleTest = dataAll[0].count
+}
+if(dataToday.length!==0){
+  sampleTestToday = dataToday[0].count
+}
+      
+      // console.log(dataToday[0].count,"dataToday",dataAll[0].count)
 
-   
+console.log(sampleTest, sampleTestToday)
 
       let dataForBoxes = {
+        sampleTest:sampleTest,
+        sampleTestToday:sampleTestToday,
         confirmedCase: confirm,
         confirmedCaseToday: confirmToday,
         death: death,
@@ -277,8 +332,6 @@ export default {
           },
         },
       ]);
-
-    
 
       return data;
     },
@@ -445,11 +498,12 @@ export default {
     // @Desc getting the data for report
     //auth and private
     getDataForReport: async (_, {}, { PersonalInfo }) => {
+      let startDate = new Date();
       let today = moment(startDate).startOf('day').format()
-      let torow = new Date(endDate);
+      let torow = new Date(today);
       torow.setDate(torow.getDate() + 1);
       let tomorrow = moment(torow).startOf('day').format()
-
+  console.log(today)
       // console.log(startDate,endDate)
 
       const data = await PersonalInfo.aggregate([
@@ -457,56 +511,48 @@ export default {
           $project: {
             district: 1,
             menConfirmToday: {
-              $cond: [ {$and : [ { $eq: [ "$gender", "ប្រុស"] },
-              { $gte: [ "$currentState.confirmedAt",today] }] }, 1,0 ]
+              $cond: [ { $eq: [ "$gender", "ប្រុស"] },0,1]
             },
+
             womenConfirmToday: {
-              $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
-             { $gte: [ "$currentState.confirmedAt",today] }] }, 1,0 ]
+              $cond:[ { $eq: [ "$gender", "ស្រី"] }, 0,1 ]
             },
              menConfirm: {
-              $cond: [ {$and : [ { $eq: [ "$gender", "ប្រុស"] },
-              { $eq: [ "$currentState.confirm",true] }] }, 1,0 ]
+              $cond: [ { $eq: [ "$gender", "ប្រុស"] }, 0,1 ]
             },
             womenConfirm: {
-              $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
-              { $eq: [ "$currentState.confirm",true] }] }, 1,0 ]
+              $cond: [ { $eq: [ "$gender", "ស្រី"] }, 0,1 ]
           },
 
           //For Recovery
           menRecoveredToday: {
-            $cond: [ {$and : [ { $eq: [ "$gender", "ប្រុស"] },
-            { $gte: [ "$currentState.recoveredAt",today] }] }, 1,0 ]
+            $cond:  [ { $eq: [ "$gender", "ប្រុស"] },
+          0,1]
           },
           womenRecoveredToday: {
-            $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
-           { $gte: [ "$currentState.recoveredAt",today] }] }, 1,0 ]
+            $cond:  [ { $eq: [ "$gender", "ស្រី"] },
+          0,1 ]
           },
            menRecovered: {
-            $cond: [ {$and : [ { $eq: [ "$gender", "ប្រុស"] },
-            { $eq: [ "$currentState.recovered",true] }] }, 1,0 ]
+            $cond: [ { $eq: [ "$gender", "ប្រុស"] },
+            0,1 ]
           },
           womenRecovered: {
-            $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
-            { $eq: [ "$currentState.recovered",true] }] }, 1,0 ]
+            $cond: [ { $eq: [ "$gender", "ស្រី"] }, 0,1 ]
         },
 
         //For Deaths
         menDeathsToday: {
-          $cond: [ {$and : [ { $eq: [ "$gender", "ប្រុស"] },
-          { $gte: [ "$currentState.deathAt",today] }] }, 1,0 ]
+          $cond:  [ { $eq: [ "$gender", "ប្រុស"] },0,1 ]
         },
         womenDeathsToday: {
-          $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
-         { $gte: [ "$currentState.deathAt",today] }] }, 1,0 ]
+          $cond:  [ { $eq: [ "$gender", "ស្រី"] },, 0,1 ]
         },
          menDeaths: {
-          $cond: [ {$and : [ { $eq: [ "$gender", "ប្រុស"] },
-          { $eq: [ "$currentState.death",true] }] }, 1,0 ]
+          $cond: [ { $eq: [ "$gender", "ប្រុស"] }, 0,1 ]
         },
         womenDeaths: {
-          $cond: [ {$and : [ { $eq: [ "$gender", "ស្រី"] },
-          { $eq: [ "$currentState.death",true] }] }, 1,0 ]
+          $cond:  [ { $eq: [ "$gender", "ស្រី"] }, 0,1 ]
       },
         //
           },
@@ -531,6 +577,7 @@ export default {
           },
         },
       ]);
+
    return data
      
     },
@@ -540,7 +587,6 @@ export default {
     //@Desc get locations 
     //@auth 
  affectedLocationReport: async(_,{},{AffectedLocation})=>{
-
       let tod = new Date();
       let today = moment(tod).startOf('day').format()
       let torow = new Date(tod);

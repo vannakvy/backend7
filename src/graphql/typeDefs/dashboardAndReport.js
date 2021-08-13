@@ -29,6 +29,8 @@ type Inter{
 }
 
 type AllProvince{
+    sampleTest:Int,
+    sampleTestToday:Int,
     confirmedCase:Int
     confirmedCaseToday:Int
     death: Int 
