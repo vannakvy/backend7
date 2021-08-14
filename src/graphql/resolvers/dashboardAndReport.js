@@ -37,7 +37,6 @@ export default {
 
      let query = {};
 
-
       let data =  await PersonalInfo.aggregate([
         // { "$match":{ "district": district } },
           { "$match":{ "sampleTest.date": {$gte:today,$lt:end} } },
@@ -497,84 +496,174 @@ console.log(sampleTest, sampleTestToday)
 
     // @Desc getting the data for report
     //auth and private
-    getDataForReport: async (_, {}, { PersonalInfo }) => {
-      let startDate = new Date();
-      let today = moment(startDate).startOf('day').format()
-      let torow = new Date(today);
-      torow.setDate(torow.getDate() + 1);
-      let tomorrow = moment(torow).startOf('day').format()
-  // console.log(today)
-      // console.log(startDate,endDate)
-const men = await PersonalInfo.countDocuments({"gender":"ប្រុស"})
-console.log(men)
+    getDataForReport: async (_, {startDate,endDate}, { PersonalInfo }) => {
+
+      var today = new Date(new Date(startDate).setUTCHours(0,0,0,0));
+      var tomorrow= new Date(new Date(endDate).setUTCHours(23,59,59,59));
+      // var nd = tomorrow.toISOString();
+    
+
+
+
       const data = await PersonalInfo.aggregate([
         {
           $project: {
             district: 1,
             // menConfirmToday: {
-
             //   $cond: [ {$and:[ { $eq: [ "$gender", "ប្រុស"] },{ $gte: [ "$confirmedAt", today] },]},1,0]
             // },
             menConfirmToday:{  $cond: [
               {$and: [
-                  {$eq: ["$currentState.confirm", true]},
-                  // {$eq: ["gender", "ប្រុស"]},
-                  // {$lte: ["$day", new Date(2014, 0, 8)]}
+                  {$eq: ["$gender", "ប្រុស"]},
+                  {$eq: ["$currentState.confirm",true]},
+                  {$gte: ["$currentState.confirmedAt", today]},
+                  {$lt: ["$currentState.confirmedAt",tomorrow]}
               ]}, 
               1, 
               0
-          ]}
+          ]},
 
-            // "menConfirmToday": {
-            //   "$cond": {
-            // "if": {
-            //   "$eq": ["$gender", "ប្រុស"],
-            //   "$eq": ["$confirm", true],
-            // },
-            // "then": 1,
-            // "else": 0
-            //   }
-            // }
-      //       womenConfirmToday: {
-      //         $cond:[ { $eq: [ "$gender", "ស្រី"] }, 0,1 ]
-      //       },
-      //        menConfirm: {
-      //         $cond: [ { $eq: [ "$gender", "ប្រុស"] }, 0,1 ]
-      //       },
-      //       womenConfirm: {
-      //         $cond: [ { $eq: [ "$gender", "ស្រី"] }, 0,1 ]
-      //     },
 
-      //     //For Recovery
-      //     menRecoveredToday: {
-      //       $cond:  [ { $eq: [ "$gender", "ប្រុស"] },
-      //     0,1]
-      //     },
-      //     womenRecoveredToday: {
-      //       $cond:  [ { $eq: [ "$gender", "ស្រី"] },
-      //     0,1 ]
-      //     },
+          womenConfirmToday:{  $cond: [
+            {$and: [
+                {$eq: ["$gender", "ស្រី"]},
+                {$eq: ["$currentState.confirm",true]},
+                {$gte: ["$currentState.confirmedAt", today]},
+                {$lt: ["$currentState.confirmedAt",tomorrow]}
+            ]}, 
+            1, 
+            0
+        ]},
+        menConfirm:{  $cond: [
+          {$and: [
+              {$eq: ["$gender", "ប្រុស"]},
+              {$eq: ["$currentState.confirm",true]},
+              // {$gte: ["$currentState.confirmedAt", today]},
+              // {$lt: ["$currentState.confirmedAt",tomorrow]}
+          ]}, 
+          1, 
+          0
+      ]},
+      womenConfirm:{  $cond: [
+        {$and: [
+            {$eq: ["$gender", "ស្រី"]},
+            {$eq: ["$currentState.confirm",true]},
+            // {$gte: ["$currentState.confirmedAt", today]},
+            // {$lt: ["$currentState.confirmedAt",tomorrow]}
+        ]}, 
+        1, 
+        0
+      ]},
+
+
+      menRecoveredToday:{  $cond: [
+        {$and: [
+            {$eq: ["$gender", "ប្រុស"]},
+            {$eq: ["$currentState.recovered",true]},
+            {$gte: ["$currentState.recoveredAt", today]},
+            {$lt: ["$currentState.recoveredAt",tomorrow]}
+        ]}, 
+        1, 
+        0
+    ]},
+   
+      womenRecoveredToday:{  $cond: [
+        {$and: [
+            {$eq: ["$gender", "ស្រី"]},
+            {$eq: ["$currentState.recovered",true]},
+            {$gte: ["$currentState.recoveredAt", today]},
+            {$lt: ["$currentState.recoveredAt",tomorrow]}
+        ]}, 
+        1, 
+        0
+    ]},
       //      menRecovered: {
       //       $cond: [ { $eq: [ "$gender", "ប្រុស"] },
       //       0,1 ]
       //     },
+
+      menRecovered:{  $cond: [
+        {$and: [
+            {$eq: ["$gender", "ប្រុស"]},
+            {$eq: ["$currentState.recovered",true]},
+            // {$gte: ["$currentState.recoveredAt", today]},
+            // {$lt: ["$currentState.recoveredAt",tomorrow]}
+        ]}, 
+        1, 
+        0
+    ]},
+
+
       //     womenRecovered: {
       //       $cond: [ { $eq: [ "$gender", "ស្រី"] }, 0,1 ]
       //   },
+      womenRecovered:{  $cond: [
+        {$and: [
+            {$eq: ["$gender", "ស្រី"]},
+            {$eq: ["$currentState.recovered",true]},
+            // {$gte: ["$currentState.recoveredAt", today]},
+            // {$lt: ["$currentState.recoveredAt",tomorrow]}
+        ]}, 
+        1, 
+        0
+    ]},
+      
 
       //   //For Deaths
       //   menDeathsToday: {
       //     $cond:  [ { $eq: [ "$gender", "ប្រុស"] },0,1 ]
       //   },
-      //   womenDeathsToday: {
-      //     $cond:  [ { $eq: [ "$gender", "ស្រី"] },, 0,1 ]
-      //   },
+
+      menDeathsToday:{  $cond: [
+        {$and: [
+            {$eq: ["$gender", "ប្រុស"]},
+            {$eq: ["$currentState.death",true]},
+            {$gte: ["$currentState.deathAt", today]},
+            {$lt: ["$currentState.deathAt",tomorrow]}
+        ]}, 
+        1, 
+        0
+    ]},
+
+      womenDeathsToday:{  $cond: [
+        {$and: [
+            {$eq: ["$gender", "ស្រី"]},
+            {$eq: ["$currentState.death",true]},
+            {$gte: ["$currentState.deathAt", today]},
+            {$lt: ["$currentState.deathAt",tomorrow]}
+        ]}, 
+        1, 
+        0
+    ]},
+    
       //    menDeaths: {
       //     $cond: [ { $eq: [ "$gender", "ប្រុស"] }, 0,1 ]
       //   },
+
+      womenDeathsToday:{  $cond: [
+        {$and: [
+            {$eq: ["$gender", "ប្រុស"]},
+            {$eq: ["$currentState.death",true]},
+            // {$gte: ["$currentState.deathAt", today]},
+            // {$lt: ["$currentState.deathAt",tomorrow]}
+        ]}, 
+        1, 
+        0
+    ]},
       //   womenDeaths: {
       //     $cond:  [ { $eq: [ "$gender", "ស្រី"] }, 0,1 ]
       // },
+
+      womenDeaths:{  $cond: [
+        {$and: [
+            {$eq: ["$gender", "ស្រី"]},
+            {$eq: ["$currentState.death",true]},
+            // {$gte: ["$currentState.deathAt", today]},
+            // {$lt: ["$currentState.deathAt",tomorrow]}
+        ]}, 
+        1, 
+        0
+    ]},
         //
           },
         },
@@ -582,22 +671,24 @@ console.log(men)
           $group: {
             _id: "$district",
             menConfirmToday: { $sum: "$menConfirmToday" },
-          //  womenConfirmToday: { $sum: "$womenConfirmToday" },
-          //  menConfirm: { $sum: "$menConfirm" },
-          //  womenConfirm: { $sum: "$womenConfirm" },
+           womenConfirmToday: { $sum: "$womenConfirmToday" },
+           menConfirm: { $sum: "$menConfirm" },
+           womenConfirm: { $sum: "$womenConfirm" },
            
-          //  menRecoveredToday: { $sum: "$menConfirmToday" },
-          //  womenRecoveredToday: { $sum: "$womenRecoveredToday" },
-          //  menRecovered: { $sum: "$menRecovered" },
-          //  womenRecovered: { $sum: "$womenRecovered" },
+           menRecoveredToday: { $sum: "$menConfirmToday" },
+           womenRecoveredToday: { $sum: "$womenRecoveredToday" },
+           menRecovered: { $sum: "$menRecovered" },
+           womenRecovered: { $sum: "$womenRecovered" },
 
-          //  menDeathsToday: { $sum: "$menDeathsToday" },
-          //  womenDeathsToday: { $sum: "$womenDeathsToday" },
-          //  menDeaths: { $sum: "$menDeaths" },
-          //  womenDeaths: { $sum: "$womenDeaths" },
+           menDeathsToday: { $sum: "$menDeathsToday" },
+           womenDeathsToday: { $sum: "$womenDeathsToday" },
+           menDeaths: { $sum: "$menDeaths" },
+           womenDeaths: { $sum: "$womenDeaths" },
           },
         },
       ]);
+
+    console.log(data)
 
    return data
      
@@ -607,12 +698,11 @@ console.log(men)
 
     //@Desc get locations 
     //@auth 
- affectedLocationReport: async(_,{},{AffectedLocation})=>{
-      let tod = new Date();
-      let today = moment(tod).startOf('day').format()
-      let torow = new Date(tod);
-      torow.setDate(torow.getDate() + 1);
-      let tomorrow = moment(torow).startOf('day').format()
+ affectedLocationReport: async(_,{startDate,endDate},{AffectedLocation})=>{
+console.log(startDate,endDate)
+  var today = new Date(new Date(startDate).setUTCHours(0,0,0,0));
+  var tomorrow= new Date(new Date(endDate).setUTCHours(23,59,59,59));
+  console.log(today,tomorrow)
 // ទីតាំពាក់ព័ន
 //1
      let totalAffectedLocation = await AffectedLocation.countDocuments({});
@@ -624,6 +714,10 @@ console.log(men)
 //3
     let totalAffectedLocationNotClosed = await AffectedLocation.countDocuments({
       $and: [{ openAt: {$eq: null} }, { closeAt: {$eq: null} }],
+    });
+
+    let totalAffectedLocationNotClosedToday = await AffectedLocation.countDocuments({
+      $and: [{ openAt: {$eq: null} }, { closeAt: {$eq: null}},{"createdAt": { $gte: today, $lt: tomorrow }}],
     });
 //4
     let totalAffectedLocationOn = await AffectedLocation.countDocuments({
@@ -639,10 +733,12 @@ let closedLocation = await AffectedLocation.countDocuments({
 //6
 let closedLocationToday = await AffectedLocation.countDocuments({
   $and: [
-    { closeAt: {$eq: null}},
-    { openAt: {$ne: null} },
+    { closeAt: {$ne: null}},
+    { openAt: {$eq: null} },
     { closeAt:{ $gte: today, $lt: tomorrow }} ],
 });
+
+
 
 //7
 let openedLocation = await AffectedLocation.countDocuments({
@@ -662,10 +758,9 @@ let coorporateLocation = await AffectedLocation.countDocuments({
 //10
 let coorporateLocationToday = await AffectedLocation.countDocuments({
   $and: [
-    { coorporate: {$ne: null} },
+    { coorporate: {$eq: false} },
     { createdAt:{ $gte: today, $lt: tomorrow }} ],
 });
-
 
 return {
   totalAffectedLocation,
@@ -677,7 +772,8 @@ return {
   coorporateLocationToday,
   openedLocation,
   openedLocationToday,
-  closedLocationToday
+  closedLocationToday,
+  totalAffectedLocationNotClosedToday
 }
  },
 
@@ -727,7 +823,11 @@ return {
 
 // console.log(totalInterview)
     return totalInterview;
- }
+ },
+
+ 
+
+ 
   },
 };
 

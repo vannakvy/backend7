@@ -20,7 +20,8 @@ export default gql`
       interview:Boolean, 
       page: Int!
       limit: Int!
-      keyword: String
+      keyword: String,
+      startDate: Date, endDate:Date, district:String
       ): PaginateResponse!
     getPersonalInfoWithPagination(
       page: Int!

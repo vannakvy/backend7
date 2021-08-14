@@ -72,10 +72,26 @@ export default {
       { PersonalInfo, roles }
     ) => {
   
-    // console.log(startDate.toLocaleString(),"dd")
-    // console.log(endDate.toLocaleString(),"ddend")
-    // let a =  moment(startDate, "YYYY-MM-DD").add(new Date().getTimezoneOffset(),'minute').format('DD-MM-YYYY HH:mm')
-      // console.log(moment(startDate).format('LLL').format('DD-MM-YYYY HH:mm'))
+      await PersonalInfo.aggregate([
+        {$project: { "name" : { $concat : [ "$lastName", " ", "$firstName" ] } }},
+        {$match: {"name": {$regex: /bob j/i}}}
+      ]).exec(function(err, result){
+        console.log(result,"ddg");
+      });
+
+
+    let a = await PersonalInfo.find({
+        "$expr": {
+          "$regexMatch": {
+            "input": { "$concat": ["$lastName"," ","$firstName"] },
+            "regex": keyword,  //Your text search here
+            "options": "i"
+          }
+        }
+      })
+
+    console.log(a)
+
 
       const options = {
         page: page || 1,
@@ -109,6 +125,7 @@ export default {
       if (startDate !== null || endDate !== null) {
         start = formatDate(startDate) + "T00:00:00.00";
         end = formatDate(endDate) + "T23:59:59.00";
+
     
         // start = startDate;
         // end = endDate;
@@ -116,19 +133,30 @@ export default {
           $and: [
             {
               $or: [
-                { patientId: { $regex: keyword, $options: "i" } },
-                { englishName: { $regex: keyword, $options: "i" } },
-                { firstName: { $regex: keyword, $options: "i" } },
-                { lastName: { $regex: keyword, $options: "i" } },
-                { village: { $regex: keyword, $options: "i" } },
-                { commune: { $regex: keyword, $options: "i" } },
-                { disctrict: { $regex: keyword, $options: "i" } },
-                { province: { $regex: keyword, $options: "i" } },
-                { patientId: { $regex: keyword, $options: "i" } },
-                { idCard: { $regex: keyword, $options: "i" } },
-                { tel: { $regex: keyword, $options: "i" } },
+                {
+                  "$expr": {
+                    "$regexMatch": {
+                      "input": { "$concat": ["$lastName"," ","$firstName"] },
+                      "regex": keyword,  //Your text search here
+                      "options": "i"
+                    }
+                  }
+                },
+                // { patientId: { $regex: keyword, $options: "i" } },
+                // { englishName: { $regex: keyword, $options: "i" } },
+                // { firstName: { $regex: keyword, $options: "i" } },
+                // { lastName: { $regex: keyword, $options: "i" } },
+                // { village: { $regex: keyword, $options: "i" } },
+                // { commune: { $regex: keyword, $options: "i" } },
+                // { disctrict: { $regex: keyword, $options: "i" } },
+                // { province: { $regex: keyword, $options: "i" } },
+                // { patientId: { $regex: keyword, $options: "i" } },
+                // { idCard: { $regex: keyword, $options: "i" } },
+                // { tel: { $regex: keyword, $options: "i" } },
               ],
             },
+
+            
             // { "currentState.confirm": false },
             //  { "sampleTest": { $ne: []} },
             //  { "district": { $ne: []} },
@@ -144,17 +172,26 @@ export default {
           $and: [
             {
               $or: [
-                { patientId: { $regex: keyword, $options: "i" } },
-                { englishName: { $regex: keyword, $options: "i" } },
-                { firstName: { $regex: keyword, $options: "i" } },
-                { lastName: { $regex: keyword, $options: "i" } },
-                { village: { $regex: keyword, $options: "i" } },
-                { commune: { $regex: keyword, $options: "i" } },
-                { disctrict: { $regex: keyword, $options: "i" } },
-                { province: { $regex: keyword, $options: "i" } },
-                { patientId: { $regex: keyword, $options: "i" } },
-                { idCard: { $regex: keyword, $options: "i" } },
-                { tel: { $regex: keyword, $options: "i" } },
+                {
+                  "$expr": {
+                    "$regexMatch": {
+                      "input": { "$concat": ["$lastName", " ","$firstName"] },
+                      "regex": keyword,  //Your text search here
+                      "options": "i"
+                    }
+                  }
+                },
+                // { patientId: { $regex: keyword, $options: "i" } },
+                // { englishName: { $regex: keyword, $options: "i" } },
+                // { firstName: { $regex: keyword, $options: "i" } },
+                // { lastName: { $regex: keyword, $options: "i" } },
+                // { village: { $regex: keyword, $options: "i" } },
+                // { commune: { $regex: keyword, $options: "i" } },
+                // { disctrict: { $regex: keyword, $options: "i" } },
+                // { province: { $regex: keyword, $options: "i" } },
+                // { patientId: { $regex: keyword, $options: "i" } },
+                // { idCard: { $regex: keyword, $options: "i" } },
+                // { tel: { $regex: keyword, $options: "i" } },
               ],
             },
             testLocationQuery,
@@ -260,9 +297,10 @@ export default {
 
     getPatientForInterviewWithPagination: async (
       _,
-      { page, limit, keyword = "", interview, startDate, endDate },
+      { page, limit, keyword = "",disctrict, interview, startDate, endDate },
       { PersonalInfo }
     ) => {
+      console.log(startDate, endDate)
       const options = {
         page: page || 1,
         limit: limit || 10,
@@ -342,9 +380,11 @@ export default {
     // @Access Auth
     getConfirmedPersonalInfoByInterviewWithPagination: async (
       _,
-      { page, limit, keyword = "", interview },
+      { page, limit, keyword = "", interview, startDate, endDate, district },
       { PersonalInfo }
     ) => {
+
+      console.log(startDate, endDate, district)
       const options = {
         page: page || 1,
         limit: limit || 10,
@@ -460,7 +500,7 @@ export default {
           dateQuery={}
           break;
       }
-      console.log(dateQuery,"qee")
+     
       let query = {
         $and: [
           {
