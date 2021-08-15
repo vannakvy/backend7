@@ -4,7 +4,7 @@ import {error, success} from 'consola'
 import {DB,IN_PROD} from './index.js'
 
 dotenv.config()
-const DB_URI = IN_PROD? "mongodb://192.168.1.152:27017/newDatabase" : DB
+const DB_URI = !IN_PROD? "mongodb://192.168.1.152:27017/newDatabase" : DB
 console.log(DB_URI)
 const connectDB =   async()=>{
     try{
