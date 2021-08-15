@@ -72,26 +72,23 @@ export default {
       { PersonalInfo, roles }
     ) => {
   
-      await PersonalInfo.aggregate([
-        {$project: { "name" : { $concat : [ "$lastName", " ", "$firstName" ] } }},
-        {$match: {"name": {$regex: /bob j/i}}}
-      ]).exec(function(err, result){
-        console.log(result,"ddg");
-      });
+    //   await PersonalInfo.aggregate([
+    //     {$project: { "name" : { $concat : [ "$lastName", " ", "$firstName" ] } }},
+    //     {$match: {"name": {$regex: /bob j/i}}}
+    //   ]).exec(function(err, result){
+    //     console.log(result,"ddg");
+    //   });
 
 
-    let a = await PersonalInfo.find({
-        "$expr": {
-          "$regexMatch": {
-            "input": { "$concat": ["$lastName"," ","$firstName"] },
-            "regex": keyword,  //Your text search here
-            "options": "i"
-          }
-        }
-      })
-
-    console.log(a)
-
+    // let a = await PersonalInfo.find({
+    //     "$expr": {
+    //       "$regexMatch": {
+    //         "input": { "$concat": ["$lastName"," ","$firstName"] },
+    //         "regex": keyword,  //Your text search here
+    //         "options": "i"
+    //       }
+    //     }
+    //   })
 
       const options = {
         page: page || 1,
@@ -118,9 +115,7 @@ export default {
         }else{
           testLocationQuery = {sampleTest: {$elemMatch: {testLocation: testLocation }}}
         }
-      
       }
-
 
       if (startDate !== null || endDate !== null) {
         start = formatDate(startDate) + "T00:00:00.00";
