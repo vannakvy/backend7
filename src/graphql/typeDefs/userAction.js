@@ -2,18 +2,18 @@ import {gql} from 'apollo-server-express'
 
 export default gql`
   extend type Query {
-    allAffectedLocations:[AffectedLocation!]!
-    getAffectedLocationWithPagination(page:Int!, limit:Int!, keyword:String,startDate:Date, endDate:Date):AffectedLocationPaginator!
-    getAffectedLocationById(id:ID!):AffectedLocation!
+    allUserActions:[UserAction!]!
+    getUserActionWithPagination(page:Int!, limit:Int!, keyword:String,startDate:Date, endDate:Date):UserActionPaginator!
+    getUserActionById(id:ID!):UserAction!
   }
 
   extend type Mutation{
-    createAffectedLocation(newAffectedLocation:AffectedLocationInput):AffectedLocationResponseWithId! @isAuth(requires:SUPPER) 
-    updateAffectedLocation(updatedAffectedLocation:AffectedLocationInput,id:ID!):AffectedLocationResponse! @isAuth(requires:SUPPER) 
-    deleteAffectedLocation(id:ID!):AffectedLocationResponse! @isAuth(requires:SUPPER) 
+    createUserAction(newUserAction:UserActionInput):UserActionResponseWithId! @isAuth(requires:SUPPER) 
+    updateUserAction(updatedUserAction:UserActionInput,id:ID!):UserActionResponse! @isAuth(requires:SUPPER) 
+    deleteUserAction(id:ID!):UserActionResponse! @isAuth(requires:SUPPER) 
   }
 
-  type AffectedLocation {
+  type UserAction {
         id:ID!
         locationName:String
         village:String
@@ -32,7 +32,7 @@ export default gql`
         locationType:String
   }
 
-  input AffectedLocationInput {
+  input UserActionInput {
         locationName:String
         village:String
         commune:String
@@ -47,19 +47,19 @@ export default gql`
         infected:Boolean
         locationType:String
   }
-  type AffectedLocationResponse {
+  type UserActionResponse {
       success: Boolean 
       message:String
   }
 
-  type AffectedLocationResponseWithId {
+  type UserActionResponseWithId {
       success: Boolean 
       message:String
-      affectedLocation: AffectedLocation
+      UserAction: UserAction
   }
 
-  type AffectedLocationPaginator{
-      affectedLocations:[AffectedLocation!]!
+  type UserActionPaginator{
+      UserActions:[UserAction!]!
       paginator: Paginator!
   }
 `

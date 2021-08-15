@@ -8,9 +8,9 @@ export default gql`
   }
 
   extend type Mutation{
-    createQuarantineInfo(newQuarantineInfo:QuarantineInfoInput):QuarantineInfoResponseWidthData!
-    updateQuarantineInfo(updatedQuarantineInfo:QuarantineInfoInput,id:ID!):QuarantineInfoResponse!
-    deleteQuarantineInfo(id:ID!):QuarantineInfoResponse!
+    createQuarantineInfo(newQuarantineInfo:QuarantineInfoInput):QuarantineInfoResponseWidthData! @isAuth(requires:SUPPER) 
+    updateQuarantineInfo(updatedQuarantineInfo:QuarantineInfoInput,id:ID!):QuarantineInfoResponse! @isAuth(requires:SUPPER) 
+    deleteQuarantineInfo(id:ID!):QuarantineInfoResponse! @isAuth(requires:SUPPER) 
   }
 
   type QuarantineInfo {

@@ -17,10 +17,8 @@ export default gql`
             DEVELOPER,
             POLICE,
             DOCTOR,
-            OFFICER
-  
+            OFFICER,
           }
-          
                                 
         type Query {
             _:String

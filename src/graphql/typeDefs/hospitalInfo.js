@@ -14,12 +14,12 @@ export default gql`
   extend type Mutation {
     createHospitalInfo(
       newHospitalInfo: HospitalInfoInput
-    ): HospitalInfoResponseWithData!
+    ): HospitalInfoResponseWithData! @isAuth(requires:SUPPER) 
     updateHospitalInfo(
       updatedHospitalInfo: HospitalInfoInput
       id: ID!
-    ): HospitalInfoResponse!
-    deleteHospitalInfo(id: ID!): HospitalInfoResponse!
+    ): HospitalInfoResponse! @isAuth(requires:SUPPER) 
+    deleteHospitalInfo(id: ID!): HospitalInfoResponse! @isAuth(requires:SUPPER) 
   }
 
   type HospitalInfo {

@@ -116,7 +116,7 @@ export default {
           testLocationQuery = {sampleTest: {$elemMatch: {testLocation: testLocation }}}
         }
       }
-
+ 
       if (startDate !== null || endDate !== null) {
         start = formatDate(startDate) + "T00:00:00.00";
         end = formatDate(endDate) + "T23:59:59.00";
@@ -295,7 +295,10 @@ export default {
       { page, limit, keyword = "",disctrict, interview, startDate, endDate },
       { PersonalInfo }
     ) => {
-      console.log(startDate, endDate)
+
+
+      
+
       const options = {
         page: page || 1,
         limit: limit || 10,
@@ -322,7 +325,7 @@ export default {
           },
           { sampleTest: { $elemMatch: { result: true } } },
           { interviewed: interview },
-          // { "currentState.confirmedAt": { $gte: startDate, $lt: endDate } },
+          // { "currentState.confirmedAt": { $gte: today, $lt: tomorrow } },
         ],
       };
       const personalInfos = await PersonalInfo.paginate(query, options);
@@ -375,15 +378,27 @@ export default {
     // @Access Auth
     getConfirmedPersonalInfoByInterviewWithPagination: async (
       _,
-      { page, limit, keyword = "", interview, startDate, endDate, district },
+      { page, limit, keyword = "", interview, startDate, endDate, district},
       { PersonalInfo }
     ) => {
 
-      console.log(startDate, endDate, district)
+      let dateQuery = {}
+      if(startDate !== null && endDate !== null && startDate !== undefined && endDate !== undefined){
+        // console.log(startDate, endDate, district)
+        var today = new Date(new Date(startDate).setUTCHours(0,0,0,0));
+        var tomorrow= new Date(new Date(endDate).setUTCHours(23,59,59,59));
+        dateQuery = { "currentState.confirmedAt": { $gte: today, $lt: tomorrow } }
+      }
+
+      let districtQuery = {}
+      if(district !== ""){
+   
+        districtQuery={ district: district}
+      }
       const options = {
         page: page || 1,
         limit: limit || 10,
-        customLabels: PersonalInfoLabels,
+        customLabels: PersonalInfoLabels, 
         sort: {
           createdAt: -1,
         },
@@ -398,14 +413,18 @@ export default {
               { lastName: { $regex: keyword, $options: "i" } },
               { village: { $regex: keyword, $options: "i" } },
               { commune: { $regex: keyword, $options: "i" } },
-              { disctrict: { $regex: keyword, $options: "i" } },
+             
               { province: { $regex: keyword, $options: "i" } },
               { patientId: { $regex: keyword, $options: "i" } },
               { idCard: { $regex: keyword, $options: "i" } },
             ],
           },
           { "currentState.confirm": true },
+          { "currentState.recovered": false },
+          { "currentState.death": false },
           { interviewed: interview },
+          districtQuery,
+          dateQuery,
         ],
       };
       const personalInfos = await PersonalInfo.paginate(query, options);

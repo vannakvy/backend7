@@ -1,5 +1,4 @@
 import { gql } from "apollo-server-express";
-
 export default gql`
   extend type Query {
     excelExport(startDate:Date, endDate:Date): [PersonalInfo!]!
@@ -39,35 +38,33 @@ export default gql`
     ): PaginateResponse!
   }
   extend type Mutation {
-    createPersonalInfo(newInfo: PersonalInfoInput!): PersonalInfoResponseWithData
-    recordSampleTest(sampleTest:SampleTestInput!,personalInfoId:ID!):PersonalInfoResponse!
+    createPersonalInfo(newInfo: PersonalInfoInput!): PersonalInfoResponseWithData @isAuth(requires:SUPPER) 
+    recordSampleTest(sampleTest:SampleTestInput!,personalInfoId:ID!):PersonalInfoResponse! @isAuth(requires:SUPPER) 
     updatePersonalInfo(
       updatedInfo: PersonalInfoInput!
       id: ID!
-    ): PersonalInfoResponse
+    ): PersonalInfoResponse @isAuth(requires:SUPPER) 
     deletePersonalInfo(id: ID!): PersonalInfoResponse @isAuth(requires:ADMIN) 
     deleteSampleTest(personalInfoId:ID!,sampleTestId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
-    updateSampleTest(personalInfoId:ID!,sampleTestId:ID!,sampleTest:SampleTestInput):PersonalInfoResponse 
-    updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse  
+    updateSampleTest(personalInfoId:ID!,sampleTestId:ID!,sampleTest:SampleTestInput):PersonalInfoResponse @isAuth(requires:SUPPER) 
+    updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse @isAuth(requires:SUPPER) 
 
-    updateAffectedFrom(personalInfoId:ID!,updateValue:AffectedFromInput):PersonalInfoResponse  
+    updateAffectedFrom(personalInfoId:ID!,updateValue:AffectedFromInput):PersonalInfoResponse  @isAuth(requires:SUPPER) 
 
     
   # For police 
-  addHistoryWithin14days(createLocation:HistoryWithin14daysInput,personalInfoId:ID!):PersonalInfoResponse 
+  addHistoryWithin14days(createLocation:HistoryWithin14daysInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:SUPPER) 
   deleteHistoryWithin14days(personalInfoId:ID!,historyWithin14Id:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
 
-  addPeopleToQuarantine(newQuarantine:QuarantingInput,personalInfo:ID!):PersonalInfoResponse 
+  addPeopleToQuarantine(newQuarantine:QuarantingInput,personalInfo:ID!):PersonalInfoResponse @isAuth(requires:SUPPER) 
   deletePeopleFromQuarantine(personalInfoId:ID!,quarantingId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
 
-  addPatientToHospital(newHospitalization:HospitalizationsInput,personalInfoId:ID!):PersonalInfoResponse 
+  addPatientToHospital(newHospitalization:HospitalizationsInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:SUPPER) 
   deletePatientFromHospital(personalInfoId:ID!,hospitalId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
 
-  addVaccination(vaccination:VaccinationInput,personalInfoId:ID!):PersonalInfoResponse 
+  addVaccination(vaccination:VaccinationInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:SUPPER) 
   deleteVaccination(personalInfoId:ID!,vaccinationId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
-
-
-  updateTestLocation(query:String,update:String):String
+  updateTestLocation(query:String,update:String):String @isAuth(requires:SUPPER) 
 
   # //delete  left 
   # //update left 

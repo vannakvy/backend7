@@ -27,15 +27,10 @@ export default {
     // @Desc get totalSampleTest and today sample test 
     // Access auth 
     getAllAllSampleTest:async(_,{},{PersonalInfo})=>{
-
-        let today = new Date();
-        today.setHours(0, 0, 0, 0);
-        let end = new Date();
-        end.setHours(23, 59, 59,59);
-        // end.setDate(start.getDate() + 1)
-     let district = "សៀមរាប"
-
-     let query = {};
+      var today = new Date(new Date().setUTCHours(0,0,0,0));
+      var end= new Date(new Date().setUTCHours(23,59,59,59));
+      let district = "សៀមរាប"
+      let query = {};
 
       let data =  await PersonalInfo.aggregate([
         // { "$match":{ "district": district } },
@@ -90,10 +85,8 @@ export default {
 
 
 
-      let today = new Date();
-      today.setHours(0, 0, 0, 0);
-      let tomorrow = new Date();
-      tomorrow.setHours(23, 59, 59,59);
+      var today = new Date(new Date().setUTCHours(0,0,0,0));
+      var tomorrow= new Date(new Date().setUTCHours(23,59,59,59));
    
 
       let totalHospital = await HospitalInfo.countDocuments({})
@@ -135,8 +128,6 @@ export default {
           } }
        ])
      
-
-
 
         confirm = await PersonalInfo.countDocuments({
           "currentState.confirm": true,
@@ -216,10 +207,6 @@ export default {
           
           ])
 
-        
-       
-      
-
       dataToday =  await PersonalInfo.aggregate([
         { "$match":{ "district": district } },
           { "$match":{ "sampleTest.date": {$gte:today,$lt:tomorrow} } },
@@ -262,7 +249,6 @@ if(dataToday.length!==0){
       
       // console.log(dataToday[0].count,"dataToday",dataAll[0].count)
 
-console.log(sampleTest, sampleTestToday)
 
       let dataForBoxes = {
         sampleTest:sampleTest,
@@ -287,8 +273,8 @@ console.log(sampleTest, sampleTestToday)
     },
 
     getAllDistrictForMap: async (_, {}, { PersonalInfo }) => {
-      let today = new Date();
-      today.setHours(0, 0, 0, 0);
+      var today = new Date(new Date().setUTCHours(0,0,0,0));
+      // var tomorrow= new Date(new Date(endDate).setUTCHours(23,59,59,59));
 
       const data = await PersonalInfo.aggregate([
         {
@@ -339,7 +325,7 @@ console.log(sampleTest, sampleTestToday)
     getDataForGrap: async (_, {}, { PersonalInfo }) => {
       const convert = (e) => {
         let array = [];
-        let limitDate = 20;
+        let limitDate = 30;
         e.map((load) => {
           if (load._id.month !== null) {
             if (limitDate == 0) return;
@@ -497,13 +483,9 @@ console.log(sampleTest, sampleTestToday)
     // @Desc getting the data for report
     //auth and private
     getDataForReport: async (_, {startDate,endDate}, { PersonalInfo }) => {
-
       var today = new Date(new Date(startDate).setUTCHours(0,0,0,0));
       var tomorrow= new Date(new Date(endDate).setUTCHours(23,59,59,59));
       // var nd = tomorrow.toISOString();
-    
-
-
 
       const data = await PersonalInfo.aggregate([
         {
@@ -554,7 +536,6 @@ console.log(sampleTest, sampleTestToday)
         1, 
         0
       ]},
-
 
       menRecoveredToday:{  $cond: [
         {$and: [
@@ -688,7 +669,6 @@ console.log(sampleTest, sampleTestToday)
         },
       ]);
 
-    console.log(data)
 
    return data
      
@@ -699,10 +679,10 @@ console.log(sampleTest, sampleTestToday)
     //@Desc get locations 
     //@auth 
  affectedLocationReport: async(_,{startDate,endDate},{AffectedLocation})=>{
-console.log(startDate,endDate)
+
   var today = new Date(new Date(startDate).setUTCHours(0,0,0,0));
   var tomorrow= new Date(new Date(endDate).setUTCHours(23,59,59,59));
-  console.log(today,tomorrow)
+
 // ទីតាំពាក់ព័ន
 //1
      let totalAffectedLocation = await AffectedLocation.countDocuments({});
