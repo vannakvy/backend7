@@ -1,9 +1,7 @@
 import {gql} from 'apollo-server-express'
-
-
 export default gql`
 extend type Query {
-    getPeopeleConfirmRecoverAndDeath(startDate:Date, endDate:Date):reportData
+    getPeopeleConfirmRecoverAndDeath(startDate:Date, endDate:Date):reportData 
     getAllAllSampleTest:Test
     getAllProvince(district:String): AllProvince!
     getAllDistrictForMap:[AllProvince!]!
@@ -11,7 +9,7 @@ extend type Query {
     getDataForBarGraphTotal:BarGraphTotal
     getDataForReport(startDate:Date,endDate:Date):[Report]
     affectedLocationReport(startDate:Date,endDate:Date):AffectedData 
-    interviewForReport3Times:Inter
+    InterViewReport(startDate:Date, endDate:Date):Inter
     getDataForGrapBottom:GraphResponse
 }
 type reportData{
@@ -43,8 +41,10 @@ type AllProvince{
     totalQuarantine:Int,
     affectedLocation:Int,
     totalPeopleInQuarantine:Int
-    totalAffectedLocationOn:Int
-    totalAffectedLocationClose:Int
+    totalAffectedLocation:Int,
+    totalAffectedLocationToday:Int
+    totalAffectedLocationClosed:Int,
+    totalAffectedLocationClosedToday:Int
 }
 
 type AffectedData{

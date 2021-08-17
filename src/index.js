@@ -73,7 +73,7 @@ const startApp = async () => {
     const httpServer = http.createServer(app);
     server.installSubscriptionHandlers(httpServer);
     httpServer.listen(PORT, () => {
-      console.log(`http://localhost:${PORT}${server.subscriptionsPath}`);
+      console.log(`http://localhost:${PORT}${server.graphqlPath}`);
     });
   } catch (err) {
     error({

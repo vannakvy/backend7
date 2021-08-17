@@ -76,18 +76,17 @@ export default {
           return {
             message: "ឈ្មោះនេះមាននៅក្នុង ការកត់ត្រាហើយ",
             success: false,
-            quarantineInfo: null,
+            quarantineInfo: {},
           };
         }
         const quarantines = new QuarantineInfo(newQuarantineInfo);
-
         const isCreated = await quarantines.save();
 
         if (!isCreated) {
           return {
             message: "មិនអាចបង្កើតបានទេ",
             success: false,
-            quarantineInfo: null,
+            quarantineInfo: {},
           };
         }
         return {
@@ -99,7 +98,7 @@ export default {
         return {
           message: `មិនអាចបង្កើតបានទេ សូមមេត្តាទាក់ទង ខាងអភិវត្តកម្មវិធី ជាមួយនិងសារនេះ ${erro.message}`,
           success: false,
-          quarantineInfo: null,
+          quarantineInfo: {},
         };
       }
     },

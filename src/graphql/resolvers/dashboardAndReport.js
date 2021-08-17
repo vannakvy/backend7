@@ -82,7 +82,10 @@ export default {
       let sampleTestToday=0;
       let dataToday=[];
       let dataAll=[];
-
+      let totalAffectedLocation=0;
+      let totalAffectedLocationToday=0;
+      let totalAffectedLocationClosed=0;
+      let totalAffectedLocationClosedToday=0;
 
 
       var today = new Date(new Date().setUTCHours(0,0,0,0));
@@ -91,31 +94,30 @@ export default {
 
       let totalHospital = await HospitalInfo.countDocuments({})
       let totalQuarantine = await QuarantineInfo.countDocuments({})
-      let totalAffectedLocation = await AffectedLocation.countDocuments({})
-      let totalAffectedLocationClose = await AffectedLocation.countDocuments({
-        $and: [{ openAt: {$eq: null} }, { closeAt: {$ne: null} }],
-      });
-      let totalAffectedLocationOn = await AffectedLocation.countDocuments({
-        $and: [{ openAt: {$ne: null} }, { closeAt: {$ne: null} }],
-      });
+      // let totalAffectedLocation = await AffectedLocation.countDocuments({})
+      // let totalAffectedLocationClose = await AffectedLocation.countDocuments({
+      //   $and: [{ openAt: {$eq: null} }, { closeAt: {$ne: null} }],
+      // });
+     
 
 
       
       if (district === "" || district === "ករំីណីទាំងអស់") {
 
+        totalAffectedLocation = await AffectedLocation.countDocuments({})
+        totalAffectedLocationToday = await AffectedLocation.countDocuments({createdAt:{$gte:today,$lt:tomorrow}})
+        totalAffectedLocationClosed = await AffectedLocation.countDocuments({ $and: [{ openAt: {$eq: null} }, { closeAt: {$ne: null} }]});
+        totalAffectedLocationClosedToday = await AffectedLocation.countDocuments({ $and: [{ openAt: {$eq: null} }, { closeAt: {$ne: null} },{closedAt:{$gte:today,$lt:tomorrow}}]});
          dataAll =  await PersonalInfo.aggregate([
           // { "$match":{ "district": district } },
           { "$project": {
                 "all": { "$size": "$sampleTest" }
           } },
           { "$group": {"_id": 1,"count": {"$sum": "$all"}},
-          
           },
           
           ])   
      
-
-
        dataToday =  await PersonalInfo.aggregate([
         // { "$match":{ "district": district } },
           { "$match":{ "sampleTest.date": {$gte:today,$lt:tomorrow} } },
@@ -156,6 +158,12 @@ export default {
 
       } else {
 
+        totalAffectedLocation = await AffectedLocation.countDocuments({"district":district})
+        totalAffectedLocationToday = await AffectedLocation.countDocuments({ $and:[{"createdAt":{$gte:today,$lt:tomorrow}},{"district":district}]});
+
+        totalAffectedLocationClosed = await AffectedLocation.countDocuments({ $and: [{ openAt: {$eq: null} }, { closeAt: {$ne: null} },{district:district}]});
+        totalAffectedLocationClosedToday = await AffectedLocation.countDocuments({ $and: [{ openAt: {$eq: null} }, { closeAt: {$ne: null} },{closedAt:{$gte:today,$lt:tomorrow}},{district:district}]});
+
         confirm = await PersonalInfo.countDocuments({
           $and: [{ "currentState.confirm": true }, { district: district }],
         });
@@ -166,7 +174,6 @@ export default {
           $and: [{ "currentState.death": true }, { district: district }],
         });
         //   // const confirmToday = await PersonalInfo.countDocuments({"currentState.confirm":true,"currentState.confirmedAt": new Date() });
-     
 
         confirmToday = await PersonalInfo.countDocuments({
           $and: [
@@ -204,7 +211,6 @@ export default {
           { "$group": {"_id": 1,"count": {"$sum": "$all"}},
           
           },
-          
           ])
 
       dataToday =  await PersonalInfo.aggregate([
@@ -261,14 +267,19 @@ if(dataToday.length!==0){
         recoveredToday: recoveredToday,
         totalHospital:totalHospital,
         totalQuarantine:totalQuarantine,
-        affectedLocation:totalAffectedLocation,
-        totalAffectedLocationOn:totalAffectedLocationOn,
-        totalAffectedLocationClose:totalAffectedLocationClose,
+        totalAffectedLocation:totalAffectedLocation,
+        totalAffectedLocationToday:totalAffectedLocationToday,
+        totalAffectedLocationClosed:totalAffectedLocationClosed,
+        totalAffectedLocationClosedToday:totalAffectedLocationClosedToday
+        // totalAffectedLocationOn:totalAffectedLocationOn,
+        // totalAffectedLocationClose:totalAffectedLocationClose,
         // totalAffectedLocationNew:totalAffectedLocationNew
         // totalPeopleInHospitalization,
         // totalQuarantine,
         // totalAffectedLocation,
       };
+
+      console.log(dataForBoxes)
       return dataForBoxes;
     },
 
@@ -325,7 +336,7 @@ if(dataToday.length!==0){
     getDataForGrap: async (_, {}, { PersonalInfo }) => {
       const convert = (e) => {
         let array = [];
-        let limitDate = 30;
+        let limitDate = 50;
         e.map((load) => {
           if (load._id.month !== null) {
             if (limitDate == 0) return;
@@ -341,6 +352,20 @@ if(dataToday.length!==0){
        let a =  array.sort(function(a, b){return new Date(a.x) - new Date(b.x)});
         return a;
       };
+
+      // let group = await PersonalInfo.aggregate([
+      //   {$match:{"currentState.confirm":true}},
+      //   {$group:{
+      //     _id:{
+      //       month: { $month: "$currentState.confirmedAt" },
+      //       day: { $dayOfMonth: "$currentState.confirmedAt" },
+      //       year: { $year: "$currentState.confirmedAt" },
+      //     },
+      //     value: { $sum: 1 },
+      //   }},
+      // ])
+
+      // console.log(group,"group")
 
       let confirm = await PersonalInfo.aggregate([
         {
@@ -478,7 +503,6 @@ if(dataToday.length!==0){
          deaths
        }
      },
-
 
     // @Desc getting the data for report
     //auth and private
@@ -757,59 +781,164 @@ return {
 }
  },
 
- interviewForReport3Times:async(_,{},{PersonalInfo})=>{
-    const totalInterview = await PersonalInfo.aggregate([
-      {   $group : {
-        _id : "currentState.confirmAt",
-        count: { $sum: 1 }
-     }}
-    ] 
-      // $and:[ { interviewed: {$eq: false} }]
-    )
-    const test2 = await PersonalInfo.aggregate([
-      {$match:{interviewed:false}},
-      {   $group : {
-        _id : "interviewed",
-        count: { $sum: 1 }
-     }}
-    ])
+ InterViewReport:async(_,{startDate, endDate},{PersonalInfo})=>{
+
+
+    
+
+   
     ////
-    let tod = new Date();
-    let today = moment(tod).startOf('day').format()
-    let torow = new Date(tod);
-    torow.setDate(torow.getDate() + 1);
-    let tomorrow = moment(torow).startOf('day').format()
+    var today = new Date(new Date(startDate).setUTCHours(0,0,0,0));
+    var tomorrow= new Date(new Date(endDate).setUTCHours(23,59,59,59));
     const data = await PersonalInfo.aggregate([
       {
         $project: {
           interviewed: 1,
-          interviewedToday: {
-            $cond: [ {$and : [ { $eq: [ "$interviewed", true] },
-            { $gte: [ "interviewedAt",today] }] }, 1,0 ]
-          },
-          interviewTotal: {
-            $cond: [ { $eq: [ "$interviewed", true] }, 1,0]},
-        },
+          gender:1,
+          nationality:1,
+          interviewTotal:{  $cond: [
+            {$and: [
+                {$eq: ["$interviewed",true]},
+                // {$eq: ["$currentState.recovered",true]},
+                // {$gte: ["$interviewedAt", today]},
+                // {$lt: ["$interviewedAt",tomorrow]}
+            ]}, 
+            1, 
+            0
+        ]},
+        totalKhmer:{  $cond: [
+          {$and: [
+              {$eq: ["$interviewed",true]},
+              {$eq: ["$nationality","ខ្មែរ"]},
+              // {$eq: ["$gender","ស្រី"]},
+              // {$gte: ["$interviewedAt", today]},
+              // {$lt: ["$interviewedAt",tomorrow]}
+          ]}, 
+          1, 
+          0
+      ]},
+        
+        totalWomenKhmer:{  $cond: [
+          {$and: [
+              {$eq: ["$interviewed",true]},
+              {$eq: ["$nationality","ខ្មែរ"]},
+              {$eq: ["$gender","ស្រី"]},
+              // {$gte: ["$interviewedAt", today]},
+              // {$lt: ["$interviewedAt",tomorrow]}
+          ]}, 
+          1, 
+          0
+      ]},
+      totalWomenKhmerToday:{  $cond: [
+        {$and: [
+            {$eq: ["$interviewed",true]},
+            {$eq: ["$nationality","ខ្មែរ"]},
+            {$gte: ["$interviewedAt", today]},
+            {$lt: ["$interviewedAt",tomorrow]}
+        ]}, 
+        1, 
+        0
+    ]},
+    totalChinaToday:{  $cond: [
+      {$and: [
+          {$eq: ["$interviewed",true]},
+          {$eq: ["$nationality","ចិន"]},
+          {$gte: ["$interviewedAt", today]},
+          {$lt: ["$interviewedAt",tomorrow]}
+      ]}, 
+      1, 
+      0
+  ]},
+  totalChinaWomen:{  $cond: [
+    {$and: [
+        {$eq: ["$interviewed",true]},
+        {$eq: ["$nationality","ចិន"]},
+        {$eq: ["$gender","ស្រី"]},
+        
+        // {$gte: ["$interviewedAt", today]},
+        // {$lt: ["$interviewedAt",tomorrow]}
+    ]}, 
+    1, 
+    0
+]},
+totalChina:{  $cond: [
+  {$and: [
+      {$eq: ["$interviewed",true]},
+      {$eq: ["$nationality","ចិន"]},
+      // {$eq: ["$gender","ស្រី"]},
+      // {$gte: ["$interviewedAt", today]},
+      // {$lt: ["$interviewedAt",tomorrow]}
+  ]}, 
+  1, 
+  0
+]},
       },
+    },
       {
         $group: {
           _id: "$interviewed",
-          today: { $sum: "$interviewedToday"},
+          // today: { $sum: "$interviewedToday"},
           interviewTotal: { $sum: "$interviewTotal" },
+          totalKhmer: { $sum: "$totalKhmer" },
+          totalWomenKhmer: { $sum: "$totalWomenKhmer" },
+          totalWomenKhmerToday: { $sum: "$totalWomenKhmerToday" },
+
+          totalChina: { $sum: "$totalChina" },
+          totalChinaToday: { $sum: "$totalChinaToday" },
+          totalChinaWomen: { $sum: "$totalChinaWomen" },
+          
         },
       },
     ]);
+
+
+
+    const totaSampleTestLocation = await PersonalInfo.aggregate([
+      { $unwind: "$sampleTest"},
+      { $group: { _id: "$sampleTest.testLocation",count:{$sum:1} }},
+    ] 
+    )
+
+  let  dataToday =  await PersonalInfo.aggregate([
+      // { "$match":{ "district": district } },
+        { "$match":{ "sampleTest.date": {$gte:today,$lt:tomorrow} } },
+        { "$group": {
+            "_id": 1,
+            "count": {
+                "$sum": 1
+            }
+        } }
+     ])
+
+
+     let dataAll =  await PersonalInfo.aggregate([
+      // { "$match":{ "district": district } },
+      { "$project": {
+            "all": { "$size": "$sampleTest" }
+      } },
+      { "$group": {"_id": 1,"count": {"$sum": "$all"}},
+    },
+   ])
+
+
+    // console.log(totaSampleTestLocation.length)
+    // console.log(data)
+    // console.log(dataToday)
+    // console.log(dataAll)
+    // console.log(totaSampleTestLocation)
     ///
 
-// console.log(totalInterview)
-    return totalInterview;
+
+    return {
+      interviewTotal: data[0].interviewTotal
+      
+    };
  },
-
- 
-
- 
   },
 };
+
+
+
 
 
 // let totalAffectedLocationNew = await AffectedLocation.countDocuments({
