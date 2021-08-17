@@ -40,7 +40,7 @@ const AuthMiddleware = async (req, res, next) => {
     } catch (err) {
         req.isAuth = false;
         //  throw new Error(status:401)
-        res.status(401)
+        return next()
     }
     // If decoded token is null then set authentication of the request false
     if (!decodedToken) {
