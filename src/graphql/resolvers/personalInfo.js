@@ -452,7 +452,7 @@ export default {
     //@access auth
     getPersonalInfoWithPagination: async (
       _,
-      { page, limit, keyword, currentState, startDate,endDate },
+      { page, limit, keyword, currentState, startDate,endDate,covidType="" },
       { PersonalInfo }
     ) => {
       const options = {
@@ -467,24 +467,26 @@ export default {
       let today = "";
       let tomorrow = "";
       if(startDate !==null || endDate !==null){
-          today = moment(startDate).startOf('day').format();
-          let torow = new Date(endDate);
-          torow.setDate(torow.getDate() + 1);
-          tomorrow = moment(torow).startOf('day').format();
+        today = new Date(new Date(startDate).setUTCHours(0,0,0,0));
+        tomorrow = new Date(new Date(endDate).setUTCHours(23,59,59,59));
       }
 
    
-
       let dateQuery = {}
       let current = {};
       let current1 = {};
       let current2 = {};
+      let delta = {};
 
       switch (currentState) {
         case "វិជ្ជមាន":
           current = { "currentState.confirm": true}
           current1 = { "currentState.recovered": false}
           current2 = { "currentState.death": false}
+          if(covidType!==""){
+            delta = {"currentState.covidVariant": covidType}
+          }
+          
             if(today!==""){
               dateQuery = {"currentState.confirmedAt":{$gte:today,$lt:tomorrow}}
             }
@@ -533,7 +535,8 @@ export default {
           current,
           current1,
           current2,
-          dateQuery
+          dateQuery,
+          delta
           // {'currentState.confirmedAt': {$gte: '2021-08-13T00:00:00+07:00',$lt: '2021-08-14T00:00:00+07:00'}}
         ],
       };
@@ -716,22 +719,6 @@ export default {
           }
         );
 
-        // if ((sampleTest.result = true)) {
-        //   let updateState = {
-        //     confirm: sampleTest.result,
-        //     confirmedAt: sampleTest.resultDate,
-        //     covidVariant: sampleTest.covidVariant,
-        //   };
-
-        //   const updated = await PersonalInfo.update(
-        //     { _id: personalInfoId },
-        //     {
-        //       $set: {
-        //         currentState: updateState,
-        //       },
-        //     }
-        //   );
-
 
         return {
           success: true,
@@ -790,7 +777,93 @@ export default {
         };
       }
     },
+    //@Desc update the quarantine in the personalinfo 
+    //@Access auth and super 
+    updatePatientFromHospital: async (
+      _,
+      {personalInfoId,hospitalId,updateInfo},
+      { PersonalInfo }
+    ) => {
+   
+      try {
+      
+        await PersonalInfo.findOneAndUpdate(
+          { _id: personalInfoId, "quaranting._id": hospitalId },
+          {
+            $set: {
+              // midExamDetails.$.Marks
+              "quaranting.$.date_in": updateInfo.date_in,
+              "quaranting.$.date_out": updateInfo.date_out,
+              "quaranting.$.locationName": updateInfo.locationName,
+              "quaranting.$.locationType": updateInfo.locationType,
+              "quaranting.$.coorporate": updateInfo.coorporate,
+              "quaranting.$.personType": updateInfo.personType,
+              "quaranting.$.out_status": updateInfo.out_status,
+              "quaranting.$.qurantineInfo": updateInfo.qurantineInfo,
+              "quaranting.$.lat": updateInfo.lat,
+              "quaranting.$.long": updateInfo.long,
+              
+            },
+          }
+        )
 
+        return {
+          success: true,
+          message: "ការកែប្រែទទួលបានជោគជ័យ",
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
+      
+ //@Desc update the hospitalinfo in the personal info 
+ //@Access auth and supper 
+    updatePatientFromHospital: async (
+      _,
+      { personalInfoId,hospitalId,updateInfo},
+      { PersonalInfo }
+    ) => {
+   
+      try {
+
+
+        console.log(hospitalId)
+        console.log(updateInfo)
+       
+      
+       await PersonalInfo.findOneAndUpdate(
+          {  _id: personalInfoId, "hospitalizations._id": hospitalId},
+          {
+            $set: {
+           
+              "hospitalizations.$.date_in": updateInfo.date_in,
+              "hospitalizations.$.date_out": updateInfo.date_out,
+              "hospitalizations.$.hospitalInfo": updateInfo.hospitalInfo,
+              "hospitalizations.$.covidVariant": updateInfo.covidVariant,
+              "hospitalizations.$.coorporate": updateInfo.coorporate,
+              "hospitalizations.$.description": updateInfo.description,
+              "hospitalizations.$.lat": updateInfo.lat,
+              "hospitalizations.$.long": updateInfo.long,
+
+            },
+          }
+        )
+
+        return {
+          success: true,
+          message: "Update Successfully",
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
+      
     // deletePatientFromHospital
     // For police
     addPeopleToQuarantine: async (
@@ -904,14 +977,15 @@ export default {
         if (!updated) {
           return {
             success: false,
-            message: "Cannot this status ",
+            message: "មិនអាចកែប្រែបានទេ  ",
           };
         }
         return {
           success: true,
-          message: "Updated successfully ",
+          message: "កែប្រែបានជោគជ័យ ",
         };
       } catch (error) {
+       
         return {
           success: false,
           message: error.message,

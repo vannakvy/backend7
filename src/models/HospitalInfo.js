@@ -8,8 +8,14 @@ const HospitalInfoSchema = mongoose.Schema({
     district: String,
     province:String,
     personInchage:String,
-    long: Number,
-    lat: Number,
+    long: {
+        type:Number,
+        default: 102.32
+      },
+      lat: {
+        type:Number,
+        default: 104.32
+      },
     other:String,
     personInCharge:{
         firstName:String,

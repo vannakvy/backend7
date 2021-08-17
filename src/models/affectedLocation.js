@@ -18,8 +18,14 @@ const AffectedLocationSchema = mongoose.Schema(
       type: Date,
       default: null,
     },
-    long: Number,
-    lat: Number,
+    long: {
+      type:Number,
+      default: 102.32
+    },
+    lat: {
+      type:Number,
+      default: 104.32
+    },
     coorporate: {
       type: Boolean,
       default: true,

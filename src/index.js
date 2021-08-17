@@ -55,7 +55,7 @@ const server = new ApolloServer({
     },
   },
   tracing: true,
-  playground: !IN_PROD,
+  playground: IN_PROD,
 });
 
 const startApp = async () => {

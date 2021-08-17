@@ -104,8 +104,14 @@ const PersonalInfoShema = mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'QuarantineInfo'
         },
-        long:Number,
-        lat:Number,
+        long: {
+            type:Number,
+            default: 102.32
+          },
+          lat: {
+            type:Number,
+            default: 104.32
+          },
         locationName:String
        
        }],    

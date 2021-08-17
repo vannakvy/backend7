@@ -3,31 +3,20 @@ import Paginate from "mongoose-paginate-v2";
 
 const UserActionSchema = mongoose.Schema(
   {
-    locationName: String,
-    locationType:String,
-    village: String,
-    commune: String,
-    district: String,
-    province: String,
-    other: String,
-    openAt: {
-      type: Date,
-      default: null,
-    },
-    closeAt: {
-      type: Date,
-      default: null,
-    },
-    long: Number,
-    lat: Number,
-    coorporate: {
-      type: Boolean,
-      default: true,
-    },
-    infected: {
-      type: Boolean,
-      default: false,
-    },
+userId:{
+  type:mongoose.Schema.Types.ObjectId,
+  ref:"User"
+},
+date:Date,
+action:{
+  type:String,
+  default:""
+},
+log:{
+  type:String,
+  default:""
+},
+userName:String,
   },
   { timestamps: true }
 );

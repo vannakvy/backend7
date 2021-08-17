@@ -28,7 +28,8 @@ export default gql`
       keyword: String,
       currentState:String,
       startDate:Date,
-      endDate:Date
+      endDate:Date,
+      covidType:String,
     ): PaginateResponse!
     getPersonalInfoByCaseWithPagination(
       page: Int!
@@ -47,10 +48,9 @@ export default gql`
     deletePersonalInfo(id: ID!): PersonalInfoResponse @isAuth(requires:ADMIN) 
     deleteSampleTest(personalInfoId:ID!,sampleTestId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
     updateSampleTest(personalInfoId:ID!,sampleTestId:ID!,sampleTest:SampleTestInput):PersonalInfoResponse @isAuth(requires:SUPPER) 
-    updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse @isAuth(requires:SUPPER) 
+    updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse @isAuth(requires:ADMIN) 
 
     updateAffectedFrom(personalInfoId:ID!,updateValue:AffectedFromInput):PersonalInfoResponse  @isAuth(requires:SUPPER) 
-
     
   # For police 
   addHistoryWithin14days(createLocation:HistoryWithin14daysInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:SUPPER) 
@@ -58,9 +58,11 @@ export default gql`
 
   addPeopleToQuarantine(newQuarantine:QuarantingInput,personalInfo:ID!):PersonalInfoResponse @isAuth(requires:SUPPER) 
   deletePeopleFromQuarantine(personalInfoId:ID!,quarantingId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
+  updatePeopleFromQuarantine(personalInfoId:ID!,quarantineInfo:ID!,updateInfo:QuarantingInput):PersonalInfoResponse @isAuth(requires:SUPPER) 
 
   addPatientToHospital(newHospitalization:HospitalizationsInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:SUPPER) 
   deletePatientFromHospital(personalInfoId:ID!,hospitalId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
+  updatePatientFromHospital(personalInfoId:ID!,hospitalId:ID!,updateInfo:HospitalizationsInput):PersonalInfoResponse @isAuth(requires:SUPPER) 
 
   addVaccination(vaccination:VaccinationInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:SUPPER) 
   deleteVaccination(personalInfoId:ID!,vaccinationId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
@@ -145,7 +147,7 @@ export default gql`
         date_out:Date,
         personTypes:String,
         out_status:String,
-        quarantineInfo:ID!
+        quarantineInfo:ID
         locationName:String,
         lat:Float
         long:Float
@@ -320,12 +322,11 @@ type PersonalInfoResponseWithData{
     long:Float,
     lat:Float,
   }
-
   input HospitalizationsInput{
     date_in: Date
     date_out: Date
     hospitalName: String
-    hospitalInfo: ID!
+    hospitalInfo: ID
     covidVariant: String
     coorporate: Boolean
     description: String

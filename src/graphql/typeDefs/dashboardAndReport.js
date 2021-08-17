@@ -26,6 +26,8 @@ type Inter{
 }
 
 type AllProvince{
+    delta:Int,
+    deltaToday:Int,
     sampleTest:Int,
     sampleTestToday:Int,
     confirmedCase:Int

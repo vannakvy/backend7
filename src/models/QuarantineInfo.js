@@ -7,8 +7,14 @@ const QuarantineInfoSchema = mongoose.Schema({
     commune: String,
     district: String,
     province:String,
-    long: Number,
-    lat: Number,
+    long: {
+        type:Number,
+        default: 102.32
+      },
+      lat: {
+        type:Number,
+        default: 104.32
+      },
     other:String,
     capacity:{type:Number,required:true,default:0},
     locationType:String,
