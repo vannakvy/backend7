@@ -208,6 +208,7 @@ export default {
     getPatientForHospitalWithPagination: async (
       _,
       { page, limit, keyword = "", startDate, endDate, hospitalId },
+
       { PersonalInfo }
     ) => {
       const options = {
@@ -219,6 +220,16 @@ export default {
         },
         //   populate: "case",
       };
+      let dateQuery = {}
+      
+      if(startDate !== null && endDate !== null && startDate !== undefined && endDate !== undefined){
+        // console.log(startDate, endDate, district)
+        var today = new Date(new Date(startDate).setUTCHours(0,0,0,0));
+        var tomorrow= new Date(new Date(endDate).setUTCHours(23,59,59,59));
+        dateQuery = { hospitalizations:{$elemMatch:{date_in:{$gte:today,$lt:tomorrow}} }}
+        // { hospitalizations: { $elemMatch: { hospitalInfo: hospitalId } } },
+      }
+    
       let query = {
         $and: [
           {
@@ -236,7 +247,7 @@ export default {
             ],
           },
           { hospitalizations: { $elemMatch: { hospitalInfo: hospitalId } } },
-          // { "quarantine.date_in": { $gte: startDate, $lt: endDate } },
+          dateQuery
         ],
       };
       const personalInfos = await PersonalInfo.paginate(query, options);
@@ -296,9 +307,6 @@ export default {
       { PersonalInfo }
     ) => {
 
-
-      
-
       const options = {
         page: page || 1,
         limit: limit || 10,
@@ -329,7 +337,6 @@ export default {
         ],
       };
       const personalInfos = await PersonalInfo.paginate(query, options);
-
       return personalInfos;
     },
     //Des
@@ -596,6 +603,42 @@ export default {
   },
 
   Mutation: {
+
+    //@Desc update the the historywithin14 days 
+    //@access polic 
+    updateHistoryWithin14days:async(_,{personalInfoId,historyWithin14Id,updateInfo},{PersonalInfo})=>{
+      try {
+      
+        await PersonalInfo.findOneAndUpdate(
+          { _id: personalInfoId, "historyWithin14days._id": historyWithin14Id },
+          {
+            $set: {
+              // midExamDetails.$.Marks
+              "hospitalizations.$.locationName": updateInfo.locationName,
+              "hospitalizations.$.affectedLocation": updateInfo.affectedLocation,
+              "hospitalizations.$.date": updateInfo.date,
+              "hospitalizations.$.lat": updateInfo.lat,
+              "hospitalizations.$.long": updateInfo.long,
+              "hospitalizations.$.other": updateInfo.other,
+              "hospitalizations.$.description": updateInfo.description,
+              "hospitalizations.$.direct": updateInfo.direct,
+
+            },
+          }
+        );
+
+
+        return {
+          success: true,
+          message: "កែរប្រែបានជោគជ័យ",
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
     //@Desc add Vaccination 
     //@ACCESS 
     addVaccination: async (
@@ -777,9 +820,55 @@ export default {
         };
       }
     },
+
+    //@Desc update the people from the qurantine 
+    //@Access polic and admin 
+
+    // updatePeopleFromQuarantine: async (
+    //   _,
+    //   {personalInfoId,quarantineId,updateInfo},
+    //   { PersonalInfo }
+    // ) => {
+   
+    //   try {
+      
+    //     await PersonalInfo.findOneAndUpdate(
+    //       { _id: personalInfoId, "quaranting._id": quarantineId },
+    //       {
+    //         $set: {
+    //           // midExamDetails.$.Marks
+    //           "quaranting.$.date_in": updateInfo.date_in,
+    //           "quaranting.$.date_out": updateInfo.date_out,
+    //           "quaranting.$.locationName": updateInfo.locationName,
+    //           "quaranting.$.locationType": updateInfo.locationType,
+    //           "quaranting.$.coorporate": updateInfo.coorporate,
+    //           "quaranting.$.personType": updateInfo.personType,
+    //           "quaranting.$.out_status": updateInfo.out_status,
+    //           "quaranting.$.qurantineInfo": updateInfo.qurantineInfo,
+    //           "quaranting.$.lat": updateInfo.lat,
+    //           "quaranting.$.long": updateInfo.long,
+              
+    //         },
+    //       }
+    //     )
+
+    //     return {
+    //       success: true,
+    //       message: "ការកែប្រែទទួលបានជោគជ័យ",
+    //     };
+    //   } catch (error) {
+    //     return {
+    //       success: false,
+    //       message: error.message,
+    //     };
+    //   }
+    // },
+
+
+
     //@Desc update the quarantine in the personalinfo 
     //@Access auth and super 
-    updatePatientFromHospital: async (
+    updatePeopleFromQuarantine: async (
       _,
       {personalInfoId,hospitalId,updateInfo},
       { PersonalInfo }
@@ -802,7 +891,7 @@ export default {
               "quaranting.$.qurantineInfo": updateInfo.qurantineInfo,
               "quaranting.$.lat": updateInfo.lat,
               "quaranting.$.long": updateInfo.long,
-              
+              "quaranting.$.roomNumber": updateInfo.roomNumber,
             },
           }
         )
@@ -830,15 +919,11 @@ export default {
       try {
 
 
-        console.log(hospitalId)
-        console.log(updateInfo)
-       
-      
+    
        await PersonalInfo.findOneAndUpdate(
           {  _id: personalInfoId, "hospitalizations._id": hospitalId},
           {
             $set: {
-           
               "hospitalizations.$.date_in": updateInfo.date_in,
               "hospitalizations.$.date_out": updateInfo.date_out,
               "hospitalizations.$.hospitalInfo": updateInfo.hospitalInfo,

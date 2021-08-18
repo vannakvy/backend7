@@ -49,20 +49,22 @@ export default gql`
     deleteSampleTest(personalInfoId:ID!,sampleTestId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
     updateSampleTest(personalInfoId:ID!,sampleTestId:ID!,sampleTest:SampleTestInput):PersonalInfoResponse @isAuth(requires:SUPPER) 
     updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse 
-
     updateAffectedFrom(personalInfoId:ID!,updateValue:AffectedFromInput):PersonalInfoResponse  @isAuth(requires:SUPPER) 
     
   # For police 
-  addHistoryWithin14days(createLocation:HistoryWithin14daysInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:SUPPER) 
-  deleteHistoryWithin14days(personalInfoId:ID!,historyWithin14Id:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
+  addHistoryWithin14days(createLocation:HistoryWithin14daysInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:POLICE) 
+  deleteHistoryWithin14days(personalInfoId:ID!,historyWithin14Id:ID!):PersonalInfoResponse @isAuth(requires:POLICE) 
+  updateHistoryWithin14days(personalInfoId:ID!,historyWithin14Id:ID!,updateInfo:HistoryWithin14daysInput): PersonalInfoResponse  @isAuth(requires:POLICE) 
+
+
 
   addPeopleToQuarantine(newQuarantine:QuarantingInput,personalInfo:ID!):PersonalInfoResponse @isAuth(requires:SUPPER) 
   deletePeopleFromQuarantine(personalInfoId:ID!,quarantingId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
   updatePeopleFromQuarantine(personalInfoId:ID!,quarantineInfo:ID!,updateInfo:QuarantingInput):PersonalInfoResponse @isAuth(requires:SUPPER) 
 
-  addPatientToHospital(newHospitalization:HospitalizationsInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:SUPPER) 
+  addPatientToHospital(newHospitalization:HospitalizationsInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:DOCTOR) 
   deletePatientFromHospital(personalInfoId:ID!,hospitalId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
-  updatePatientFromHospital(personalInfoId:ID!,hospitalId:ID!,updateInfo:HospitalizationsInput):PersonalInfoResponse @isAuth(requires:SUPPER) 
+  updatePatientFromHospital(personalInfoId:ID!,hospitalId:ID!,updateInfo:HospitalizationsInput):PersonalInfoResponse @isAuth(requires:DOCTOR) 
 
   addVaccination(vaccination:VaccinationInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:SUPPER) 
   deleteVaccination(personalInfoId:ID!,vaccinationId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
@@ -77,6 +79,21 @@ export default gql`
   }
  
   type PersonalInfo {
+
+    from:String,
+    carPlateNumber: String,
+    driverName:String,
+    to: String, 
+
+    souceOfSuspect:String,
+    recievedLabFormAt:Date,
+    officerId:String,
+    updateAt:Date,
+
+    workplaceInfo:String,
+    totalCoworker:Int,
+
+
     englishName:String,
     patientId:String
     id: ID
@@ -129,6 +146,7 @@ export default gql`
   }
   type Quarantings{
         id:ID
+        roomNumber:Int,
         coorporate:Boolean
         date_in:Date,
         date_out:Date,
@@ -149,6 +167,7 @@ export default gql`
         out_status:String,
         quarantineInfo:ID
         locationName:String,
+        roomNumber:Int,
         lat:Float
         long:Float
   }
@@ -228,6 +247,16 @@ export default gql`
 
   
   input PersonalInfoInput {
+    workplaceInfo:String,
+    totalCoworker:Int,
+    carPlateNumber: String,
+    driverName:String,
+    from:String,
+    to: String, 
+    souceOfSuspect:String,
+    recievedLabFormAt:Date,
+    officerId:String,
+    updateAt:Date,
     covidVariant:String,
     englishName:String,
     patientId:String
@@ -268,6 +297,7 @@ type PersonalInfoResponseWithData{
   response : PersonalInfoResponse
   personalInfo:PersonalInfo!
 }
+
   type PaginateResponse {
     paginator: Paginator
     personalInfos: [PersonalInfo!]!
@@ -293,6 +323,7 @@ type PersonalInfoResponseWithData{
     description: String
     direct:Boolean
   }
+
   type AffectedFrom{
     date:Date
     patientName:String

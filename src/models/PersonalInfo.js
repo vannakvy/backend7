@@ -3,6 +3,18 @@ import Paginate from 'mongoose-paginate-v2'
 //dddd
 
 const PersonalInfoShema = mongoose.Schema({
+    workplaceInfo:String,
+    totalCoworker:Number,
+   //police update
+    carPlateNumber: String,
+    driverName:String,
+    from :String,
+    to: String, 
+    // 
+    souceOfSuspect:String,
+    recievedLabFormAt:Date,
+    officerId:String,
+    updateAt:Date,
     patientId:String,
     firstName:String,
     lastName:String,
@@ -38,7 +50,6 @@ const PersonalInfoShema = mongoose.Schema({
         default: false
     },
     interviewedAt:Date,
-
 
     vaccination:[{
         times:{
@@ -95,6 +106,7 @@ const PersonalInfoShema = mongoose.Schema({
             type:Boolean,
             default:true,
         },
+        roomNumber:Number,
         locationType:String,
         date_in:Date,
         date_out:Date,
