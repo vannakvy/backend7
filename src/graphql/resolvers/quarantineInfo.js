@@ -12,6 +12,31 @@ const QuarantineLabels = {
 
 export default {
   Query: {
+
+    //@Desc get total people in the quarantine 
+    //@Access auth 
+    QuarantineDashboard:async(_,{quarantineId},{PersonalInfo})=>{
+      var today = new Date(new Date().setUTCHours(0, 0, 0, 0));
+      var tomorrow= new Date(new Date().setUTCHours(23,59,59,59));
+
+      let totalInToday = await PersonalInfo.countDocuments(
+      {$and:[ {quaranting: { $elemMatch: { quarantineInfo: quarantineId } }},{ quaranting: { $elemMatch: { date_in: {$gte:today,$lt:tomorrow}}}} ]} )   
+      let totalIn = await PersonalInfo.countDocuments({quaranting: { $elemMatch: { quarantineInfo: quarantineId }}} );   
+
+      let totalOutToday = await PersonalInfo.countDocuments(
+          {$and:[ {quaranting: { $elemMatch: { quarantineInfo: quarantineId } }},{ quaranting: { $elemMatch: { date_out: {$gte:today,$lt:tomorrow}}}} ]} )   
+      let totalOut = await PersonalInfo.countDocuments({$and:[ {quaranting: { $elemMatch: { quarantineInfo: quarantineId } }},
+          { quaranting: { $elemMatch: { date_out: {$ne:null}}}} ]} );
+          
+   return {
+       totalIn,
+       totalInToday,
+       totalOut,
+       totalOutToday,
+
+   }
+
+  },
     //@Desc getting all the Quantine
     //@access private
     //

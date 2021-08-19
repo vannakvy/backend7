@@ -796,6 +796,34 @@ export default {
       { PersonalInfo }
     ) => {
       try {
+
+
+        let isExisted = await PersonalInfo.findById(personalInfoId);
+        if (!isExisted) {
+          return {
+            message: "មិនអាចបញ្ចូលបានទេព្រោះគ្មានបុគ្គលនេះទេ",
+            success: false,
+          };
+        }
+
+
+        let isAlreadyIn = await PersonalInfo.findOne({
+          $and: [
+            {"_id": personalInfoId},
+            {hospitalizations:{$elemMatch:{hospitalInfo:newHospitalization.hospitalInfo}}}
+          ]
+        } );   
+       
+       
+        if (isAlreadyIn) {
+          return {
+            message: "បុគ្គលនេះស្ថិតនៅក្នុងមណ្ឌលនេះម្តងហើយ",
+            success: false,
+          };
+        }
+
+
+
         const updatedData = await PersonalInfo.findByIdAndUpdate(
           personalInfoId,
           { $push: { hospitalizations: newHospitalization } }
@@ -806,8 +834,6 @@ export default {
             message: "មិនទាន់មានអ្នកកំណត់ត្រានេះទេ",
           };
         }
-
-    
 
         return {
           message: "បញ្ចូលបានជោកជ័យ",
@@ -965,14 +991,15 @@ export default {
           };
         }
 
-        let isAlreadyIn = await PersonalInfo.findOne({
-          quaranting: {
-            $elemMatch: {
-              quarantineInfo: newQuarantine.quarantineInfo.toString(),
-            },
-          },
-        });
 
+        let isAlreadyIn = await PersonalInfo.findOne({
+          $and: [
+            {"_id": personalInfo},
+            {quaranting:{$elemMatch:{quarantineInfo:newQuarantine.quarantineInfo}}}
+          ]
+        } );   
+        console.log(isAlreadyIn)
+       
         if (isAlreadyIn) {
           return {
             message: "បុគ្គលនេះស្ថិតនៅក្នុងមណ្ឌលនេះម្តងហើយ",
@@ -1019,7 +1046,6 @@ export default {
             success: false,
           };
         }
-
         await PersonalInfo.updateOne(
           { _id: personalInfoId },
           {
@@ -1042,6 +1068,43 @@ export default {
         };
       }
     },
+
+    //@Desc update the travel
+    //@Access Police 
+
+    updateTravelOverCountryHistory: async (
+      _,
+      { personalInfoId, updateValue },
+      { PersonalInfo }
+    ) => {
+      try {
+        const updated = await PersonalInfo.updateOne(
+          { _id: personalInfoId },
+          {
+            $set: {
+              travelOverCountryHistory: updateValue,
+            },
+          }
+        );
+        if (!updated) {
+          return {
+            success: false,
+            message: "មិនអាចកែប្រែបានទេ ",
+          };
+        }
+        return {
+          success: true,
+          message: "កែប្រែបានជោគជ័យ",
+        };
+      } catch (error) {
+       
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
+
 
     //@Desc update the current State
     //@Access auth
@@ -1094,6 +1157,7 @@ export default {
             },
           }
         );
+
         if (!updated) {
           return {
             success: false,

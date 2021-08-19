@@ -9,8 +9,9 @@ export default gql`
       keyword: String
     ): HospitalInfoPaginator!
     getHospitalInfoById(id: ID!): HospitalInfo!
+    hospitalDashboard(hospitalInfo:ID!):totalDataInHospital
   }
-
+ 
   extend type Mutation {
     createHospitalInfo(
       newHospitalInfo: HospitalInfoInput
@@ -20,6 +21,13 @@ export default gql`
       id: ID!
     ): HospitalInfoResponse! @isAuth(requires:SUPPER) 
     deleteHospitalInfo(id: ID!): HospitalInfoResponse! @isAuth(requires:SUPPER) 
+  }
+
+  type totalDataInHospital {
+             totalIn:Int
+             totalInToday:Int
+             totalOut:Int
+             totalOutToday:Int
   }
 
   type HospitalInfo {

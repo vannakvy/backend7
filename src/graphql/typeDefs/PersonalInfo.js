@@ -47,9 +47,11 @@ export default gql`
     ): PersonalInfoResponse @isAuth(requires:SUPPER) 
     deletePersonalInfo(id: ID!): PersonalInfoResponse @isAuth(requires:ADMIN) 
     deleteSampleTest(personalInfoId:ID!,sampleTestId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
-    updateSampleTest(personalInfoId:ID!,sampleTestId:ID!,sampleTest:SampleTestInput):PersonalInfoResponse @isAuth(requires:SUPPER) 
+    updateSampleTest(personalInfoId:ID!,sampleTestId:ID!,sampleTest:SampleTestInput):PersonalInfoResponse 
     updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse 
-    updateAffectedFrom(personalInfoId:ID!,updateValue:AffectedFromInput):PersonalInfoResponse  @isAuth(requires:SUPPER) 
+    updateAffectedFrom(personalInfoId:ID!,updateValue:AffectedFromInput):PersonalInfoResponse  
+
+  
     
   # For police 
   addHistoryWithin14days(createLocation:HistoryWithin14daysInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:POLICE) 
@@ -70,7 +72,9 @@ export default gql`
   deleteVaccination(personalInfoId:ID!,vaccinationId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
   updateTestLocation(query:String,update:String):String @isAuth(requires:SUPPER) 
 
-  # //delete  left 
+  # //
+  updateTravelOverCountryHistory(personalInfoId:ID!,updateValue:TravelOverCountryHistoryInput):PersonalInfoResponse
+
   # //update left 
   }
 
@@ -79,7 +83,9 @@ export default gql`
   }
  
   type PersonalInfo {
-
+    currentAddress:String,
+    reasonForTestingOther:String,
+    social:String,
     from:String,
     carPlateNumber: String,
     driverName:String,
@@ -92,6 +98,8 @@ export default gql`
 
     workplaceInfo:String,
     totalCoworker:Int,
+
+    pob:String,
 
 
     englishName:String,
@@ -121,6 +129,7 @@ export default gql`
     updatedAt: Date
     interviewed: Boolean
     interviewedAt:Date
+    interviewStatus:String,
     currentState: currentStatus
     sampleTest:[SampleTest]
     travelOverCountryHistory:TravelOverCountryHistory
@@ -147,6 +156,7 @@ export default gql`
   type Quarantings{
         id:ID
         roomNumber:Int,
+        totalRoomate:Int,
         coorporate:Boolean
         date_in:Date,
         date_out:Date,
@@ -159,6 +169,7 @@ export default gql`
         lat:Float
   }
   input QuarantingInput{
+    totalRoomate:Int,
         locationType:String
         coorporate:Boolean
         date_in:Date,
@@ -247,23 +258,33 @@ export default gql`
 
   
   input PersonalInfoInput {
+    currentAddress:String,
+    pob:String,
+
+    reasonForTestingOther:String,
+    social:String,
     workplaceInfo:String,
     totalCoworker:Int,
     carPlateNumber: String,
+
     driverName:String,
     from:String,
     to: String, 
+
     souceOfSuspect:String,
     recievedLabFormAt:Date,
     officerId:String,
     updateAt:Date,
     covidVariant:String,
+
+    
     englishName:String,
     patientId:String
     currentState:currentStatusInput
     firstName: String
     interviewed:Boolean
     interviewedAt:Date
+    interviewStatus:String,
     lastName: String
     age: Int
     case:ID
@@ -325,6 +346,7 @@ type PersonalInfoResponseWithData{
   }
 
   type AffectedFrom{
+    relationType:String,
     date:Date
     patientName:String
     patientCode: String
@@ -334,6 +356,8 @@ type PersonalInfoResponseWithData{
   }
 
   input AffectedFromInput{
+
+    relationType:String,
     date:Date
     patientName:String
     patientCode: String

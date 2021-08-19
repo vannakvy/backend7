@@ -3,6 +3,9 @@ import Paginate from 'mongoose-paginate-v2'
 //dddd
 
 const PersonalInfoShema = mongoose.Schema({
+    reasonForTestingOther:String,
+    //
+    social:String,
     workplaceInfo:String,
     totalCoworker:Number,
    //police update
@@ -11,6 +14,9 @@ const PersonalInfoShema = mongoose.Schema({
     from :String,
     to: String, 
     // 
+    currentAddress:String,
+    pob:String,
+
     souceOfSuspect:String,
     recievedLabFormAt:Date,
     officerId:String,
@@ -49,6 +55,7 @@ const PersonalInfoShema = mongoose.Schema({
         type: Boolean,
         default: false
     },
+    interviewStatus:String,
     interviewedAt:Date,
 
     vaccination:[{
@@ -111,6 +118,7 @@ const PersonalInfoShema = mongoose.Schema({
         date_in:Date,
         date_out:Date,
         personTypes:String,
+        totalRoomate:Number,
         out_status:String,
         quarantineInfo:{
             type: mongoose.Schema.Types.ObjectId,
@@ -128,6 +136,7 @@ const PersonalInfoShema = mongoose.Schema({
        
        }],    
     affectedFrom:{
+        relationType:String,
         date:Date,
         patientName:String,
         patientCode:String,

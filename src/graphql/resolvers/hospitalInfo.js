@@ -14,11 +14,38 @@ const HospitalInfoLabels = {
 export default {
     Query:{
 
+        //@Desc get data for the dashboard int each hopital 
+        //@access auth 
+
+        hospitalDashboard:async(_,{hospitalInfo},{PersonalInfo})=>{
+            var today = new Date(new Date().setUTCHours(0, 0, 0, 0));
+            var tomorrow= new Date(new Date().setUTCHours(23,59,59,59));
+
+            let totalInToday = await PersonalInfo.countDocuments(
+            {$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},{ hospitalizations: { $elemMatch: { date_in: {$gte:today,$lt:tomorrow}}}} ]} )   
+            let totalIn = await PersonalInfo.countDocuments({hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo }}} );   
+
+            let totalOutToday = await PersonalInfo.countDocuments(
+                {$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},{ hospitalizations: { $elemMatch: { date_out: {$gte:today,$lt:tomorrow}}}} ]} )   
+            let totalOut = await PersonalInfo.countDocuments({$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},
+                { hospitalizations: { $elemMatch: { date_out: {$ne:null}}}} ]} );
+                
+         return {
+             totalIn,
+             totalInToday,
+             totalOut,
+             totalOutToday,
+  
+         }
+     
+        },
+
         //@Desc hospital location 
         //@access private 
         //
 
         allHospitalInfos:async(_,{},{HospitalInfo})=>{
+           
             const Hospitalizations = await HospitalInfo.find({});
             return Hospitalizations;
         },

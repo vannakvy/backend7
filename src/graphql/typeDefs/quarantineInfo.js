@@ -5,6 +5,7 @@ export default gql`
     allQuarantineInfos:[QuarantineInfo!]!
     getQuarantineInfoWithPagination(page:Int!, limit:Int!, keyword:String):QuarantineInfoPaginator!
     getQuarantineInfoById(id:ID!):QuarantineInfo!
+    QuarantineDashboard(quarantineId:ID!):totalDataInQuarantine
   }
 
   extend type Mutation{
@@ -12,7 +13,12 @@ export default gql`
     updateQuarantineInfo(updatedQuarantineInfo:QuarantineInfoInput,id:ID!):QuarantineInfoResponse! @isAuth(requires:SUPPER) 
     deleteQuarantineInfo(id:ID!):QuarantineInfoResponse! @isAuth(requires:SUPPER) 
   }
-
+  type totalDataInQuarantine {
+             totalIn:Int
+             totalInToday:Int
+             totalOut:Int
+             totalOutToday:Int
+  }
   type QuarantineInfo {
         capacity:Int
         id:ID
