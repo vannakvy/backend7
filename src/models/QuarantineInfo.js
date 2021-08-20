@@ -9,9 +9,11 @@ const QuarantineInfoSchema = mongoose.Schema({
     province:String,
     long: {
         type:Number,
+        required:true,
         default: 102.32
       },
       lat: {
+        required: true,
         type:Number,
         default: 104.32
       },

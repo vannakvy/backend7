@@ -325,6 +325,7 @@ type PersonalInfoResponseWithData{
   }
 
   type HistoryWithin14days {
+    endDate:Date,
     id:ID!
     locationName: String
     lat:Float 
@@ -336,6 +337,7 @@ type PersonalInfoResponseWithData{
   }
 
   input HistoryWithin14daysInput {
+    endDate:Date,
     locationName: String
     affectedLocation: ID!
     date: Date
@@ -346,6 +348,9 @@ type PersonalInfoResponseWithData{
   }
 
   type AffectedFrom{
+    riskLevel:String,
+    lastTouchAt:Date,
+
     relationType:String,
     date:Date
     patientName:String
@@ -356,7 +361,8 @@ type PersonalInfoResponseWithData{
   }
 
   input AffectedFromInput{
-
+    riskLevel:String,
+    lastTouchAt:Date,
     relationType:String,
     date:Date
     patientName:String

@@ -75,9 +75,7 @@ export default {
                     ]
                 };
                 
-
             const affectedLocations = await AffectedLocation.paginate(query, options);
-            console.log(affectedLocations)
               return affectedLocations;
         },
         //@Desc getting the AffectedLocation by id
@@ -95,18 +93,8 @@ export default {
         createAffectedLocation:async(_,{newAffectedLocation},{AffectedLocation})=>{
             try {
                
-                // const isExisted = await AffectedLocation.find({locationName:newAffectedLocation.locationName});
-                // console.log(locationName)
-                // if(isExisted==[]){
-                //     return{
-                //         message:"The AffectedLocation with this name is already exist",
-                //         success: false,
-                //         affectedLocation:{}
-                //     }
-                // }
                 const affectedLocations = new AffectedLocation(newAffectedLocation);
                 const isCreated = await affectedLocations.save();
-                console.log(isCreated)
                 if(!isCreated){
                     return {
                         message:"Cannot create AffectedLocation",

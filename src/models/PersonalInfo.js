@@ -101,6 +101,7 @@ const PersonalInfoShema = mongoose.Schema({
             ref:'AffectedLocation'
         },
         date:Date,
+        endDate:Date,
         description:String,
         direct:{
             type:Boolean,
@@ -133,9 +134,10 @@ const PersonalInfoShema = mongoose.Schema({
             default: 104.32
           },
         locationName:String
-       
        }],    
     affectedFrom:{
+        riskLevel:String,
+        lastTouchAt:Date,
         relationType:String,
         date:Date,
         patientName:String,

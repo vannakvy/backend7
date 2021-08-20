@@ -894,16 +894,17 @@ export default {
 
     //@Desc update the quarantine in the personalinfo 
     //@Access auth and super 
+   
     updatePeopleFromQuarantine: async (
       _,
-      {personalInfoId,hospitalId,updateInfo},
+      {personalInfoId,quarantineInfo,updateInfo},
       { PersonalInfo }
     ) => {
    
       try {
       
-        await PersonalInfo.findOneAndUpdate(
-          { _id: personalInfoId, "quaranting._id": hospitalId },
+   await PersonalInfo.findOneAndUpdate(
+          { _id: personalInfoId, "quaranting._id": quarantineInfo },
           {
             $set: {
               // midExamDetails.$.Marks
@@ -912,7 +913,7 @@ export default {
               "quaranting.$.locationName": updateInfo.locationName,
               "quaranting.$.locationType": updateInfo.locationType,
               "quaranting.$.coorporate": updateInfo.coorporate,
-              "quaranting.$.personType": updateInfo.personType,
+              "quaranting.$.personTypes": updateInfo.personTypes,
               "quaranting.$.out_status": updateInfo.out_status,
               "quaranting.$.qurantineInfo": updateInfo.qurantineInfo,
               "quaranting.$.lat": updateInfo.lat,
@@ -921,7 +922,6 @@ export default {
             },
           }
         )
-
         return {
           success: true,
           message: "ការកែប្រែទទួលបានជោគជ័យ",
@@ -929,7 +929,7 @@ export default {
       } catch (error) {
         return {
           success: false,
-          message: error.message,
+          message: `សូមទាក់ទាងខាង IT ដើម្បីដោះស្រាយបញ្ហានេះ ${error.message}`,
         };
       }
     },
@@ -944,8 +944,6 @@ export default {
    
       try {
 
-
-    
        await PersonalInfo.findOneAndUpdate(
           {  _id: personalInfoId, "hospitalizations._id": hospitalId},
           {
@@ -998,7 +996,7 @@ export default {
             {quaranting:{$elemMatch:{quarantineInfo:newQuarantine.quarantineInfo}}}
           ]
         } );   
-        console.log(isAlreadyIn)
+       
        
         if (isAlreadyIn) {
           return {

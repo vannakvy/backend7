@@ -43,6 +43,8 @@
     "nodemon": "^2.0.7",
     "npm-force-resolutions": "0.0.10",
     "subscriptions-transport-ws": "^0.9.18",
+    "winston": "^3.3.3",
+    "winston-mongodb": "^5.0.7",
     "yup": "^0.29.3"
   }
 }

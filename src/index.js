@@ -1,3 +1,5 @@
+
+
 import { join } from "path";
 import { error, success } from "consola";
 import { PORT, IN_PROD } from "./config";
@@ -13,6 +15,7 @@ import connectDB from "./config/db";
 import http from "http";
 import path from 'path'
 import dotenv from 'dotenv'
+const logger = require('./config/logger')
 
 const app = express();
 dotenv.config()
@@ -42,7 +45,7 @@ const server = new ApolloServer({
     const isAuth = req.isAuth
     const user = req.user
     const roles = req.role
-    // console.log(user)
+    // console.log(roles,"sgsg")
     return { req,roles,isAuth,user, pubsub, ...AppModels };
   },
   subscriptions: {
@@ -74,6 +77,7 @@ const startApp = async () => {
     server.installSubscriptionHandlers(httpServer);
     httpServer.listen(PORT, () => {
       console.log(`http://localhost:${PORT}${server.graphqlPath}`);
+      // logger.log('info',"hello")
     });
   } catch (err) {
     error({

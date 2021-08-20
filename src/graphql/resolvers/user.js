@@ -1,6 +1,8 @@
 import { hash, compare } from "bcryptjs";
+import logger from '../../config/logger.js'
 
 import { ApolloError } from "apollo-server-express";
+
 
 import { serializeUser, issueAuthToken } from "../../helpers/Userfunctions";
 
@@ -37,18 +39,16 @@ export default {
 
     allUsers: async (_, {}, { User, req }) => {
       const users = await User.find({});
-      // throw new ApolloError("Username not found", "404");
-
       return users;
     },
-    getUserById: async (_, { userId }, { User }) => {
-      const user = await User.findById(userId);
-      if (!user) {
+    getUserById: async (_, { userId }, { User,user }) => {
+      const users = await User.findById(userId);
+      if (!users) {
+        logger.log('error',`${user.userName},${user._id} trying to get the user by id but cannot find it from the database`)
         throw new ApolloError("There is no user with this id", "404");
       }
-      return user;
+      return users;
     },
-
     //@Desc get all users with pagination
 
     getUserWithPagination: async (
@@ -57,7 +57,6 @@ export default {
       { User }
     ) => {
 
-      console.log("hello ")
       
       let key = keyword.toString();
    
@@ -93,7 +92,6 @@ export default {
      * @Access Public
      */
     loginUser: async (_, { username, password }, { User }) => {
-   
       // Validate Incoming User Credentials
       await UserAuthenticationRules.validate(
         { username, password },
@@ -106,19 +104,22 @@ export default {
       
       // If User is not found
       if (!user) {
+        logger.log('error',`${username}, trying to login but cannot find it from the database`)
         throw new ApolloError("Username not found", "404");
       }
       // If user is found then compare the password
       let isMatch = await compare(password, user.password);
+     
       // If Password don't match
       if (!isMatch) {
+        logger.log('error',`${username}, trying to login but the password does not match`)
         throw new ApolloError("The password is not correct");
       }
       user = await serializeUser(user);
 
-      
       // Issue Token
       let token = await issueAuthToken(user);
+      logger.log('info',`${user.username},${user.id} is logging in successfully`)
       return {
         user,
         token,
@@ -130,24 +131,23 @@ export default {
      * @Params userId and new role
      * @Access admin
      */
-    addRole: async (_, { userId, role }, { User }) => {
+    addRole: async (_, { userId, role }, { User,user }) => {
       try {
        
-        
-        let user = await User.findById(userId);
-        
-        if (user) {
-          const search =(role) => user.roles.find(element => element.role === role);
-         
-          
+        let users = await User.findById(userId);
+        if (users) {
+          const search =(role) => users.roles.find(element => element.role === role);
           if (search()) {
+
+            logger.log('error',`${user.username},${user.id} trying to add the role but the role : ${role} is already exist`);
             return {
               message: "this role is already exist",
               success: false,
             };
           } else {
-            user.roles.push({ role });
-            let a = await user.save();
+            users.roles.push({ role });
+            let a = await users.save();
+            logger.log('info',`${user.username},${user.id} add the role : ${role} successfully`);
             return {
               success: true,
               message: "Role added succesfully",
@@ -155,6 +155,7 @@ export default {
           }
         }
       } catch (error) {
+        logger.log('error',`${user.username},${user.id} add the role: ${role} Not success ${error.message}`);
         return {
           message: "Cannot add new roles",
         };
@@ -165,7 +166,7 @@ export default {
     // @params userid , role id
     // @access Admin
 
-    deleteRole: async (_, { userId, roleId }, { User }) => {
+    deleteRole: async (_, { userId, roleId }, { User,user }) => {
       try {
         const res = await User.findById(userId);
         const hasRole = res.roles.find(
@@ -173,21 +174,22 @@ export default {
         );
 
         if (!hasRole) {
+          logger.log('error',`${user.username},${user.id} delete roleId: ${roleId} but Not found in db`);
           return {
             success: false,
             message: "There is no this role in this user",
           };
         }
-
         res.roles.id(hasRole._id).remove();
         await res.save();
-
+        logger.log('info',`${user.username},${user.id} delete roleId: ${roleId} successfully`);
         // doc.subdocs.pull({ _id: 4815162342 })  => the second way to delete below object in array of subdocs
         return {
           success: true,
           message: "Role Deleted successfully!",
         };
       } catch (error) {
+        logger.log('error',`${user.username},${user.id} delete roleId: ${roleId} not success with the error: ${error}`);
         return {
           success: false,
           message: "Role Delete is not completed !",
@@ -199,16 +201,17 @@ export default {
      * @Params newUser{ username, firstName, lastName, email, password }
      * @Access Public
      */
-    registerUser: async (_, { newUser }, { User }) => {
+    registerUser: async (_, { newUser }, { User,user }) => {
       try {
         let { email, username } = newUser;
         // Validate Incoming New User Arguments
         await UserRegisterationRules.validate(newUser, { abortEarly: false });
         // Check if the Username is taken
-        let user = await User.findOne({
+        let users = await User.findOne({
           username,
         });
-        if (user) {
+        if (users) {
+          logger.log('error',`${user.username},${user.id} create user with userName: ${username}, username is already exist`);
           return {
             success: false,
             message: "មិនអាចបង្កើតបានទេ ",
@@ -216,10 +219,11 @@ export default {
         }
 
         // Check is the Email address is already registred
-        user = await User.findOne({
+        users = await User.findOne({
           email,
         });
-        if (user) {
+        if (users) {
+          logger.log('error',`${user.username},${user.id} create user with userName: ${username} and email: ${email} email is already exist`);
           return {
             success: false,
             message: "the email is already token",
@@ -227,14 +231,13 @@ export default {
         }
         // New User's Account can be created
         user = new User(newUser);
-
-        await user.roles.push({ role: newUser.role });
+        await users.roles.push({ role: newUser.role });
 
         // Hash the user password
-        user.password = await hash(user.password, 10);
+        users.password = await hash(user.password, 10);
         // Save the user to the database
-        let result = await user.save();
-
+        let result = await users.save();
+        logger.log('info',`${user.username},${user.id} create user with userName: ${username} successfully`);
         // result = await serializeUser(result);
         // // Issue Token
         // let token = await issueAuthToken(result);
@@ -245,6 +248,7 @@ export default {
           };
         }
       } catch (err) {
+        logger.log('error',`${user.username},${user.id} create user with userName: ${username} not success ${err.message}`);
         return {
           success: false,
           message: " Cannot create this user please contact the admin ",
@@ -256,10 +260,10 @@ export default {
     //  * @Params newUser{ username, firstName, lastName, email, password }
     //  * @Access Private
     //  */
-    updateAccount: async (_, { userId, password, username }, { User }) => {
+    updateAccount: async (_, { userId, password, username }, { User,user }) => {
       try {
         let userExist = await User.findById(userId);
-        let user = await User.findOne({
+        let users = await User.findOne({
           username,
         });
         // console.log(userExist,"ddd")
@@ -267,7 +271,7 @@ export default {
 
         if (userExist) {
           // Check if the Username is taken
-          if (user === null || userExist.username === username) {
+          if (users === null || userExist.username === username) {
             userExist.username = username;
             userExist.password = await hash(password, 10);
             let result = await userExist.save();
@@ -275,12 +279,13 @@ export default {
             //    result = await serializeUser(result);
             //  let a = await issueAuthToken(result);
             //  console.log(a)
-
+            logger.log('info',`${user.username},${user.id} update user account: ${username} success`);
             return {
               message: "Successfully update the Account",
               success: true,
             };
           } else {
+            logger.log('error',`${user.username},${user.id} update user account: ${username} not success`);
             return {
               message: "Cannot update this account",
               success: false,
@@ -288,6 +293,7 @@ export default {
           }
         }
       } catch (err) {
+        logger.log('error',`${user.username},${user.id} update user account: ${username} not success :${err.message}`);
         return {
           message: "This user is not exist",
           success: false,
