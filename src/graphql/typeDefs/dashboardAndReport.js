@@ -22,7 +22,18 @@ today:Int
 all:Int
 }
 type Inter{
-    totalInterview:Int
+   interviewTotal: Int,
+   totalKhmer: Int,
+   totalWomenKhmer: Int,
+   totalWomenKhmerToday: Int,
+   totalChina: Int,
+   totalChinaToday: Int,
+   totalChinaWomen: Int,
+   totalSampleTestLocation: Int,
+   totalSampleTest: Int,
+   totalSampleTestWomen: Int,
+   totalAffectedLocation: Int,
+   fulltotalAffectedLocation: Int
 }
 
 type AllProvince{

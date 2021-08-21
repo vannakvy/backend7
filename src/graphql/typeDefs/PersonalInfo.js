@@ -83,6 +83,8 @@ export default gql`
   }
  
   type PersonalInfo {
+    
+
     currentAddress:String,
     reasonForTestingOther:String,
     social:String,
@@ -258,6 +260,7 @@ export default gql`
 
   
   input PersonalInfoInput {
+   
     currentAddress:String,
     pob:String,
 
@@ -350,9 +353,8 @@ type PersonalInfoResponseWithData{
   type AffectedFrom{
     riskLevel:String,
     lastTouchAt:Date,
-
     relationType:String,
-    date:Date
+    affectedDate:Date
     patientName:String
     patientCode: String
     relation:String
@@ -364,7 +366,7 @@ type PersonalInfoResponseWithData{
     riskLevel:String,
     lastTouchAt:Date,
     relationType:String,
-    date:Date
+    affectedDate:Date
     patientName:String
     patientCode: String
     relation: String

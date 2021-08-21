@@ -598,6 +598,9 @@ export default {
       };
     },
 
+
+
+
     // @Desc getting the data for report
     //auth and private
     getDataForReport: async (_, { startDate, endDate }, { PersonalInfo }) => {
@@ -929,7 +932,7 @@ export default {
       };
     },
 
-    InterViewReport: async (_, { startDate, endDate }, { PersonalInfo }) => {
+    InterViewReport: async (_, { startDate, endDate }, { PersonalInfo,AffectedLocation }) => {
       ////
       var today = new Date(new Date(startDate).setUTCHours(0, 0, 0, 0));
       var tomorrow = new Date(new Date(endDate).setUTCHours(23, 59, 59, 59));
@@ -1061,44 +1064,81 @@ export default {
         },
       ]);
 
-      const totaSampleTestLocation = await PersonalInfo.aggregate([
-        { $unwind: "$sampleTest" },
-        { $group: { _id: "$sampleTest.testLocation", count: { $sum: 1 } } },
-      ]);
+  let interview = data.filter(res=>res._id===true)
+  
 
-      let dataToday = await PersonalInfo.aggregate([
-        // { "$match":{ "district": district } },
-        { $match: { "sampleTest.date": { $gte: today, $lt: tomorrow } } },
-        {
-          $group: {
-            _id: 1,
-            count: {
-              $sum: 1,
-            },
-          },
-        },
-      ]);
+      // let dataToday = await PersonalInfo.aggregate([
+      //   // { "$match":{ "district": district } },
+      //   { $match: { "sampleTest.date": { $gte: today, $lt: tomorrow } } },
+      //   {
+      //     $group: {
+      //       _id: 1,
+      //       count: {
+      //         $sum: 1,
+      //       },
+      //     },
+      //   },
+      // ]);
 
-      let dataAll = await PersonalInfo.aggregate([
+      //total Affected Location 
+
+      let totalAffectedLocation = await AffectedLocation.countDocuments({});
+      let fulltotalAffectedLocation = await AffectedLocation.countDocuments({$and:[{province:{$ne:null}},{district:{$ne:null}},{commune:{$ne:null}},{village:{$ne:null}}]});
+   
+          // get total sampletest location 
+          const totaSampleTestLocation = await PersonalInfo.aggregate([
+            { $unwind: "$sampleTest" },
+            { $group: { _id: "$sampleTest.testLocation", count: { $sum: 1 } } },
+          ]);
+         let totalSampleTestLocation = totaSampleTestLocation.reduce((init,data)=>{
+          return data.count + init
+         },0 )
+ 
+      //get total sample test 
+      let totalSampleTest = await PersonalInfo.aggregate([
         // { "$match":{ "district": district } },
         {
           $project: {
             all: { $size: "$sampleTest" },
           },
         },
-        { $group: { _id: 1, count: { $sum: "$all" } } },
+        { $group: { _id: 1, totalSampleTest: { $sum: "$all" } } },
       ]);
 
-      // console.log(totaSampleTestLocation.length)
-      // console.log(data)
-      // console.log(dataToday)
-      // console.log(dataAll)
-      // console.log(totaSampleTestLocation)
-      ///
+      //get total sample test which is a women
+      let totalSampleTestWomen = await PersonalInfo.aggregate([
+        { "$match":{ "gender": "ស្រី" } },
+        {
+          $project: {
+            all: { $size: "$sampleTest" },
+          },
+        },
+        { $group: { _id: 1, totalSampleTest: { $sum: "$all" } } },
+      ]);
+      let totalSampleTests = totalSampleTest[0].totalSampleTest? totalSampleTest[0].totalSampleTest :0;
+      let totalSampleTestWomens = totalSampleTestWomen[0].totalSampleTest? totalSampleTestWomen[0].totalSampleTest :0;
 
-      return {
-        interviewTotal: data[0].interviewTotal,
+      ///
+const res = {
+
+      interviewTotal: interview[0].interviewTotal,
+      totalKhmer: interview[0].totalKhmer,
+      totalWomenKhmer: interview[0].totalWomenKhmer,
+      totalWomenKhmerToday: interview[0].totalWomenKhmerToday,
+      totalChina: interview[0].totalChina,
+      totalChinaToday: interview[0].totalChinaToday,
+      totalChinaWomen: interview[0].totalChinaWomen,
+      interviewTotal: data[0].interviewTotal,
+
+
+        totalSampleTestLocation:totalSampleTestLocation,
+        totalSampleTest:totalSampleTests,
+        totalSampleTestWomen:totalSampleTestWomens,
+        totalAffectedLocation: totalAffectedLocation,
+        fulltotalAffectedLocation:fulltotalAffectedLocation
       };
+      console.log(res)
+      return res
     },
   },
 };

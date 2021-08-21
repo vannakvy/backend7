@@ -3,6 +3,7 @@ import Paginate from 'mongoose-paginate-v2'
 //dddd
 
 const PersonalInfoShema = mongoose.Schema({
+    // 
     reasonForTestingOther:String,
     //
     social:String,
@@ -139,7 +140,8 @@ const PersonalInfoShema = mongoose.Schema({
         riskLevel:String,
         lastTouchAt:Date,
         relationType:String,
-        date:Date,
+        
+        affectedDate:Date,
         patientName:String,
         patientCode:String,
         relation:String,

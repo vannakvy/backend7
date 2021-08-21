@@ -10,10 +10,12 @@ const HospitalInfoSchema = mongoose.Schema({
     personInchage:String,
     long: {
         type:Number,
+        required:true,
         default: 102.32
       },
       lat: {
         type:Number,
+        required:true,
         default: 104.32
       },
     other:String,
