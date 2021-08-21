@@ -9,6 +9,7 @@ import hospitalInfo from './hospitalInfo';
 // import hospitalization from './hospitalization';
 import dashboardAndReport from './dashboardAndReport';
 import affectedLocation from './affectedLocation'
+import additionalData from './additionalData'
 // import historyLocation from './historyLocation';
 export default [
     user,
@@ -22,6 +23,7 @@ export default [
     // hospitalization,
     dashboardAndReport,
     affectedLocation,
+    additionalData
     // historyLocation
 ];
 

@@ -165,3 +165,96 @@
 {"level":"error","message":"the token is not exist","timestamp":"2021-08-21T03:19:46.350Z"}
 {"level":"error","message":"the token is not exist","timestamp":"2021-08-21T03:20:19.744Z"}
 {"level":"error","message":"the token is not exist","timestamp":"2021-08-21T03:20:19.760Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T06:25:16.436Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T06:25:16.474Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T06:25:16.485Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T06:28:06.282Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T06:28:06.289Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T06:28:06.301Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T06:28:06.396Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T06:28:06.404Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T06:28:06.407Z"}
+{"level":"error","message":"verify token fail : jwt expired","timestamp":"2021-08-21T07:05:52.343Z"}
+{"level":"error","message":"verify token fail : verify token is null}","timestamp":"2021-08-21T07:05:52.344Z"}
+{"level":"error","message":"verify token fail : jwt expired","timestamp":"2021-08-21T07:05:52.400Z"}
+{"level":"error","message":"verify token fail : verify token is null}","timestamp":"2021-08-21T07:05:52.400Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:05:59.076Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:05:59.235Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:05:59.246Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:05:59.387Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:12:03.286Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:12:03.533Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:12:03.553Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:12:03.559Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:12:03.562Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:12:03.640Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:12:03.644Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:12:03.654Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:12:03.671Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:12:04.540Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:13:17.181Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:13:26.956Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:13:26.972Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:13:48.664Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:13:52.137Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:13:58.046Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:14:14.630Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:14:28.579Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:14:45.549Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:15:21.848Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:15:32.689Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:15:55.017Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:16:00.557Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:16:00.563Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:16:00.604Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:16:07.231Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:16:11.388Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:16:11.391Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:16:11.434Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:16:11.620Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:18:24.530Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:18:24.580Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:18:25.192Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:18:32.825Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:18:32.836Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:18:32.842Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:18:32.856Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:18:32.859Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:18:32.870Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:18:32.876Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T07:18:32.926Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:18:50.648Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:18:50.688Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:18:50.693Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:18:50.696Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:18:50.726Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:18:50.731Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:18:50.755Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:18:50.759Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:18:51.480Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:19:12.954Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:19:16.388Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:19:16.397Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:19:16.403Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:19:16.406Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:19:16.487Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:19:16.490Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:19:16.492Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:19:16.510Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:19:17.276Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:19:30.302Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T10:19:39.266Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T10:19:39.462Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T10:19:39.470Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T10:19:39.473Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T10:19:39.476Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T10:19:39.532Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T10:19:39.535Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T10:19:39.544Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T10:19:39.561Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T10:19:40.128Z"}
+{"level":"error","message":"the token is not exist","timestamp":"2021-08-21T10:19:56.717Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:23:35.476Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:23:36.282Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:28:03.547Z"}
+{"level":"error","message":"cannot find the user in the database by decodedToken.id in auth middleware","timestamp":"2021-08-21T10:28:04.285Z"}

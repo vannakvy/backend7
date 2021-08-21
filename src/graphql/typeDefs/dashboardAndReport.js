@@ -58,6 +58,9 @@ type AllProvince{
     totalAffectedLocationToday:Int
     totalAffectedLocationClosed:Int,
     totalAffectedLocationClosedToday:Int
+    totalAffectedPeople:Int
+    totalAffectedPeopleToday:Int
+  
 }
 
 type AffectedData{

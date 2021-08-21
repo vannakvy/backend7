@@ -108,6 +108,8 @@ export default {
       let totalAffectedLocationToday = 0;
       let totalAffectedLocationClosed = 0;
       let totalAffectedLocationClosedToday = 0;
+      let totalAffectedPeople =0;
+      let totalAffectedPeopleToday =0;
 
       var today = new Date(new Date().setUTCHours(0, 0, 0, 0));
       var tomorrow = new Date(new Date().setUTCHours(23, 59, 59, 59));
@@ -117,7 +119,10 @@ export default {
   
 
       if (district === "" || district === "ករំីណីទាំងអស់") {
+        // 
 
+        totalAffectedPeople = await PersonalInfo.countDocuments({"affectedFrom.patientCode": {$ne:null}});
+        totalAffectedPeopleToday = await PersonalInfo.countDocuments({$and:[{"affectedFrom.patientCode": {$ne:null}},{"affectedDate":{$gte:today,$lt:tomorrow}}]});
         //ទីតាំងពាក់ព័នសរុប
         totalAffectedLocation = await AffectedLocation.countDocuments({});
         // ទីតាំងពាក់ព័នសរុបថ្ងៃនេះ
@@ -169,7 +174,7 @@ export default {
       ]);
 
 
-      console.log(totalAffectedPersoanl)
+     
 
         //អ្នកពាក់ព័នសរុបថ្ងៃនេះ
 
@@ -213,6 +218,14 @@ export default {
           "currentState.deathAt": { $gte: today, $lt: tomorrow },
         });
       } else {
+
+        totalAffectedPeople = await PersonalInfo.countDocuments({$and:[{"affectedFrom.patientCode": {$ne:null}},{district:district}]});
+        totalAffectedPeopleToday = await PersonalInfo.countDocuments({$and:[{"affectedFrom.patientCode": {$ne:null}},{"affectedDate":{$gte:today,$lt:tomorrow}},{district:district}]});
+
+
+
+
+
 
         deltaToday = await PersonalInfo.countDocuments({
           $and: [
@@ -367,6 +380,8 @@ export default {
         totalAffectedLocationToday: totalAffectedLocationToday,
         totalAffectedLocationClosed: totalAffectedLocationClosed,
         totalAffectedLocationClosedToday: totalAffectedLocationClosedToday,
+        totalAffectedPeople:totalAffectedPeople,
+        totalAffectedPeopleToday:totalAffectedPeopleToday
         // totalAffectedLocationOn:totalAffectedLocationOn,
         // totalAffectedLocationClose:totalAffectedLocationClose,
         // totalAffectedLocationNew:totalAffectedLocationNew
@@ -1064,24 +1079,7 @@ export default {
         },
       ]);
 
-  let interview = data.filter(res=>res._id===true)
-  
-
-      // let dataToday = await PersonalInfo.aggregate([
-      //   // { "$match":{ "district": district } },
-      //   { $match: { "sampleTest.date": { $gte: today, $lt: tomorrow } } },
-      //   {
-      //     $group: {
-      //       _id: 1,
-      //       count: {
-      //         $sum: 1,
-      //       },
-      //     },
-      //   },
-      // ]);
-
-      //total Affected Location 
-
+      let interview = data.filter(res=>res._id===true)
       let totalAffectedLocation = await AffectedLocation.countDocuments({});
       let fulltotalAffectedLocation = await AffectedLocation.countDocuments({$and:[{province:{$ne:null}},{district:{$ne:null}},{commune:{$ne:null}},{village:{$ne:null}}]});
    
@@ -1125,11 +1123,11 @@ const res = {
       totalKhmer: interview[0].totalKhmer,
       totalWomenKhmer: interview[0].totalWomenKhmer,
       totalWomenKhmerToday: interview[0].totalWomenKhmerToday,
+
       totalChina: interview[0].totalChina,
       totalChinaToday: interview[0].totalChinaToday,
       totalChinaWomen: interview[0].totalChinaWomen,
       interviewTotal: data[0].interviewTotal,
-
 
         totalSampleTestLocation:totalSampleTestLocation,
         totalSampleTest:totalSampleTests,
@@ -1137,7 +1135,7 @@ const res = {
         totalAffectedLocation: totalAffectedLocation,
         fulltotalAffectedLocation:fulltotalAffectedLocation
       };
-      console.log(res)
+  
       return res
     },
   },

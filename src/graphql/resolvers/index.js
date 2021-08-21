@@ -10,6 +10,7 @@ import quarantineInfo from './quarantineInfo'
 import hospitalInfo from './hospitalInfo';
 import dashboardAndReport from './dashboardAndReport';
 import affectedLocation from './affectedLocation';
+import additionalData from './additionalData';
 // import historyLocation from './historyLocation';
 
 export default [
@@ -24,6 +25,7 @@ export default [
     // quarantine,
     dashboardAndReport,
     affectedLocation,
+    additionalData
     // historyLocation
 ]  
 

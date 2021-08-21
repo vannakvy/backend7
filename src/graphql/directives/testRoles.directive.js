@@ -39,7 +39,7 @@ export class AuthDirective extends SchemaDirectiveVisitor {
         const context = args[2];
       let roles = context.roles
       if(roles===undefined){
-        throw new Error("សូមមេត្តា refresh page​  ");
+        throw new Error("សូមមេត្តា refresh page រឺ​ login ម្តងទៀត​ ");
       }
       let has = roles.includes(requiredRole);
         if (!has) {
