@@ -39,14 +39,87 @@ export default {
         allAdditionalData:async(_,{district},{Additional})=>{
             let data = await Additional.findOne({district:district});
             return data;
+        },
+
+        //@Desc get all of the aditional data 
+        //@Access auth
+
+        allAdditional:async(_,{},{Additional})=>{
+            let data = await Additional.find({});
+            return data;
+        },
+
+        //@Desc get all additional data for Neaknaron report 
+        //@Access auth 
+        additionalDataTwo:async(_,{},{AdditionalTwo}) =>{
+            let data = await AdditionalTwo.find({});
+            return data;
+
         }
+
     },
     Mutation:{
+        //@Desc create Data for Neakron Report 
+        //@Desc admin 
+
+        createAdditionalTwo:async(_,{createDatas},{AdditionalTwo})=>{
+
+            try {
+                let newAdditionalData = new AdditionalTwo(createDatas);
+                let created = await newAdditionalData.save();
+                if(!created){
+                    return {
+                        success:false,
+                        message:"មិនអាចបង្កើតបានទេ"
+                    }
+                }
+                return {
+                    success: true,
+                    message:"បង្កើតទិន្ន៍យបន្ថែមបានជោគជ័យ"
+                    
+                }
+            } catch (error) {
+                return {
+                    success: false,
+                    message:`ការបង្កើតមិនបានជោគជ័យ ${error.message}` 
+                }
+            }
+
+        },
+
+        //@Desc update additional Data for the Neakron report 
+        //@Access admin
+
+        updateAdditionalTwo:async(_,{times="goglobal",updateData},{AdditionalTwo})=>{
+            try {
+                 let updated = await AdditionalTwo.findOneAndUpdate({times:times},{$set:updateData});
+
+                if(!updated){
+                    return {
+                        success:false,
+                        message:"មិនអាចបកែបានទេ"
+                    }
+                  
+                }
+                return {
+                    success: true,
+                    message:"បកែទិន្ន៍យបន្ថែមបានជោគជ័យ"
+                    
+                }
+            } catch (error) {
+                return {
+                    success: false,
+                    message:`ការបកែមិនបានជោគជ័យ ${error.message}` 
+                }
+            }
+               
+           
+        },
+
         //@Desc create additional Data 
-        //@Access admin only\
+        //@Access admin only
         createAdditional:async(_,{additionalData},{Additional})=>{
             try {
-
                 let existed = await Additional.findOne({district:additionalData.district});
                 if(existed){
                     return {

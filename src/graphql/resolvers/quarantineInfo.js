@@ -33,7 +33,6 @@ export default {
        totalInToday,
        totalOut,
        totalOutToday,
-
    }
 
   },

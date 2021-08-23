@@ -897,14 +897,14 @@ export default {
    
     updatePeopleFromQuarantine: async (
       _,
-      {personalInfoId,quarantineInfo,updateInfo},
+      {personalInfoId,quarantineInfoInnerId,updateInfo},
       { PersonalInfo }
     ) => {
    
       try {
       
    await PersonalInfo.findOneAndUpdate(
-          { _id: personalInfoId, "quaranting._id": quarantineInfo },
+          { _id: personalInfoId, "quaranting._id": quarantineInfoInnerId },
           {
             $set: {
               // midExamDetails.$.Marks
@@ -915,10 +915,11 @@ export default {
               "quaranting.$.coorporate": updateInfo.coorporate,
               "quaranting.$.personTypes": updateInfo.personTypes,
               "quaranting.$.out_status": updateInfo.out_status,
-              "quaranting.$.qurantineInfo": updateInfo.qurantineInfo,
+              "quaranting.$.quarantineInfo": updateInfo.quarantineInfo,
               "quaranting.$.lat": updateInfo.lat,
               "quaranting.$.long": updateInfo.long,
               "quaranting.$.roomNumber": updateInfo.roomNumber,
+              "quaranting.$.totalRoomate": updateInfo.totalRoomate,
             },
           }
         )
@@ -941,16 +942,17 @@ export default {
       { personalInfoId,hospitalId,updateInfo},
       { PersonalInfo }
     ) => {
-   
+     
       try {
 
-       await PersonalInfo.findOneAndUpdate(
+       await PersonalInfo.findOneAndUpdate( 
           {  _id: personalInfoId, "hospitalizations._id": hospitalId},
           {
             $set: {
-              "hospitalizations.$.date_in": updateInfo.date_in,
+              "hospitalizations.$.date_in": updateInfo.date_in,  
               "hospitalizations.$.date_out": updateInfo.date_out,
               "hospitalizations.$.hospitalInfo": updateInfo.hospitalInfo,
+              "hospitalizations.$.hospitalName": updateInfo.hospitalName,
               "hospitalizations.$.covidVariant": updateInfo.covidVariant,
               "hospitalizations.$.coorporate": updateInfo.coorporate,
               "hospitalizations.$.description": updateInfo.description,

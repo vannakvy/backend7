@@ -115,7 +115,7 @@ const PersonalInfoShema = mongoose.Schema({
             type:Boolean,
             default:true,
         },
-        roomNumber:Number,
+        roomNumber:String,
         locationType:String,
         date_in:Date,
         date_out:Date,

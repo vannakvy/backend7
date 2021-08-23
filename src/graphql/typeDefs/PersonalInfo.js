@@ -62,7 +62,7 @@ export default gql`
 
   addPeopleToQuarantine(newQuarantine:QuarantingInput,personalInfo:ID!):PersonalInfoResponse @isAuth(requires:SUPPER) 
   deletePeopleFromQuarantine(personalInfoId:ID!,quarantingId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
-  updatePeopleFromQuarantine(personalInfoId:ID!,quarantineInfo:ID!,updateInfo:QuarantingInput):PersonalInfoResponse @isAuth(requires:SUPPER) 
+  updatePeopleFromQuarantine(personalInfoId:ID!,quarantineInfoInnerId:ID!,updateInfo:QuarantingInput):PersonalInfoResponse 
 
   addPatientToHospital(newHospitalization:HospitalizationsInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:DOCTOR) 
   deletePatientFromHospital(personalInfoId:ID!,hospitalId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
@@ -157,21 +157,21 @@ export default gql`
   }
   type Quarantings{
         id:ID
-        roomNumber:Int,
+        roomNumber:String,
         totalRoomate:Int,
         coorporate:Boolean
         date_in:Date,
         date_out:Date,
         personTypes:String,
         out_status:String,
-        quarantineInfo:QuarantineInfo
+        quarantineInfo:ID
         locationType:String
         locationName:String,
         long:Float,
         lat:Float
   }
   input QuarantingInput{
-    totalRoomate:Int,
+        totalRoomate:Int,
         locationType:String
         coorporate:Boolean
         date_in:Date,
@@ -180,7 +180,7 @@ export default gql`
         out_status:String,
         quarantineInfo:ID
         locationName:String,
-        roomNumber:Int,
+        roomNumber:String,
         lat:Float
         long:Float
   }
@@ -378,7 +378,7 @@ type PersonalInfoResponseWithData{
     date_in: Date
     date_out: Date
     hospitalName: String
-    hospitalInfo: HospitalInfo
+    hospitalInfo: ID
     covidVariant: String
     coorporate: Boolean
     description: String
