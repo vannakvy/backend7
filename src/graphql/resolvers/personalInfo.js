@@ -374,7 +374,7 @@ export default {
             ],
           },
           // { "currentState.confirm": true },
-          { "currentState.confirm": false },
+          // { "currentState.confirm": false },
           { "affectedFrom.patientCode": patientId },
         ],
       };
@@ -707,20 +707,22 @@ export default {
       { PersonalInfo }
     ) => {
       try {
+      
         let a = await PersonalInfo.updateOne(
           { _id: personalInfoId },
           {
-            $pull: { quaranting: { quarantineInfo: quarantingId } },
+            $pull: { quaranting: { _id: quarantingId } },
           }
         );
+
         return {
           success: true,
-          message: "Deleted Successfully",
+          message: "លុបទទួលបានជោគជ័យ",
         };
       } catch (error) {
         return {
           success: false,
-          message: error.message,
+          message: `លុបទិន្ន័យមិនបានទទួលបានជោគជ័យទេ ${error.message}`,
         };
       }
     },
@@ -958,7 +960,6 @@ export default {
               "hospitalizations.$.description": updateInfo.description,
               "hospitalizations.$.lat": updateInfo.lat,
               "hospitalizations.$.long": updateInfo.long,
-
             },
           }
         )
