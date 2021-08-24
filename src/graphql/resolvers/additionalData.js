@@ -97,23 +97,22 @@ export default {
                 if(!updated){
                     return {
                         success:false,
-                        message:"មិនអាចបកែបានទេ"
+                        message:"មិនអាចកែប្រែបានទេ"
                     }
                   
                 }
                 return {
                     success: true,
-                    message:"បកែទិន្ន៍យបន្ថែមបានជោគជ័យ"
+                    message:"កែប្រែបានជោគជ័យ"
                     
                 }
             } catch (error) {
                 return {
                     success: false,
-                    message:`ការបកែមិនបានជោគជ័យ ${error.message}` 
+                    message:`ការកែប្រែមិនបានជោគជ័យ ${error.message}` 
                 }
             }
                
-           
         },
 
         //@Desc create additional Data 

@@ -945,9 +945,12 @@ export default {
     },
 
     InterViewReport: async (_, { startDate, endDate }, { PersonalInfo,AffectedLocation }) => {
+
+     
       ////
       var today = new Date(new Date(startDate).setUTCHours(0, 0, 0, 0));
       var tomorrow = new Date(new Date(endDate).setUTCHours(23, 59, 59, 59));
+      console.log(today, tomorrow)
       const data = await PersonalInfo.aggregate([
         {
           $project: {
@@ -1115,17 +1118,43 @@ export default {
       let totalSampleTests = totalSampleTest[0].totalSampleTest? totalSampleTest[0].totalSampleTest :0;
       let totalSampleTestWomens = totalSampleTestWomen[0].totalSampleTest? totalSampleTestWomen[0].totalSampleTest :0;
 
-      ///
-const res = {
-      interviewTotal: interview[0].interviewTotal? interview[0].interviewTotal:0 ,
-      totalKhmer: interview[0].totalKhmer?interview[0].totalKhmer:0,
-      totalWomenKhmer: interview[0].totalWomenKhmer?interview[0].totalWomenKhmer:0,
-      totalWomenKhmerToday: interview[0].totalWomenKhmerToday? interview[0].totalWomenKhmerToday:0,
+      let interviewTotal= 0
+      let totalKhmer = 0
+      let totalWomenKhmer=  0
+      let totalWomenKhmerToday = 0
+      let totalChina = 0
+      let totalChinaToday=  0
+      let totalChinaWomen= 0
 
-      totalChina: interview[0].totalChina? interview[0].totalChina :0,
-      totalChinaToday: interview[0].totalChinaToday? interview[0].totalChinaToday:0,
-      totalChinaWomen: interview[0].totalChinaWomen ? interview[0].totalChinaWomen:0,
-    
+      if(interview.length > 0){
+        interviewTotal= interview[0].interviewTotal
+        totalKhmer = interview[0].totalKhmer
+        totalWomenKhmer=  interview[0].totalWomenKhmer
+        totalWomenKhmerToday = interview[0].totalWomenKhmerToday
+        totalChina = interview[0].totalChina
+        totalChinaToday=  interview[0].totalChinaToday
+        totalChinaWomen= interview[0].totalChinaWomen
+
+      }
+
+
+      // interviewTotal: interview[0].interviewTotal? interview[0].interviewTotal:0 ,
+      // totalKhmer: interview[0].totalKhmer?interview[0].totalKhmer:0,
+      // totalWomenKhmer: interview[0].totalWomenKhmer?interview[0].totalWomenKhmer:0,
+      // totalWomenKhmerToday: interview[0].totalWomenKhmerToday? interview[0].totalWomenKhmerToday:0,
+
+      // totalChina: interview[0].totalChina? interview[0].totalChina :0,
+      // totalChinaToday: interview[0].totalChinaToday? interview[0].totalChinaToday:0,
+      // totalChinaWomen: interview[0].totalChinaWomen ? interview[0].totalChinaWomen:0,
+const res = {
+        interviewTotal,
+        totalKhmer,
+        totalWomenKhmer,
+        totalWomenKhmerToday,
+
+        totalChina,
+        totalChinaToday,
+        totalChinaWomen,
         totalSampleTestLocation:totalSampleTestLocation,
         totalSampleTest:totalSampleTests,
         totalSampleTestWomen:totalSampleTestWomens,

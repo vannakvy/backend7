@@ -26,10 +26,11 @@ export default {
             let totalIn = await PersonalInfo.countDocuments({hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo }}} );   
 
             let totalOutToday = await PersonalInfo.countDocuments(
-                {$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},{ hospitalizations: { $elemMatch: { date_out: {$gte:today,$lt:tomorrow}}}} ]} )   
+                {$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},{ hospitalizations: { $elemMatch: { date_out: {$gte:today,$lt:tomorrow}}}} ]} ) 
+
             let totalOut = await PersonalInfo.countDocuments({$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},
-                { hospitalizations: { $elemMatch: { date_out: {$ne:null}}}} ]} );
-                
+                { hospitalizations: { $elemMatch: { date_out: {$ne:null}}}},{ hospitalizations: { $elemMatch: { date_out: {$lt: new Date()}}}}, ]} );
+
          return {
              totalIn,
              totalInToday,
