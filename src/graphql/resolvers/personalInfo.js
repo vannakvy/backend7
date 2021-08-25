@@ -479,7 +479,7 @@ export default {
       }
 
 
-      [{$match:{"currentState.recovered":true}},{$group:{_id:firstName},total:{$sum:1}},{$sort:-1}]
+  
    
       let dateQuery = {}
       let current = {};
