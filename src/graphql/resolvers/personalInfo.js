@@ -478,6 +478,8 @@ export default {
         tomorrow = new Date(new Date(endDate).setUTCHours(23,59,59,59));
       }
 
+
+      [{$match:{"currentState.recovered":true}},{$group:{_id:firstName},total:{$sum:1}},{$sort:-1}]
    
       let dateQuery = {}
       let current = {};
@@ -492,6 +494,8 @@ export default {
           current2 = { "currentState.death": false}
           if(covidType!==""){
             delta = {"currentState.covidVariant": covidType}
+            current1 = {}
+            current2 = {}
           }
           
             if(today!==""){
@@ -523,7 +527,7 @@ export default {
           dateQuery={}
           break;
       }
-     
+
       let query = {
         $and: [
           {

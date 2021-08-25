@@ -34,7 +34,6 @@ export default {
        totalOut,
        totalOutToday,
    }
-
   },
     //@Desc getting all the Quantine
     //@access private
