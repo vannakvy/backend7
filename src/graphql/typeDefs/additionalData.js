@@ -119,6 +119,24 @@ export default gql`
 
     affected:Int,
     affectedWomen:Int,
+
+    positiveToday:Int,
+    positiveWomenToday:Int,
+
+    hospitalizingToday:Int,
+    hospitalizingWomenToday:Int,
+
+    deathToday:Int,
+    deathWomenToday:Int,
+
+    recoverToday:Int,
+    recoverWomenToday:Int,
+
+    sampleTestToday:Int,
+    sampleTestWomenToday:Int,
+
+    affectedToday:Int,
+    affectedWomenToday:Int,
   }
 
   input AdditonalDataInput {
@@ -140,6 +158,23 @@ export default gql`
 
     affected:Int,
     affectedWomen:Int,
+    positiveToday:Int,
+    positiveWomenToday:Int,
+
+    hospitalizingToday:Int,
+    hospitalizingWomenToday:Int,
+
+    deathToday:Int,
+    deathWomenToday:Int,
+
+    recoverToday:Int,
+    recoverWomenToday:Int,
+
+    sampleTestToday:Int,
+    sampleTestWomenToday:Int,
+
+    affectedToday:Int,
+    affectedWomenToday:Int,
   }
   type AdditioanalResponse {
       success: Boolean 

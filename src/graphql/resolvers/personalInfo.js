@@ -490,8 +490,8 @@ export default {
       switch (currentState) {
         case "វិជ្ជមាន":
           current = { "currentState.confirm": true}
-          current1 = { "currentState.recovered": false}
-          current2 = { "currentState.death": false}
+          // current1 = { "currentState.recovered": false}
+          // current2 = { "currentState.death": false}
           if(covidType!==""){
             delta = {"currentState.covidVariant": covidType}
             current1 = {}
@@ -505,7 +505,7 @@ export default {
         case "ជាសះស្បើយ":
           current = { "currentState.recovered": true}
           current1 = {}
-          current2 = { "currentState.death": false}
+          // current2 = { "currentState.death": false}
             if(today!==""){
               dateQuery = {"currentState.recoveredAt":{$gte:today,$lt:tomorrow}}
             }
