@@ -31,7 +31,6 @@ app.use(bodyParser.json());
   '/app/userProfile',
   express.static(path.join(__dirname, 'uploads'))
  );
- 
 app.use(express.static(join(__dirname, "./uploads")));
 
 const pubsub = new PubSub();

@@ -34,6 +34,9 @@ const email = yup
     const role = yup
     .string()
     .required('Role is required.')
+    const page = yup
+    .string()
+    .required('Role is required.')
     
 
 const password = yup
@@ -50,7 +53,8 @@ export const UserRegisterationRules = yup.object().shape({
     lastName,
     email,
     role,
-    tel
+    tel,
+    page
 });
 
 // User Authentication Validation Schema

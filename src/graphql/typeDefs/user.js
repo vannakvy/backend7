@@ -7,20 +7,27 @@ export default gql`
         # the rules start from the right to the left
         authUser: User! @isAuth(requires:ADMIN) 
         allUsers:[User!] @isAuth(requires:ADMIN) 
-        getUserById(userId:String!):User! 
+        getCurrentUser:User! 
         getUserWithPagination(page:Int,limit:Int,keyword:String):UserPaginator!  @isAuth(requires:ADMIN) 
     }
     extend type Mutation {
         registerUser(newUser: UserInput!): userResponse! @isAuth(requires:ADMIN) 
         addRole(userId:ID!role:String!): userResponse! @isAuth(requires:ADMIN) 
+        addPage(userId:ID!page:String!): userResponse! @isAuth(requires:ADMIN) 
         deleteRole(userId:ID!,roleId:ID!): userResponse! @isAuth(requires:ADMIN) 
-        loginUser(username: String!, password: String!):AuthUser! 
+        deletePages(userId:ID!,pageId:ID!): userResponse! @isAuth(requires:ADMIN) 
+        loginUser(username: String!, password: String!):Loggineduser! 
         deleteUser(userId:ID!):userResponse! @isAuth(requires:ADMIN) 
         updateAccount(userId:ID!,password:String!,username:String!):userResponse! @isAuth(requires:ADMIN) 
         updateUserDetail(userId:ID!,tel:String!,firstName:String!,lastName:String!,email:String!):userResponse! @isAuth(requires:ADMIN) 
         updateProfileImage(userId:ID!,image:String!):userResponse!
     }
 
+    type Loggineduser{
+        token:String,
+         user:User
+
+    }
     input UserInput {
         email:String!
         username:String!
@@ -28,6 +35,7 @@ export default gql`
         password: String!
         firstName: String!
         role: String!
+        page:String,
         tel:String!
     }
 
@@ -39,19 +47,25 @@ export default gql`
         firstName: String!
         image:String
         roles:[Role!]!
+        pages:[Page]!
         createdAt: String
         updatedAt: String
         tel:String
     }
 
-    type AuthUser {
-        user: User!
-        token:String!
-    }
+    # type AuthUser {
+    #     user: User!
+    #     token:String!
+    # }
     type Role {
        id:ID!
        role:String!
       }
+      type Page {
+       id:ID!
+       page:String!
+      }
+
       type userResponse{
           success: Boolean!
           message: String!
@@ -79,7 +93,5 @@ export default gql`
         totalDocs:Int
     }
 `;
-
-
 
 

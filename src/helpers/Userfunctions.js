@@ -24,7 +24,8 @@ export const serializeUser = user => pick(user, [
     'lastName',
     'firstName',
     'roles',
-    'tel'
+    'tel',
+    'pages'
 ]);
 
 

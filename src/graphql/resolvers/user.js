@@ -41,10 +41,9 @@ export default {
 
       return users;
     },
-    getUserById: async (_, { userId }, { User }) => {
-      const user = await User.findById(userId);
+    getCurrentUser: async (_, {}, {user }) => {
       if (!user) {
-        throw new ApolloError("There is no user with this id", "404");
+        throw new ApolloError("សូមមេត្តា login ជាថ្មី");
       }
       return user;
     },
@@ -57,7 +56,7 @@ export default {
       { User }
     ) => {
 
-      console.log("hello ")
+    
       
       let key = keyword.toString();
    
@@ -93,7 +92,6 @@ export default {
      * @Access Public
      */
     loginUser: async (_, { username, password }, { User }) => {
-   
       // Validate Incoming User Credentials
       await UserAuthenticationRules.validate(
         { username, password },
@@ -116,13 +114,12 @@ export default {
       }
       user = await serializeUser(user);
 
-      
       // Issue Token
       let token = await issueAuthToken(user);
       return {
-        user,
-        token,
-      };
+        token: token,
+        user:user
+      }
     },
 
     /**
@@ -130,33 +127,102 @@ export default {
      * @Params userId and new role
      * @Access admin
      */
+
     addRole: async (_, { userId, role }, { User }) => {
       try {
-       
-        
-        let user = await User.findById(userId);
-        
-        if (user) {
-          const search =(role) => user.roles.find(element => element.role === role);
-         
-          
-          if (search()) {
-            return {
-              message: "this role is already exist",
-              success: false,
-            };
-          } else {
-            user.roles.push({ role });
-            let a = await user.save();
-            return {
-              success: true,
-              message: "Role added succesfully",
-            };
-          }
+        let isExisted = await User.findById(userId);
+        if (!isExisted) {
+          return {
+            message: "មិនមានបុគ្គលនៅក្នុងនេះទេ",
+            success: false,
+          };
         }
-      } catch (error) {
+
+        let isAlreadyIn = await User.findOne({
+          $and: [
+            {"_id": userId},
+            {roles:{$elemMatch:{role:role}}}
+          ]
+        } );   
+       
+        if (isAlreadyIn) {
+          return {
+            message: "role នេះបានបញ្ចូលរួចហើយ",
+            success: false,
+          };
+        }
+        await User.updateOne(
+          { _id:userId },
+          {
+            $push: {
+              roles: {
+                $each: [{role}],
+                // $sort: { score: 1 },
+                $slice: -10,
+              },
+            },
+          }
+        );
         return {
-          message: "Cannot add new roles",
+          message: "បញ្ចូលបានជោកជ័យ",
+          success: true,
+        };
+      } catch (error) {
+      
+        return {
+          message: "មិនអាចបញ្ចូលបានទេ",
+          success: error.message,
+        };
+      }
+    },
+
+    //@Desc add page 
+    //@Access auth
+
+    addPage: async (_, { userId, page }, { User }) => {
+      try {
+        let isExisted = await User.findById(userId);
+        if (!isExisted) {
+          return {
+            message: "មិនមានបុគ្គលនៅក្នុងនេះទេ",
+            success: false,
+          };
+        }
+
+        let isAlreadyIn = await User.findOne({
+          $and: [
+            {"_id": userId},
+            {pages:{$elemMatch:{page:page}}}
+          ]
+        } );   
+       
+        if (isAlreadyIn) {
+          return {
+            message: "page នេះបានបញ្ចូលរួចហើយ",
+            success: false,
+          };
+        }
+        await User.updateOne(
+          { _id:userId },
+          {
+            $push: {
+              pages: {
+                $each: [{page}],
+                // $sort: { score: 1 },
+                $slice: -10,
+              },
+            },
+          }
+        );
+        return {
+          message: "បញ្ចូលបានជោកជ័យ",
+          success: true,
+        };
+      } catch (error) {
+      
+        return {
+          message: "មិនអាចបញ្ចូលបានទេ",
+          success: error.message,
         };
       }
     },
@@ -164,36 +230,82 @@ export default {
     // @DESC deleteRole
     // @params userid , role id
     // @access Admin
-
-    deleteRole: async (_, { userId, roleId }, { User }) => {
+    deleteRole: async (_, { userId, roleId }, { User }
+    ) => {
       try {
-        const res = await User.findById(userId);
-        const hasRole = res.roles.find(
-          (r) => r._id.toString() === roleId.toString()
+        let a = await User.updateOne(
+          { _id: userId },
+          {
+            $pull: { roles: { _id: roleId } },
+          }
         );
-
-        if (!hasRole) {
-          return {
-            success: false,
-            message: "There is no this role in this user",
-          };
-        }
-
-        res.roles.id(hasRole._id).remove();
-        await res.save();
-
-        // doc.subdocs.pull({ _id: 4815162342 })  => the second way to delete below object in array of subdocs
+      
         return {
           success: true,
-          message: "Role Deleted successfully!",
+          message: "លុបបានជោគជ័យ",
         };
       } catch (error) {
         return {
           success: false,
-          message: "Role Delete is not completed !",
+          message: `លុបមិនបានជោគជ័យ សូមទាក់ទងអេតមិន ជាមួសារនេះ ${error.message}`,
         };
       }
     },
+
+    //Desc delete the page they can see 
+    //@Access auth 
+    deletePages: async (_, { userId, pageId }, { User }
+    ) => {
+      try {
+  
+        let a = await User.updateOne(
+          { _id: userId },
+          {
+            $pull: { pages: { _id: pageId } },
+          }
+        );
+      
+        return {
+          success: true,
+          message: "លុបបានជោគជ័យ",
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: `លុបមិនបានជោគជ័យ សូមទាក់ទងអេតមិន ជាមួសារនេះ ${error.message}`,
+        };
+      }
+    },
+
+    // deleteRole: async (_, { userId, roleId }, { User }) => {
+    //   try {
+    //     const res = await User.findById(userId);
+    //     const hasRole = res.roles.find(
+    //       (r) => r._id.toString() === roleId.toString()
+    //     );
+
+    //     if (!hasRole) {
+    //       return {
+    //         success: false,
+    //         message: "There is no this role in this user",
+    //       };
+    //     }
+
+    //     res.roles.id(hasRole._id).remove();
+    //     await res.save();
+
+    //     // doc.subdocs.pull({ _id: 4815162342 })  => the second way to delete below object in array of subdocs
+    //     return {
+    //       success: true,
+    //       message: "Role Deleted successfully!",
+    //     };
+    //   } catch (error) {
+    //     return {
+    //       success: false,
+    //       message: "Role Delete is not completed !",
+    //     };
+    //   }
+    // },
     /**
      * @DESC to Register new user
      * @Params newUser{ username, firstName, lastName, email, password }
@@ -229,6 +341,7 @@ export default {
         user = new User(newUser);
 
         await user.roles.push({ role: newUser.role });
+        await user.pages.push({ page: newUser.page });
 
         // Hash the user password
         user.password = await hash(user.password, 10);

@@ -18,6 +18,7 @@ export default gql`
             POLICE,
             DOCTOR,
             OFFICER,
+            QUARANTINECONTROLLER
           }
                                 
         type Query {
