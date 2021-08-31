@@ -20,6 +20,7 @@
   "dependencies": {
     "@graphql-tools/schema": "^7.1.5",
     "apollo-server-express": "^2.17.0",
+    "aws-sdk": "^2.879.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "concurrently": "^6.2.0",
@@ -43,6 +44,7 @@
     "nodemon": "^2.0.7",
     "npm-force-resolutions": "0.0.10",
     "subscriptions-transport-ws": "^0.9.18",
+    "util": "^0.12.4",
     "winston": "^3.3.3",
     "winston-mongodb": "^5.0.7",
     "yup": "^0.29.3"

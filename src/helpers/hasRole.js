@@ -12,3 +12,10 @@ export const hasRole =(roles, requiredRole)=>{
         } 
     });
 }
+
+// role:[{_id:"1",type:"IT",page:["homepage","aboutpage"]}]
+
+
+// user :[
+//     {username:"vannaky",password:"123",roleId:1,previllege:["getUser","deleteProduct"]}
+// ]

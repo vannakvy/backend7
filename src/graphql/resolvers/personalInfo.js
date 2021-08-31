@@ -1,5 +1,12 @@
 import moment from "moment";
-import PersonalInfo from "../typeDefs/PersonalInfo";
+import crypto from 'crypto'
+import aws from 'aws-sdk'
+import { promisify } from "util"
+const randomBytes = promisify(crypto.randomBytes)
+import {
+  config
+} from 'dotenv';
+
 
 const PersonalInfoLabels = {
   docs: "personalInfos",
@@ -61,7 +68,6 @@ export default {
           { commune: "ចារឈូក" },
         ],
       });
-
       return allData;
     },
     //@Desc get perfornal info for the Hospital
@@ -455,6 +461,123 @@ export default {
       return personalInfos;
     },
 
+
+    getPersonalInfoWithPaginations: async (
+      _,
+      {   page,
+          limit,
+          keyword,
+          currentState,
+          startDate,
+          endDate,
+          covidType="",
+          village,
+          commune,
+          district,
+          province,
+          firstName,
+          lastName,
+          confirm,
+          death, 
+          recovered,
+          createdthisBy,
+          updatedthisBy,
+          createdSampleTestBy,
+          createdSampleTestupdatedBy,
+          createStartDate,
+          createEndDate,
+          confirmStartDate,
+          confirmEndDate,
+          recoverdStartDate,
+          recoveredEndDate,
+          deathStartDate,
+          deathEndDate,
+          sampleTestStartDate, 
+          
+          sampleTestEndDate
+       },
+      { PersonalInfo }
+    ) => {
+      const options = {
+        page: page || 1,
+        limit: limit || 10,
+        customLabels: PersonalInfoLabels,
+        sort: {
+          createdAt: -1,
+        },
+        // populate: "case",
+      };
+
+      let today = "";
+      let tomorrow = "";
+      if(startDate !==null || endDate !==null){
+        today = new Date(new Date(startDate).setUTCHours(0,0,0,0));
+        tomorrow = new Date(new Date(endDate).setUTCHours(23,59,59,59));
+      }
+
+    
+      let con = {};
+      let rec ={};
+      let dea = {};
+      let vill = {}
+      let com = {};
+      let dis ={};
+      let prov = {};
+      let first = {};
+      let last = {};
+
+
+
+      if(confirm) con = {"currentState.confirm":confirm};
+      if(recovered) rec = {"currentState.recovered":recovered};
+      if(death) dea = {"currentState.death": death};
+      // 
+      if(village) vill = {"village":village};
+      if(commune) com = {"commune":commune};
+      if(district) dis = {"district":district};
+      if(province) prov = {"province":province};
+      // ស្វែងរកតាមរយះ​ឈ្មោះ
+      if(firstName) first = {"firstName":firstName};
+      if(lastName) last= {"lastName":lastName}
+
+
+      // ស្វែងរកតាមរយះថ្ងៃទីបង្កើត
+      let createdAt = {"createdAt":{$gte:createStartDate,lt:createEndDate}};
+      // ្វែងរកតាមរយះថ្ងៃទីឆ្លង
+      let contirmedAt = {"currentState.confirmedAt":{$gte:confirmStartDate,lt:confirmEndDate}};
+      // ្វែងរកតាមរយះថ្ងៃទីស្លាប់
+      let deathAt = {"currentState.deathAt":{$gte:recoverdStartDate,lt:recoveredEndDate}};
+      // ្វែងរកតាមរយះថ្ងៃទីជា
+      let recoveredAt ={"currentState.recoveredAt":{$gte:deathStartDate,lt:deathEndDate}};
+
+      // ស្វែងរកតាមរយះថ្ងៃទីការធ្វើតេស្ត
+      let sampleTestAt = {"sampleTest":{$elemMatch:{"date":{$gte:sampleTestStartDate,lt:sampleTestEndDate}}}};
+
+      // ស្វែងរកតាមរយះអ្នកចង្កើត
+      let createdBy = {"createdBy":createdthisBy};
+      // ស្វែងរកតាមរយះអ្នកកែ
+      let updateBy = {"updatedBy":updatedthisBy};
+      // ស្វែងរកតាមរយះអ្នកបញ្ជូលការយកសំណាក
+      let sampleTestCreatedBy = {"sampleTest":{$elemMatch:{"createdBy": createdSampleTestBy}}};
+       // ស្វែងរកតាមរយះអ្នកកែការយកសំណាក
+      let sampleTestUpdatedBy = {"sampleTest":{$elemMatch:{"updatedBy": sampleTestUpdatedBy}}};
+      //ស្វែងរកតាមរយះអ្នកបញ្ជូលការការធ្វើចត្តឡីស័ក
+
+      //
+
+
+      let query = {
+        $and: [
+
+        ],
+      };
+      const personalInfos = await PersonalInfo.paginate(query, options);
+
+      return personalInfos;
+    },
+
+
+
     //@Desc Getting all the persoanl Info with pagination
     //@access auth
     getPersonalInfoWithPagination: async (
@@ -479,8 +602,7 @@ export default {
       }
 
 
-  
-   
+
       let dateQuery = {}
       let current = {};
       let current1 = {};
@@ -607,6 +729,36 @@ export default {
   },
 
   Mutation: {
+    // @Desc upload image url 
+
+    uploadImageUrl:async(_,{},{})=>{
+
+      const region = process.env.REGION
+      const bucketName = process.env.BUCKET_NAME
+      const accessKeyId = process.env.AWS_ACCESS_KEY_ID
+      const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY
+
+      const s3 = new aws.S3({
+        region,
+        accessKeyId,
+        secretAccessKey,
+        signatureVersion: 'v4'
+      })
+
+
+  const rawBytes = await randomBytes(16)
+  const imageName = rawBytes.toString('hex')
+
+  const params = ({
+    Bucket: bucketName,
+    Key: imageName,
+    Expires: 60
+  })
+
+  const uploadURL = await s3.getSignedUrlPromise('putObject', params)
+  return uploadURL
+
+    },
 
     //@Desc update the the historywithin14 days 
     //@access polic 
@@ -626,7 +778,6 @@ export default {
               "hospitalizations.$.other": updateInfo.other,
               "hospitalizations.$.description": updateInfo.description,
               "hospitalizations.$.direct": updateInfo.direct,
-
             },
           }
         );
@@ -704,6 +855,7 @@ export default {
 
     //@Decs Delete the people from the quranrantine
     //@Access
+
 
     deletePeopleFromQuarantine: async (
       _,
@@ -803,7 +955,7 @@ export default {
     ) => {
       try {
 
-
+console.log(newHospitalization,personalInfoId)
         let isExisted = await PersonalInfo.findById(personalInfoId);
         if (!isExisted) {
           return {
@@ -812,14 +964,12 @@ export default {
           };
         }
 
-
         let isAlreadyIn = await PersonalInfo.findOne({
           $and: [
             {"_id": personalInfoId},
             {hospitalizations:{$elemMatch:{hospitalInfo:newHospitalization.hospitalInfo}}}
           ]
         } );   
-       
        
         if (isAlreadyIn) {
           return {
@@ -1350,7 +1500,6 @@ export default {
           $and: [
             { firstName: newInfo.firstName },
             { lastName: newInfo.lastName },
-            { village: newInfo.village },
           ],
         });
         if (exist) {

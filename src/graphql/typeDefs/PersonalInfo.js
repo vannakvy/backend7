@@ -37,7 +37,42 @@ export default gql`
       keyword: String
       caseId:ID!
     ): PaginateResponse!
+
+    getPersonalInfoWithPaginations(
+      page: Int!
+      limit: Int!
+      keyword: String,
+      currentState:String,
+      startDate:Date,
+      endDate:Date,
+      covidType:String,
+      currentState:String,
+      village:String,
+      commune:String,
+      district:String,
+      province:String,
+      firstName:String,
+      lastName:String,
+      confirm:Boolean,
+      death:Boolean, 
+      recovered:Boolean,
+      createdthisBy:ID,
+      updatedthisBy:ID,
+      createdSampleTestBy:ID,
+      createdSampleTestupdatedBy:ID,
+      createStartDate:Date,
+      createEndDate:Date,
+      confirmStartDate:Date,
+      confirmEndDate:Date,
+      recoverdStartDate:Date,
+      recoveredEndDate:Date,
+      deathStartDate:Date,
+      deathEndDate:Date,
+      sampleTestStartDate:Date,
+      sampleTestEndDate:Date
+    ): PaginateResponse!
   }
+  
   extend type Mutation {
     createPersonalInfo(newInfo: PersonalInfoInput!): PersonalInfoResponseWithData @isAuth(requires:SUPPER) 
     recordSampleTest(sampleTest:SampleTestInput!,personalInfoId:ID!):PersonalInfoResponse! @isAuth(requires:SUPPER) 
@@ -64,7 +99,7 @@ export default gql`
   deletePeopleFromQuarantine(personalInfoId:ID!,quarantingId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
   updatePeopleFromQuarantine(personalInfoId:ID!,quarantineInfoInnerId:ID!,updateInfo:QuarantingInput):PersonalInfoResponse 
 
-  addPatientToHospital(newHospitalization:HospitalizationsInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:DOCTOR) 
+  addPatientToHospital(newHospitalization:HospitalizationsInput,personalInfoId:ID!):PersonalInfoResponse 
   deletePatientFromHospital(personalInfoId:ID!,hospitalId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
   updatePatientFromHospital(personalInfoId:ID!,hospitalId:ID!,updateInfo:HospitalizationsInput):PersonalInfoResponse @isAuth(requires:DOCTOR) 
 
@@ -74,6 +109,8 @@ export default gql`
 
   # //
   updateTravelOverCountryHistory(personalInfoId:ID!,updateValue:TravelOverCountryHistoryInput):PersonalInfoResponse
+  # UPLOAD IMAGE URL 
+  uploadImageUrl:String
 
   # //update left 
   }
@@ -84,7 +121,8 @@ export default gql`
  
   type PersonalInfo {
     
-
+    createdBy:ID 
+    updatedBy:ID
     currentAddress:String,
     reasonForTestingOther:String,
     social:String,
@@ -102,7 +140,6 @@ export default gql`
     totalCoworker:Int,
 
     pob:String,
-
 
     englishName:String,
     patientId:String
@@ -169,6 +206,8 @@ export default gql`
         locationName:String,
         long:Float,
         lat:Float
+        createdBy:ID 
+        updatedBy:ID
   }
   input QuarantingInput{
         totalRoomate:Int,
@@ -185,6 +224,8 @@ export default gql`
         long:Float
   }
   type currentStatus{
+        createdBy:ID 
+        updatedBy:ID
         confirm:Boolean,
         confirmedAt:Date,
         recovered:Boolean,
@@ -195,6 +236,8 @@ export default gql`
         reasonForDeath:String
   }
   type SampleTest{
+    createdBy:ID 
+    updatedBy:ID
     id:ID!
     date: Date,
     times:Int,
@@ -260,16 +303,13 @@ export default gql`
 
   
   input PersonalInfoInput {
-   
     currentAddress:String,
     pob:String,
-
     reasonForTestingOther:String,
     social:String,
     workplaceInfo:String,
     totalCoworker:Int,
     carPlateNumber: String,
-
     driverName:String,
     from:String,
     to: String, 
@@ -280,7 +320,6 @@ export default gql`
     updateAt:Date,
     covidVariant:String,
 
-    
     englishName:String,
     patientId:String
     currentState:currentStatusInput
@@ -374,6 +413,8 @@ type PersonalInfoResponseWithData{
     otherAffect:  String
   }
   type Hospitalizations{
+    createdBy:ID 
+    updatedBy:ID
     id:ID
     date_in: Date
     date_out: Date

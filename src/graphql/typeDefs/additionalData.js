@@ -4,6 +4,7 @@ export default gql`
   extend type Query {
     allAdditionalData(district:String):AdditonalData
     allAdditional:[AdditonalData]
+    allData:[AdditonalData]
 
     additionalDataTwo:[reportDatas]
   }

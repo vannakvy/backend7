@@ -52,10 +52,7 @@ const UserSchema = new Schema({
     timestamps: true
 });
 
-
 UserSchema.plugin(Paginate)
-
-
 const User = model('users', UserSchema);
 
 export default User;

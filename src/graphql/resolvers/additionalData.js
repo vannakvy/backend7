@@ -41,6 +41,11 @@ export default {
             return data;
         },
 
+        allData:async(_,{},{Additional})=>{
+            let data = await Additional.find({});
+            return data;
+        },
+
         //@Desc get all of the aditional data 
         //@Access auth
 

@@ -30,7 +30,6 @@ const AuthMiddleware = async (req, res, next) => {
     // console.log(authHeader)
     const token = authHeader.split(" ")[1];
     if (!token || token === "") {
-        logger.log('error',"the token is not exist");
         req.isAuth = false;
         return next();
     }
@@ -41,15 +40,12 @@ const AuthMiddleware = async (req, res, next) => {
         decodedToken = verify(token, SECRET);
         // console.log("running")
     } catch (err) {
-
-        logger.log('error',`verify token fail : ${err.message}`);
         req.isAuth = false;
         res.status(401)
         // return next()
     }
     // If decoded token is null then set authentication of the request false
     if (!decodedToken) {
-        logger.log('error',`verify token fail : verify token is null}`);
         req.isAuth = false;
         return next();
     }
@@ -57,7 +53,6 @@ const AuthMiddleware = async (req, res, next) => {
     // console.log(decodedToken.id)
     let authUser = await User.findById(decodedToken.id);
     if (!authUser) {
-        logger.log('error',`cannot find the user in the database by decodedToken.id in auth middleware`);
         req.isAuth = false;
         return next();
     }

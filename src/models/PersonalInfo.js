@@ -17,7 +17,6 @@ const PersonalInfoShema = mongoose.Schema({
     // 
     currentAddress:String,
     pob:String,
-
     souceOfSuspect:String,
     recievedLabFormAt:Date,
     officerId:String,
@@ -39,6 +38,14 @@ const PersonalInfoShema = mongoose.Schema({
     province:String,
     dob:Date,
     other:String,
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    updatedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
     relapse:{
         type: Boolean,
         default:false,
@@ -71,6 +78,14 @@ const PersonalInfoShema = mongoose.Schema({
     //ជំងឺប្រចាំកាយ
     chronic:String,
     sampleTest:[{
+        createdBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        updatedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
         formFillerName:String,
         covidVariant:String,
         specimentType:String,
@@ -107,10 +122,26 @@ const PersonalInfoShema = mongoose.Schema({
         direct:{
             type:Boolean,
             default: false
-        }
+        },
+        createdBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        updatedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
        }],
        quaranting:[
            {
+            createdBy: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User'
+            },
+            updatedBy: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User'
+            },
         coorporate:{
             type:Boolean,
             default:true,
@@ -140,7 +171,6 @@ const PersonalInfoShema = mongoose.Schema({
         riskLevel:String,
         lastTouchAt:Date,
         relationType:String,
-        
         affectedDate:Date,
         patientName:String,
         patientCode:String,
@@ -152,6 +182,14 @@ const PersonalInfoShema = mongoose.Schema({
         otherAffect:String
     },
     hospitalizations:[{
+        createdBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        updatedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
         long:Number,
         lat:Number,
         hospitalName:String,
@@ -170,6 +208,14 @@ const PersonalInfoShema = mongoose.Schema({
         description:String
     }],
     currentState:{
+        createdBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        updatedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
         covidVariant:String,
         confirm:{
             type:Boolean,
