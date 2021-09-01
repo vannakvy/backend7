@@ -3,6 +3,8 @@ import { gql } from "apollo-server-express";
 export default gql`
   extend type Query {
     allHospitalInfos: [HospitalInfo!]!
+    reportForImmigrantWorker(hospitalId:ID!):[recoveredReport!]
+
     getHospitalInfoWithPagination(
       page: Int!
       limit: Int!
@@ -22,12 +24,26 @@ export default gql`
     ): HospitalInfoResponse! @isAuth(requires:SUPPER) 
     deleteHospitalInfo(id: ID!): HospitalInfoResponse! @isAuth(requires:SUPPER) 
   }
-
+type recoveredReport{
+  _id:String,
+  total:Int
+}
   type totalDataInHospital {
+
              totalIn:Int
+             totalDeltaIn:Int 
+             totalInWomen:Int
+
              totalInToday:Int
+             totalInTodayWomen:Int
+
              totalOut:Int
+             totalOutWomen:Int
+             totalOutDelta:Int 
+
              totalOutToday:Int
+             totalOutTodayWomen:Int 
+
   }
 
   type HospitalInfo {

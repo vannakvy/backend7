@@ -213,8 +213,7 @@ export default {
 
     getPatientForHospitalWithPagination: async (
       _,
-      { page, limit, keyword = "", startDate, endDate, hospitalId },
-
+      { page, limit, keyword = "", startDate, endDate, hospitalId,patientType },
       { PersonalInfo }
     ) => {
       const options = {
@@ -226,8 +225,58 @@ export default {
         },
         //   populate: "case",
       };
+      let hospitalizing = {};
+      let recovered = {};
+      let death = {};
+      let sampleTestReminder = {};
+      let left = {};
       let dateQuery = {}
-      
+
+      switch(patientType){
+        case "កំពុងព្យាបាល":
+           hospitalizing = {$or:[{ hospitalizations: { $elemMatch: { date_out: {$eq:null}}}},{ hospitalizations: { $elemMatch: { date_out: {$gt: new Date()}}}},]};
+           recovered = {};
+           death = {};
+           sampleTestReminder = { };
+           break; 
+
+        case "ជាសះស្បើយ":
+          hospitalizing = {};
+          recovered = {"currentState.recovered":true};
+          death = {};
+          sampleTestReminder = {};
+          left = {}
+          break;
+        case "ស្លាប់":
+          hospitalizing = {};
+          recovered = {};
+          death = {"currentState.death":true};
+          sampleTestReminder = {};
+          left = {}
+          break; 
+        case "តាមដាន":
+          hospitalizing ={};
+          recovered = {};
+          death = {};
+          left = {}
+          sampleTestReminder = { hospitalizations:{$elemMatch:{nextSampleTestDate:{$gte:new Date(new Date().setUTCHours(0,0,0,0)),$lt:new Date(new Date().setUTCHours(23,59,59,59))}}}};
+          break;
+        case "បានចាកចេញ":
+          left = {$and:[ {hospitalizations: { $elemMatch: { date_out: {$ne:null}}}},{ hospitalizations: { $elemMatch: { date_out: {$lt: new Date()}}}}, ]}
+          hospitalizing ={};
+          recovered = {};
+          death = {};
+          sampleTestReminder = {};
+          break;
+        default:
+          hospitalizing ={};
+          recovered = {};
+          death = {};
+          sampleTestReminder = {};
+          left = {}
+          break;
+      }
+   
       if(startDate !== null && endDate !== null && startDate !== undefined && endDate !== undefined){
         // console.log(startDate, endDate, district)
         var today = new Date(new Date(startDate).setUTCHours(0,0,0,0));
@@ -235,7 +284,9 @@ export default {
         dateQuery = { hospitalizations:{$elemMatch:{date_in:{$gte:today,$lt:tomorrow}} }}
         // { hospitalizations: { $elemMatch: { hospitalInfo: hospitalId } } },
       }
-    
+
+
+    console.log(left)
       let query = {
         $and: [
           {
@@ -253,7 +304,12 @@ export default {
             ],
           },
           { hospitalizations: { $elemMatch: { hospitalInfo: hospitalId } } },
-          dateQuery
+          dateQuery,
+          hospitalizing,
+          recovered ,
+          death ,
+          sampleTestReminder ,
+          left ,
         ],
       };
       const personalInfos = await PersonalInfo.paginate(query, options);
@@ -492,8 +548,7 @@ export default {
           recoveredEndDate,
           deathStartDate,
           deathEndDate,
-          sampleTestStartDate, 
-          
+          sampleTestStartDate,  
           sampleTestEndDate
        },
       { PersonalInfo }
@@ -525,6 +580,15 @@ export default {
       let prov = {};
       let first = {};
       let last = {};
+      let createDateAt = {};
+      let confirmDate = {};
+      let deathDate = {};
+      let recoveredDate = {};
+      let sampleTestAtDate = {};
+      let createdBy = {};
+      let updateBy  = {};
+      let sampleTestCreatedBy = {};
+
 
 
 
@@ -542,27 +606,26 @@ export default {
 
 
       // ស្វែងរកតាមរយះថ្ងៃទីបង្កើត
-      let createdAt = {"createdAt":{$gte:createStartDate,lt:createEndDate}};
+      if(createStartDate !== null ||  createEndDate !== null)  createDateAt = {"createdAt":{$gte:createStartDate,lt:createEndDate}};
       // ្វែងរកតាមរយះថ្ងៃទីឆ្លង
-      let contirmedAt = {"currentState.confirmedAt":{$gte:confirmStartDate,lt:confirmEndDate}};
+      if(confirmDate !==null || deathDate !==null) confirmDate = {"currentState.confirmedAt":{$gte:confirmStartDate,lt:confirmEndDate}};
       // ្វែងរកតាមរយះថ្ងៃទីស្លាប់
-      let deathAt = {"currentState.deathAt":{$gte:recoverdStartDate,lt:recoveredEndDate}};
+      if( deathStartDate !==null || deathEndDate!==null) deathDate ={"currentState.recoveredAt":{$gte:deathStartDate,lt:deathEndDate}}; 
       // ្វែងរកតាមរយះថ្ងៃទីជា
-      let recoveredAt ={"currentState.recoveredAt":{$gte:deathStartDate,lt:deathEndDate}};
+      if(recoverdStartDate !==null || recoveredEndDate!==null)  recoveredDate ={"currentState.deathAt":{$gte:recoverdStartDate,lt:recoveredEndDate}};
 
       // ស្វែងរកតាមរយះថ្ងៃទីការធ្វើតេស្ត
-      let sampleTestAt = {"sampleTest":{$elemMatch:{"date":{$gte:sampleTestStartDate,lt:sampleTestEndDate}}}};
+      if(sampleTestStartDate !==null || sampleTestEndDate !==null) sampleTestAtDate = {"sampleTest":{$elemMatch:{"date":{$gte:sampleTestStartDate,lt:sampleTestEndDate}}}};
 
       // ស្វែងរកតាមរយះអ្នកចង្កើត
-      let createdBy = {"createdBy":createdthisBy};
+       createdBy = {"createdBy":createdthisBy};
       // ស្វែងរកតាមរយះអ្នកកែ
-      let updateBy = {"updatedBy":updatedthisBy};
+       updateBy = {"updatedBy":updatedthisBy};
       // ស្វែងរកតាមរយះអ្នកបញ្ជូលការយកសំណាក
-      let sampleTestCreatedBy = {"sampleTest":{$elemMatch:{"createdBy": createdSampleTestBy}}};
+       sampleTestCreatedBy = {"sampleTest":{$elemMatch:{"createdBy": createdSampleTestBy}}};
        // ស្វែងរកតាមរយះអ្នកកែការយកសំណាក
-      let sampleTestUpdatedBy = {"sampleTest":{$elemMatch:{"updatedBy": sampleTestUpdatedBy}}};
+       sampleTestUpdatedBy = {"sampleTest":{$elemMatch:{"updatedBy": sampleTestUpdatedBy}}};
       //ស្វែងរកតាមរយះអ្នកបញ្ជូលការការធ្វើចត្តឡីស័ក
-
       //
 
 
@@ -916,6 +979,8 @@ export default {
               "sampleTest.$.labFormCompletedByTel":
                 sampleTest.labFormCompletedByTel,
               "sampleTest.$.formFillerTel": sampleTest.formFillerTel,
+              "sampleTest.$.nextSampleTestDate": sampleTest.nextSampleTestDate,
+              
             },
           }
         );
@@ -955,7 +1020,8 @@ export default {
     ) => {
       try {
 
-console.log(newHospitalization,personalInfoId)
+    console.log(newHospitalization,personalInfoId)
+
         let isExisted = await PersonalInfo.findById(personalInfoId);
         if (!isExisted) {
           return {
@@ -1114,6 +1180,10 @@ console.log(newHospitalization,personalInfoId)
               "hospitalizations.$.description": updateInfo.description,
               "hospitalizations.$.lat": updateInfo.lat,
               "hospitalizations.$.long": updateInfo.long,
+              "hospitalizations.$.province": updateInfo.province,
+              "hospitalizations.$.personTypes": updateInfo.personTypes,
+              "hospitalizations.$.personTypes": updateInfo.personTypes,
+              "hospitalizations.$.nextSampleTestDate": updateInfo.nextSampleTestDate,
             },
           }
         )
@@ -1496,6 +1566,19 @@ console.log(newHospitalization,personalInfoId)
     //@access auth
     createPersonalInfo: async (_, { newInfo }, { PersonalInfo }) => {
       try {
+        if(newInfo.patientId){
+          let patientIdExist = await PersonalInfo.findOne({patientId:newInfo.patientId});
+          if (patientIdExist) {
+            return {
+              response: {
+                message: "សូមមេពិនិត្យ លេខសំគាល់អ្នកជំង្ងឺ ម្តងទៀតយើងពិនិតឃើញថា វាផ្ទូនស្ទូន",
+                success: false,
+              },
+              personalInfo: {},
+            };
+          }
+        }
+       
         let exist = await PersonalInfo.findOne({
           $and: [
             { firstName: newInfo.firstName },

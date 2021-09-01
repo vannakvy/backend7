@@ -14,6 +14,20 @@ const HospitalInfoLabels = {
 export default {
     Query:{
 
+        //@Desc get total patient that is recovered immigrant worker to a specific country 
+        //@Access doctor 
+        reportForImmigrantWorker:async(_,{hospitalId},{PersonalInfo,HospitalInfo})=>{
+         
+            const data = await PersonalInfo.aggregate([
+                {$match:{hospitalizations:{$elemMatch:{personalInfo:{$eq:hospitalId.toString()}}}}},
+                {$match:{hospitalizations:{$elemMatch:{personTypes:"ពលករ"}}}},
+                {$match:{hospitalizations:{$elemMatch:{province:{$ne:null}}}}},
+                {$unwind:"$hospitalizations"},
+                { $group: { _id: "$hospitalizations.province", total: { $sum: 1 } } },
+            ]);
+            return data
+        },
+
         //@Desc get data for the dashboard int each hopital 
         //@access auth 
 
@@ -21,25 +35,45 @@ export default {
             var today = new Date(new Date().setUTCHours(0, 0, 0, 0));
             var tomorrow= new Date(new Date().setUTCHours(23,59,59,59));
 
-            let totalInToday = await PersonalInfo.countDocuments(
-            {$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},{ hospitalizations: { $elemMatch: { date_in: {$gte:today,$lt:tomorrow}}}} ]} )   
+            let totalInToday = await PersonalInfo.countDocuments({$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},{ hospitalizations: { $elemMatch: { date_in: {$gte:today,$lt:tomorrow}}}} ]} )   
+            let totalInTodayWomen = await PersonalInfo.countDocuments({$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},{ hospitalizations: { $elemMatch: { date_in: {$gte:today,$lt:tomorrow}}}},{gender:"ស្រី"} ]} )
+           
             let totalIn = await PersonalInfo.countDocuments({hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo }}} );   
+            let totalInWomen = await PersonalInfo.countDocuments({$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},{gender:"ស្រី"} ]}); 
+            let totalDeltaIn = await PersonalInfo.countDocuments({$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},
+                {hospitalizations: { $elemMatch: { covidVariant:"DELTA"} }} ]} )
+             
+
 
             let totalOutToday = await PersonalInfo.countDocuments(
                 {$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},{ hospitalizations: { $elemMatch: { date_out: {$gte:today,$lt:tomorrow}}}} ]} ) 
+            let totalOutTodayWomen = await PersonalInfo.countDocuments(
+                    {$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},{ hospitalizations: { $elemMatch: { date_out: {$gte:today,$lt:tomorrow}}}},{gender:"ស្រី"} ]} ) 
 
             let totalOut = await PersonalInfo.countDocuments({$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},
                 { hospitalizations: { $elemMatch: { date_out: {$ne:null}}}},{ hospitalizations: { $elemMatch: { date_out: {$lt: new Date()}}}}, ]} );
+
+            let totalOutWomen = await PersonalInfo.countDocuments({$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},{gender:"ស្រី"},
+                    { hospitalizations: { $elemMatch: { date_out: {$ne:null}}}},{ hospitalizations: { $elemMatch: { date_out: {$lt: new Date()}}}},]});
+            let totalOutDelta = await PersonalInfo.countDocuments({$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }}, {hospitalizations: { $elemMatch: { covidVariant:"DELTA"} }},
+                    { hospitalizations: { $elemMatch: { date_out: {$ne:null}}}},{ hospitalizations: { $elemMatch: { date_out: {$lt: new Date()}}}},]});
 
          return {
              totalIn,
              totalInToday,
              totalOut,
              totalOutToday,
+             totalDeltaIn:totalDeltaIn,
+             totalInWomen:totalInWomen,
+             totalInTodayWomen:totalInTodayWomen,
+             totalOutWomen:totalOutWomen,
+             totalOutTodayWomen:totalOutTodayWomen ,
+             totalOutDelta:totalOutDelta
   
          }
      
         },
+        
 
         //@Desc hospital location 
         //@access private 
@@ -154,7 +188,6 @@ export default {
         //@access auth
 
         updateHospitalInfo:async(_,{id,updatedHospitalInfo},{HospitalInfo})=>{
-        
             try {
                 const isUpdated = await HospitalInfo.findByIdAndUpdate(id,updatedHospitalInfo);
                 if(!isUpdated){

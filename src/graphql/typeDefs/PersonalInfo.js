@@ -12,7 +12,7 @@ export default gql`
     getPeopleForQuarantineWithPagination(page:Int, limit:Int, keyword:String,quarantineInfoId:ID!): PaginateResponse!
     getAffectedPersonalListWithPagination(page:Int, limit:Int, keyword:String,patientId:ID!):PaginateResponse!
     # for the doctor 
-    getPatientForHospitalWithPagination(page:Int, limit:Int, keyword:String,startDate:Date, endDate:Date,hospitalId:ID!): PaginateResponse!
+    getPatientForHospitalWithPagination(page:Int, limit:Int, keyword:String,startDate:Date, endDate:Date,hospitalId:ID!,patientType:String): PaginateResponse!
     getPeopleForSampleTestWithPagination(page:Int, limit:Int, keyword:String,startDate:String, endDate:String,testLocation:String): PaginateResponse!
   
     getConfirmedPersonalInfoByInterviewWithPagination(
@@ -92,7 +92,6 @@ export default gql`
   addHistoryWithin14days(createLocation:HistoryWithin14daysInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:POLICE) 
   deleteHistoryWithin14days(personalInfoId:ID!,historyWithin14Id:ID!):PersonalInfoResponse @isAuth(requires:POLICE) 
   updateHistoryWithin14days(personalInfoId:ID!,historyWithin14Id:ID!,updateInfo:HistoryWithin14daysInput): PersonalInfoResponse  @isAuth(requires:POLICE) 
-
 
 
   addPeopleToQuarantine(newQuarantine:QuarantingInput,personalInfo:ID!):PersonalInfoResponse @isAuth(requires:SUPPER) 
@@ -236,6 +235,7 @@ export default gql`
         reasonForDeath:String
   }
   type SampleTest{
+    nextSampleTestDate:Date,
     createdBy:ID 
     updatedBy:ID
     id:ID!
@@ -272,6 +272,7 @@ export default gql`
         toCountry:String,
     },
   input SampleTestInput{
+    nextSampleTestDate:Date,
     covidVariant:String,
     reasonForTesting:String,
     date: Date,
@@ -413,6 +414,7 @@ type PersonalInfoResponseWithData{
     otherAffect:  String
   }
   type Hospitalizations{
+    nextSampleTestDate:Date,
     createdBy:ID 
     updatedBy:ID
     id:ID
@@ -425,17 +427,24 @@ type PersonalInfoResponseWithData{
     description: String
     long:Float,
     lat:Float,
+    province:String,
+    personTypes:String,
+
   }
   input HospitalizationsInput{
+    nextSampleTestDate:Date,
     date_in: Date
     date_out: Date
     hospitalName: String
-    hospitalInfo: ID
+    hospitalInfo: ID!
     covidVariant: String
     coorporate: Boolean
     description: String
     long:Float,
     lat:Float,
+    province:String,
+    personTypes:String,
+
   }
 
   # type PersonalInfoResponeWithData{

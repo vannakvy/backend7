@@ -78,6 +78,7 @@ const PersonalInfoShema = mongoose.Schema({
     //ជំងឺប្រចាំកាយ
     chronic:String,
     sampleTest:[{
+        nextSampleTestDate:Date,
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'
@@ -182,6 +183,7 @@ const PersonalInfoShema = mongoose.Schema({
         otherAffect:String
     },
     hospitalizations:[{
+        nextSampleTestDate:Date,
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'
@@ -190,6 +192,10 @@ const PersonalInfoShema = mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'
         },
+        //
+        province:String,
+        personTypes:String,
+ 
         long:Number,
         lat:Number,
         hospitalName:String,
