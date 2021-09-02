@@ -414,6 +414,7 @@ type PersonalInfoResponseWithData{
     otherAffect:  String
   }
   type Hospitalizations{
+    infection:String,
     nextSampleTestDate:Date,
     createdBy:ID 
     updatedBy:ID
@@ -432,6 +433,7 @@ type PersonalInfoResponseWithData{
 
   }
   input HospitalizationsInput{
+    infection:String,
     nextSampleTestDate:Date,
     date_in: Date
     date_out: Date

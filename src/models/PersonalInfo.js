@@ -183,6 +183,7 @@ const PersonalInfoShema = mongoose.Schema({
         otherAffect:String
     },
     hospitalizations:[{
+        infection:String,
         nextSampleTestDate:Date,
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,

@@ -262,7 +262,7 @@ export default {
           sampleTestReminder = { hospitalizations:{$elemMatch:{nextSampleTestDate:{$gte:new Date(new Date().setUTCHours(0,0,0,0)),$lt:new Date(new Date().setUTCHours(23,59,59,59))}}}};
           break;
         case "បានចាកចេញ":
-          left = {$and:[ {hospitalizations: { $elemMatch: { date_out: {$ne:null}}}},{ hospitalizations: { $elemMatch: { date_out: {$lt: new Date()}}}}, ]}
+          left = {$and:[ {hospitalizations: { $elemMatch: { date_out: {$ne:null}}}},{ hospitalizations: { $elemMatch: { date_out: {$lt: new Date(new Date().setUTCHours(0,0,0,0))}}}}, ]}
           hospitalizing ={};
           recovered = {};
           death = {};
@@ -1184,6 +1184,7 @@ export default {
               "hospitalizations.$.personTypes": updateInfo.personTypes,
               "hospitalizations.$.personTypes": updateInfo.personTypes,
               "hospitalizations.$.nextSampleTestDate": updateInfo.nextSampleTestDate,
+              "hospitalizations.$.infection": updateInfo.infection,
             },
           }
         )

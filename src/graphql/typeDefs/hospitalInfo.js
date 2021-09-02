@@ -29,18 +29,14 @@ type recoveredReport{
   total:Int
 }
   type totalDataInHospital {
-
              totalIn:Int
              totalDeltaIn:Int 
              totalInWomen:Int
-
              totalInToday:Int
              totalInTodayWomen:Int
-
              totalOut:Int
              totalOutWomen:Int
              totalOutDelta:Int 
-
              totalOutToday:Int
              totalOutTodayWomen:Int 
 

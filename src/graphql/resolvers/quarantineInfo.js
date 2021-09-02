@@ -26,7 +26,7 @@ export default {
       let totalOutToday = await PersonalInfo.countDocuments(
           {$and:[ {quaranting: { $elemMatch: { quarantineInfo: quarantineId } }},{ quaranting: { $elemMatch: { date_out: {$gte:today,$lt:tomorrow}}}} ]} )   
       let totalOut = await PersonalInfo.countDocuments({$and:[ {quaranting: { $elemMatch: { quarantineInfo: quarantineId } }},
-          { quaranting: { $elemMatch: { date_out: {$ne:null}}}},{ quaranting: { $elemMatch: { date_out: {$lt: new Date()}}}} ]} );
+          { quaranting: { $elemMatch: { date_out: {$ne:null}}}},{ quaranting: { $elemMatch: { date_out: {$lt: new Date(new Date().setUTCHours(0,0,0,0))}}}} ]} );
           
    return {
        totalIn,

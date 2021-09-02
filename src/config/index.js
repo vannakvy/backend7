@@ -11,7 +11,7 @@ export const {
     PORT,
     PROD,
     SECRET,
-    IN_PROD = PROD === 'dev',
+    IN_PROD = PROD === 'prod',
     BASE_URL = `http://localhost:${PORT}`,
 } = parsed;
 

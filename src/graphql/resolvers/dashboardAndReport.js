@@ -445,7 +445,7 @@ export default {
     getDataForGrap: async (_, {}, { PersonalInfo }) => {
       const convert = (e) => {
         let array = [];
-        let limitDate = 60;
+        let limitDate = 20;
         e.map((load) => {
           if (load._id.month !== null) {
             if (limitDate == 0) return;
