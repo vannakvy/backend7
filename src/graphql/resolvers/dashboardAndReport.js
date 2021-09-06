@@ -339,19 +339,7 @@ export default {
           },
         ]);
 
-        //  if(dataToday ===[]){
-        //    console.log("dataToday =0")
-        //    sampleTestToday =0
-        //  }else{
-        //   sampleTestToday = dataToday[0].count
-        //  }
 
-        //  if(dataAll ===[]){
-        //   sampleTest =0
-        //   console.log("dataAll =0")
-        // }else{
-        //  sampleTest = dataAll[0].count
-        // }
       }
 
       if (dataAll.length !== 0) {

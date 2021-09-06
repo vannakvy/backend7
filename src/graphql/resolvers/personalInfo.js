@@ -213,7 +213,7 @@ export default {
 
     getPatientForHospitalWithPagination: async (
       _,
-      { page, limit, keyword = "", startDate, endDate, hospitalId,patientType },
+      { page, limit, keyword = "", startDate, endDate, hospitalId,patientType,numberOfSampleTest,nextTest },
       { PersonalInfo }
     ) => {
       const options = {
@@ -231,6 +231,9 @@ export default {
       let sampleTestReminder = {};
       let left = {};
       let dateQuery = {}
+      let sampleTestTimes = {};
+      let bySampletTestNext = {}
+    
 
       switch(patientType){
         case "កំពុងព្យាបាល":
@@ -285,8 +288,17 @@ export default {
         // { hospitalizations: { $elemMatch: { hospitalInfo: hospitalId } } },
       }
 
+    
 
-    console.log(left)
+
+//find by array size 
+  if(numberOfSampleTest){
+    sampleTestTimes = { sampleTest :{$size : numberOfSampleTest}}
+  }
+  if(nextTest){
+     bySampletTestNext = { hospitalizations:{$elemMatch:{nextSampleTestDate:{$gte:new Date(new Date(nextTest).setUTCHours(0,0,0,0)),$lt:new Date(new Date(nextTest).setUTCHours(23,59,59,59))}}}};
+  }
+ 
       let query = {
         $and: [
           {
@@ -310,6 +322,8 @@ export default {
           death ,
           sampleTestReminder ,
           left ,
+          sampleTestTimes,
+          bySampletTestNext
         ],
       };
       const personalInfos = await PersonalInfo.paginate(query, options);
@@ -351,9 +365,7 @@ export default {
             ],
           },
           { "quaranting.quarantineInfo": { $eq: quarantineInfoId } },
-          // { "currentState.confirm": { $eq: quarantineInfoId } },
-          // { "quarantine.date_in": { $ne: null } },
-          // { "quarantine.date_in": { $gte: startDate, $lt: endDate } },
+        
         ],
       };
       const personalInfos = await PersonalInfo.paginate(query, options);

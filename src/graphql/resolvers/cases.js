@@ -18,7 +18,6 @@ export default {
         //@access private 
         //
 
-
         allCases:async(_,{},{Case})=>{
             const cases = await Case.find({});
             return cases;
@@ -35,7 +34,6 @@ export default {
                 },
                 // populate: "customer",
               };
-
               let query = {
                 $or: [
                     { caseName: { $regex: keyword, $options: "i" } },

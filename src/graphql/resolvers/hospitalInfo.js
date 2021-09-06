@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 
 const HospitalInfoLabels = {
     docs: "hospitalInfos",
@@ -17,11 +18,23 @@ export default {
         //@Desc get total patient that is recovered immigrant worker to a specific country 
         //@Access doctor 
         reportForImmigrantWorker:async(_,{hospitalId},{PersonalInfo,HospitalInfo})=>{
-         
-            const data = await PersonalInfo.aggregate([
-                {$match:{hospitalizations:{$elemMatch:{personalInfo:{$eq:hospitalId.toString()}}}}},
-                {$match:{hospitalizations:{$elemMatch:{personTypes:"ពលករ"}}}},
-                {$match:{hospitalizations:{$elemMatch:{province:{$ne:null}}}}},
+           let id = await mongoose.Types.ObjectId(hospitalId);
+            // const data = await PersonalInfo.aggregate([
+            //     // {$match:{hospitalizations:{$elemMatch:{hospitalInfo:{$eq:hospitalId.toString()}}}}},
+            
+            //     { $match:{hospitalizations: { $elemMatch: { hospitalInfo:{$eq:id}  } }} },
+            //     {$match:{hospitalizations:{$elemMatch:{personTypes:"ពលករ"}}}},
+            //     {$match:{"hospitalizations.province":{$ne:null}}},
+            //     {$unwind:"$hospitalizations"},
+            //     { $group: { _id: "$hospitalizations.province", total: { $sum: 1 } } },
+            // ]);
+                        const data = await PersonalInfo.aggregate([
+                {$match:{"hospitalizations.province":{$ne:null}}},
+                {$match:{"hospitalizations.hospitalInfo":{$eq:id}}},
+                {$match:{"hospitalizations.personTypes":{$eq:"ពលករ"}}},
+                // { $match:{hospitalizations: { $elemMatch: { hospitalInfo:{$eq:id}  } }} },
+                // {$match:{hospitalizations:{$elemMatch:{personTypes:"ពលករ"}}}},
+             
                 {$unwind:"$hospitalizations"},
                 { $group: { _id: "$hospitalizations.province", total: { $sum: 1 } } },
             ]);
@@ -34,7 +47,6 @@ export default {
         hospitalDashboard:async(_,{hospitalInfo},{PersonalInfo})=>{
             var today = new Date(new Date().setUTCHours(0, 0, 0, 0));
             var tomorrow= new Date(new Date().setUTCHours(23,59,59,59));
-
             let totalInToday = await PersonalInfo.countDocuments({$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},{ hospitalizations: { $elemMatch: { date_in: {$gte:today,$lt:tomorrow}}}} ]} )   
             let totalInTodayWomen = await PersonalInfo.countDocuments({$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},{ hospitalizations: { $elemMatch: { date_in: {$gte:today,$lt:tomorrow}}}},{gender:"ស្រី"} ]} )
            
