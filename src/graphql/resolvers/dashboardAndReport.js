@@ -433,7 +433,7 @@ export default {
     getDataForGrap: async (_, {}, { PersonalInfo }) => {
       const convert = (e) => {
         let array = [];
-        let limitDate = 20;
+        let limitDate = 10;
         e.map((load) => {
           if (load._id.month !== null) {
             if (limitDate == 0) return;
@@ -446,6 +446,7 @@ export default {
             // }
           }
         });
+
         let a = array.sort(function (a, b) {
           return new Date(a.x) - new Date(b.x);
         });
@@ -454,7 +455,7 @@ export default {
 
 
       let confirm = await PersonalInfo.aggregate([
-        { $sort: { "currentState.confirmAt": 1 } },
+        { $sort: { "currentState.confirmAt": -1 } },
         {
           $group: {
             _id: {
@@ -466,8 +467,6 @@ export default {
           },
         },{$limit:60}
       ]);
-
-
 
       let recovered = await PersonalInfo.aggregate([
         { $sort: { "currentState.recoveredAt": 1 } },
@@ -497,7 +496,7 @@ export default {
         },
         {$limit:60}
       ]);
-
+console.log(convert(confirm))
       return {
         cases: convert(confirm),
         recovered: convert(recovered),

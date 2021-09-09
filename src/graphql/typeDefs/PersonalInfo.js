@@ -64,7 +64,7 @@ export default gql`
       createEndDate:Date,
       confirmStartDate:Date,
       confirmEndDate:Date,
-      recoverdStartDate:Date,
+      recoveredStartDate:Date,
       recoveredEndDate:Date,
       deathStartDate:Date,
       deathEndDate:Date,
@@ -86,8 +86,6 @@ export default gql`
     updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse 
     updateAffectedFrom(personalInfoId:ID!,updateValue:AffectedFromInput):PersonalInfoResponse  
 
-  
-    
   # For police 
   addHistoryWithin14days(createLocation:HistoryWithin14daysInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:POLICE) 
   deleteHistoryWithin14days(personalInfoId:ID!,historyWithin14Id:ID!):PersonalInfoResponse @isAuth(requires:POLICE) 
@@ -119,7 +117,6 @@ export default gql`
   }
  
   type PersonalInfo {
-    
     createdBy:ID 
     updatedBy:ID
     currentAddress:String,
@@ -129,17 +126,13 @@ export default gql`
     carPlateNumber: String,
     driverName:String,
     to: String, 
-
     souceOfSuspect:String,
     recievedLabFormAt:Date,
     officerId:String,
     updateAt:Date,
-
     workplaceInfo:String,
     totalCoworker:Int,
-
     pob:String,
-
     englishName:String,
     patientId:String
     id: ID

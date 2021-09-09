@@ -35,10 +35,9 @@ export default {
     // @Desc get all users
     // @Access
 
-    allUsers: async (_, {}, { User, req }) => {
+    allUsers: async (_, {}, { User }) => {
       const users = await User.find({});
       // throw new ApolloError("Username not found", "404");
-
       return users;
     },
     getCurrentUser: async (_, {}, {user }) => {
@@ -56,10 +55,7 @@ export default {
       { User }
     ) => {
 
-    
-      
       let key = keyword.toString();
-   
       const options = {
         page: page || 1,
         limit: limit || 10,

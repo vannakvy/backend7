@@ -6,7 +6,7 @@ export default gql`
     extend type Query {
         # the rules start from the right to the left
         authUser: User! @isAuth(requires:ADMIN) 
-        allUsers:[User!] @isAuth(requires:ADMIN) 
+        allUsers:[User!]
         getCurrentUser:User! 
         getUserWithPagination(page:Int,limit:Int,keyword:String):UserPaginator!  @isAuth(requires:ADMIN) 
     }

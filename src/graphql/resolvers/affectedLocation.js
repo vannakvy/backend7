@@ -40,7 +40,7 @@ export default {
         },
         //@Desc Getting all AffectedLocations  with pagination 
         //@access auth
-        getAffectedLocationWithPagination:async(_,{page,limit,keyword, startDate, endDate},{AffectedLocation})=>{
+        getAffectedLocationWithPagination:async(_,{page,limit,keyword, startDate, endDate,status},{AffectedLocation})=>{
             const options = {
                 page: page || 1,
                 limit: limit || 10,
@@ -50,16 +50,43 @@ export default {
                 },
                 // populate: "case personalInfo",
               };
+
                 
-                
+                let startfilterDate = new Date()
+                let filterDate = new Date()
                 var openAtSet = {};
-                // let start;
-                // let end;
+                var closeAtSet = {};
+
                 if(startDate !== null || endDate !== null){
-                    let start = formatDate(startDate)+"T00:00:00.00";
-                    let end = formatDate(endDate)+"T23:59:59.00";
-                    openAtSet = { "openAt": { $gte: start, $lt: end } }
+                    let start = new Date(new Date(startDate).setUTCHours(0,0,0,0));
+                    let end = new Date(new Date(endDate).setUTCHours(23,59,59,59));
+
+                    // filterDate = new Date(endDate)
+                    // filterDate = new Date(endDate)
+
+                    openAtSet  = { "openAt": { $gte: start, $lt: end } }
+                    closeAtSet  = { "closeAt": { $gte: start, $lt: end } }
+
                 }
+
+                let statusQuery = {}
+                switch(status){
+                    case "បើក":
+                        statusQuery = {"openAt": { $lte: new Date(filterDate.setUTCHours(23,59,59,59)) }}
+                        closeAtSet = {}
+                        break;
+                    case "បិទ":
+                        statusQuery = {$and: [{"closeAt": { $lte: new Date(filterDate.setUTCHours(23,59,59,59)) }},{"openAt":{$eq:null}}] }
+                        openAtSet = {}
+                        break;
+                    default:
+                        statusQuery= {}
+                        closeAtSet = {}
+                        break;
+                }
+
+
+                console.log(openAtSet)
 
                 let query = {
                     $and:[
@@ -71,7 +98,10 @@ export default {
                             { district: { $regex: keyword, $options: "i" } },
                             { province: { $regex: keyword, $options: "i" } },
                             ],
-                        },openAtSet,
+                        },
+                        openAtSet,
+                        closeAtSet,
+                        statusQuery,
                     ]
                 };
                 

@@ -2,10 +2,12 @@ import moment from "moment";
 import crypto from 'crypto'
 import aws from 'aws-sdk'
 import { promisify } from "util"
+import mongoose from 'mongoose'
 const randomBytes = promisify(crypto.randomBytes)
 import {
   config
 } from 'dotenv';
+const logger = require("../../config/logger.js")
 
 
 const PersonalInfoLabels = {
@@ -289,8 +291,6 @@ export default {
       }
 
     
-
-
 //find by array size 
   if(numberOfSampleTest){
     sampleTestTimes = { sampleTest :{$size : numberOfSampleTest}}
@@ -534,10 +534,6 @@ export default {
       _,
       {   page,
           limit,
-          keyword,
-          currentState,
-          startDate,
-          endDate,
           covidType="",
           village,
           commune,
@@ -556,7 +552,7 @@ export default {
           createEndDate,
           confirmStartDate,
           confirmEndDate,
-          recoverdStartDate,
+          recoveredStartDate,
           recoveredEndDate,
           deathStartDate,
           deathEndDate,
@@ -575,14 +571,6 @@ export default {
         // populate: "case",
       };
 
-      let today = "";
-      let tomorrow = "";
-      if(startDate !==null || endDate !==null){
-        today = new Date(new Date(startDate).setUTCHours(0,0,0,0));
-        tomorrow = new Date(new Date(endDate).setUTCHours(23,59,59,59));
-      }
-
-    
       let con = {};
       let rec ={};
       let dea = {};
@@ -600,13 +588,21 @@ export default {
       let createdBy = {};
       let updateBy  = {};
       let sampleTestCreatedBy = {};
+      let sampleTestUpdatedBy = {};
+      let covidCon = {}
 
 
 
 
-      if(confirm) con = {"currentState.confirm":confirm};
-      if(recovered) rec = {"currentState.recovered":recovered};
-      if(death) dea = {"currentState.death": death};
+    con = {"currentState.confirm":confirm};
+    rec = {"currentState.recovered":recovered};
+    dea = {"currentState.death": death};
+
+    if(recovered) con = {};
+    if(death) {
+      con = {}
+      rec = {}
+    }
       // 
       if(village) vill = {"village":village};
       if(commune) com = {"commune":commune};
@@ -616,38 +612,81 @@ export default {
       if(firstName) first = {"firstName":firstName};
       if(lastName) last= {"lastName":lastName}
 
-
+      // confirmStartDate,
+      // confirmEndDate,
+      // ស្វែងរកប្រភេទកូវិដ
+      if(covidType !== "" && covidType !== null)  covidCon = {"currentState.covidVariant":{$eq:covidType}};
       // ស្វែងរកតាមរយះថ្ងៃទីបង្កើត
-      if(createStartDate !== null ||  createEndDate !== null)  createDateAt = {"createdAt":{$gte:createStartDate,lt:createEndDate}};
+      if(createStartDate !== null ||  createEndDate !== null)  createDateAt = {"createdAt":{$gte:new Date(new Date(createStartDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(createEndDate).setUTCHours(23,59,59,59))}};
       // ្វែងរកតាមរយះថ្ងៃទីឆ្លង
-      if(confirmDate !==null || deathDate !==null) confirmDate = {"currentState.confirmedAt":{$gte:confirmStartDate,lt:confirmEndDate}};
+      if(confirmStartDate !==null && confirmEndDate !==null) confirmDate = {"currentState.confirmedAt":{$gte:confirmStartDate,$lt:confirmEndDate}};
       // ្វែងរកតាមរយះថ្ងៃទីស្លាប់
-      if( deathStartDate !==null || deathEndDate!==null) deathDate ={"currentState.recoveredAt":{$gte:deathStartDate,lt:deathEndDate}}; 
+      if( deathStartDate !==null || deathEndDate!==null) deathDate ={"currentState.recoveredAt":{$gte:deathStartDate,$lt:deathEndDate}}; 
       // ្វែងរកតាមរយះថ្ងៃទីជា
-      if(recoverdStartDate !==null || recoveredEndDate!==null)  recoveredDate ={"currentState.deathAt":{$gte:recoverdStartDate,lt:recoveredEndDate}};
-
-      // ស្វែងរកតាមរយះថ្ងៃទីការធ្វើតេស្ត
-      if(sampleTestStartDate !==null || sampleTestEndDate !==null) sampleTestAtDate = {"sampleTest":{$elemMatch:{"date":{$gte:sampleTestStartDate,lt:sampleTestEndDate}}}};
+      if(recoveredStartDate !==null || recoveredEndDate!==null)  recoveredDate ={"currentState.deathAt":{$gte:recoveredStartDate,$lt:recoveredEndDate}};
+        // ស្វែងរកតាមរយះថ្ងៃទីការធ្វើតេស្ត
+      if(sampleTestStartDate !==null || sampleTestEndDate !==null) sampleTestAtDate = {"sampleTest":{$elemMatch:{"date":{$gte:new Date(new Date(sampleTestStartDate).setUTCHours(0,0,0,0)),$lt:new Date(new Date(sampleTestEndDate).setUTCHours(23,59,59,59))}}}};
 
       // ស្វែងរកតាមរយះអ្នកចង្កើត
-       createdBy = {"createdBy":createdthisBy};
+      if(createdthisBy) createdBy = {"createdBy":mongoose.Types.ObjectId(createdthisBy)};
       // ស្វែងរកតាមរយះអ្នកកែ
-       updateBy = {"updatedBy":updatedthisBy};
-      // ស្វែងរកតាមរយះអ្នកបញ្ជូលការយកសំណាក
-       sampleTestCreatedBy = {"sampleTest":{$elemMatch:{"createdBy": createdSampleTestBy}}};
-       // ស្វែងរកតាមរយះអ្នកកែការយកសំណាក
-       sampleTestUpdatedBy = {"sampleTest":{$elemMatch:{"updatedBy": sampleTestUpdatedBy}}};
-      //ស្វែងរកតាមរយះអ្នកបញ្ជូលការការធ្វើចត្តឡីស័ក
+      if(updatedthisBy) updateBy = {"updatedBy": mongoose.Types.ObjectId(updatedthisBy)};
+      // // ស្វែងរកតាមរយះអ្នកបញ្ជូលការយកសំណាក
+       if(createdSampleTestBy) sampleTestCreatedBy = {"sampleTest":{$elemMatch:{"createdBy": mongoose.Types.ObjectId(createdSampleTestBy)}}};
+      //  // ស្វែងរកតាមរយះអ្នកកែការយកសំណាក
+       if(createdSampleTestupdatedBy) sampleTestUpdatedBy = {"sampleTest":{$elemMatch:{"updatedBy": mongoose.Types.ObjectId(createdSampleTestupdatedBy)}}};
+      
       //
 
-
+console.log(
+  covidType,
+  village,
+  commune,
+  district,
+  province,
+  firstName,
+  lastName,
+  confirm,
+  death, 
+  recovered,
+  createdthisBy,
+  updatedthisBy,
+  createdSampleTestBy,
+  createdSampleTestupdatedBy,
+  createStartDate,
+  createEndDate,
+  confirmStartDate,
+  confirmEndDate,
+  recoveredStartDate,
+  recoveredEndDate,
+  deathStartDate,
+  deathEndDate,
+  sampleTestStartDate,  
+  sampleTestEndDate)
       let query = {
         $and: [
-
+          con,
+          rec,
+          dea,
+          vill,
+          com,
+          dis,
+          prov,
+          first,
+          last,
+          createDateAt,
+          confirmDate,
+          deathDate,
+          recoveredDate,
+          sampleTestAtDate,
+          createdBy,
+          updateBy ,
+          sampleTestCreatedBy,
+          sampleTestUpdatedBy,
+          covidCon
         ],
       };
       const personalInfos = await PersonalInfo.paginate(query, options);
-
       return personalInfos;
     },
 
@@ -675,8 +714,6 @@ export default {
         today = new Date(new Date(startDate).setUTCHours(0,0,0,0));
         tomorrow = new Date(new Date(endDate).setUTCHours(23,59,59,59));
       }
-
-
 
       let dateQuery = {}
       let current = {};
@@ -963,11 +1000,16 @@ export default {
     updateSampleTest: async (
       _,
       { personalInfoId, sampleTestId, sampleTest },
-      { PersonalInfo }
+      { PersonalInfo,user }
     ) => {
    
       try {
-      
+       if(!user){
+         return {
+           success: false,
+           message:"មិនអាចបានកែបានទេ"
+         }
+       }
         await PersonalInfo.findOneAndUpdate(
           { _id: personalInfoId, "sampleTest._id": sampleTestId },
           {
@@ -992,6 +1034,7 @@ export default {
                 sampleTest.labFormCompletedByTel,
               "sampleTest.$.formFillerTel": sampleTest.formFillerTel,
               "sampleTest.$.nextSampleTestDate": sampleTest.nextSampleTestDate,
+              "sampleTest.$.updatedBy": user.id,
               
             },
           }
@@ -1419,12 +1462,19 @@ export default {
     recordSampleTest: async (
       _,
       { sampleTest, personalInfoId },
-      { PersonalInfo }
+      { PersonalInfo,user }
     ) => {
       try {
+        if(!user){
+          return {
+            success: false, 
+            message: "សូមមេត្តា lOGIN ម្តងទៀត រឺ​ refresh "
+          }
+        }
+        let newSampleTest = {...sampleTest,createdBy:user.id};
         const updatedData = await PersonalInfo.findByIdAndUpdate(
           personalInfoId,
-          { $push: { sampleTest: sampleTest } }
+          { $push: { sampleTest: newSampleTest } }
         );
         if (!updatedData) {
           return {
@@ -1432,23 +1482,7 @@ export default {
             message: "មិនទាន់មានអ្នកកំណត់ត្រានេះទេ",
           };
         }
-        // if ((sampleTest.result = true)) {
-        //   let updateState = {
-        //     confirm: sampleTest.result,
-        //     confirmedAt: sampleTest.resultDate,
-        //     covidVariant: sampleTest.covidVariant,
-        //   };
-
-        //   const updated = await PersonalInfo.update(
-        //     { _id: personalInfoId },
-        //     {
-        //       $set: {
-        //         currentState: updateState,
-        //       },
-        //     }
-        //   );
-        // }
-
+    
         return {
           success: true,
           message: "ជោគជ័យ",
@@ -1525,9 +1559,15 @@ export default {
     deleteSampleTest: async (
       _,
       { personalInfoId, sampleTestId },
-      { PersonalInfo }
+      { PersonalInfo,user }
     ) => {
       try {
+        if(!user){
+          return {
+            success: false,
+            message: "មិនអាចលុបបានទេ"
+          }
+        }
         let a = await PersonalInfo.updateOne(
           { _id: personalInfoId },
           {
@@ -1577,8 +1617,19 @@ export default {
 
     //@Desc create new Personal Info
     //@access auth
-    createPersonalInfo: async (_, { newInfo }, { PersonalInfo }) => {
+    createPersonalInfo: async (_, { newInfo }, { PersonalInfo,user }) => {
+      
       try {
+        if(!user){
+          return {
+            response: {
+              message: "សូមមេត្តា refresh រឺ login ជាថ្មី",
+              success: false,
+            },
+            personalInfo: {},
+          };
+        }
+        let newPersonalInfo = {...newInfo,createdBy: user.id}
         if(newInfo.patientId){
           let patientIdExist = await PersonalInfo.findOne({patientId:newInfo.patientId});
           if (patientIdExist) {
@@ -1607,13 +1658,12 @@ export default {
             personalInfo: {},
           };
         }
-
-        const info = new PersonalInfo(newInfo);
+        const info = new PersonalInfo(newPersonalInfo);
         const personalInfo = await info.save();
         if (!personalInfo) {
           return {
             response: {
-              message: "Cannot create personal Info",
+              message: "មិនអាចបង្កើតបានទេ",
               success: false,
             },
             personalInfo: {},
@@ -1640,8 +1690,17 @@ export default {
     //@Desc delete the personal info
     //@access admin
 
-    deletePersonalInfo: async (_, { id }, { PersonalInfo }) => {
+    deletePersonalInfo: async (_, { id }, { PersonalInfo,user }) => {
       try {
+
+        if(!user){
+          return {
+            success: false,
+            message:"មិនអាចលុបបានទេ"
+          }
+        }
+
+        
         const deletedInfo = await PersonalInfo.findByIdAndDelete(id);
 
         if (!deletedInfo) {
@@ -1665,9 +1724,26 @@ export default {
     //@Desc update the personal info
     //@access auth
 
-    updatePersonalInfo: async (_, { id, updatedInfo }, { PersonalInfo }) => {
+    updatePersonalInfo: async (_, { id, updatedInfo }, { PersonalInfo,user }) => {
       try {
-        const isUpdated = await PersonalInfo.findByIdAndUpdate(id, updatedInfo);
+
+        if(!user){
+          return {
+          
+              message: "សូមមេត្តា refresh រឺ login ជាថ្មី",
+              success: false,
+        
+          };
+        }
+        logger.info({
+          level:"info",
+          message:`personalInfo updated ${user.id}`,
+          meta:user.id
+        })
+
+        let newPersonalInfo = {...updatedInfo,updatedBy:user.id}
+        const isUpdated = await PersonalInfo.findByIdAndUpdate(id, newPersonalInfo);
+        
         if (!isUpdated) {
           return {
             success: false,

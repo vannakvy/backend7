@@ -18,7 +18,6 @@ const logger = createLogger({
             level: 'error',
             format: format.combine(format.timestamp(), format.json())
         }),
-        
         new transports.MongoDB({
             level: 'info',
             db: process.env.DB,
