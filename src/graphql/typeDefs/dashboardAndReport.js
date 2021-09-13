@@ -60,6 +60,11 @@ type AllProvince{
     totalAffectedLocationClosedToday:Int
     totalAffectedPeople:Int
     totalAffectedPeopleToday:Int
+    confirmFilledToday:Int,
+    recoveredFilledToday:Int,
+    deathFilledFromToday:Int,
+    deltaConfirmFilledFromToday:Int,
+
   
 }
 

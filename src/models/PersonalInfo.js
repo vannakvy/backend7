@@ -215,6 +215,9 @@ const PersonalInfoShema = mongoose.Schema({
         description:String
     }],
     currentState:{
+        confirmFormFilled:Date,
+        recoveredFormFilled:Date,
+        deathFormFilled:Date,
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'

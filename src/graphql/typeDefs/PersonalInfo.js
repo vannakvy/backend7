@@ -222,6 +222,9 @@ export default gql`
         confirmedAt:Date,
         recovered:Boolean,
         recoveredAt:Date,
+        confirmFormFilled:Date,
+        recoveredFormFilled:Date,
+        deathFormFilled:Date,
         death:Boolean,
         deathAt:Date,
         covidVariant:String
@@ -285,6 +288,9 @@ export default gql`
     labFormCompletedByTel:String,
   }
   input currentStatusInput{
+        confirmFormFilled:Date,
+        recoveredFormFilled:Date,
+        deathFormFilled:Date,
         confirm:Boolean,
         confirmedAt:Date,
         recovered:Boolean,

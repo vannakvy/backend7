@@ -111,6 +111,11 @@ export default {
       let totalAffectedPeople =0;
       let totalAffectedPeopleToday =0;
 
+      let deltaConfirmFilledFromToday =0;
+      let confirmFilledToday =0;
+      let recoveredFilledToday =0;
+      let deathFilledFromToday=0;
+
       var today = new Date(new Date().setUTCHours(0, 0, 0, 0));
       var tomorrow = new Date(new Date().setUTCHours(23, 59, 59, 59));
 
@@ -186,12 +191,24 @@ export default {
           ],
         });
 
+
+        //deltaConfirmFilledFromToday 
+        deltaConfirmFilledFromToday = await PersonalInfo.countDocuments({
+          $and: [
+            { "currentState.confirm": true },
+            { "currentState.covidVariant": "DELTA" },
+            { "currentState.confirmFormFilled": { $gte: today, $lt: tomorrow } },
+          ],
+        });
+
         delta = await PersonalInfo.countDocuments({
           $and: [
             { "currentState.confirm": true },
             { "currentState.covidVariant": "DELTA" },
           ],
         });
+
+        
 
         confirm = await PersonalInfo.countDocuments({
           "currentState.confirm": true,
@@ -207,16 +224,33 @@ export default {
         confirmToday = await PersonalInfo.countDocuments({
           "currentState.confirmedAt": { $gte: today, $lt: tomorrow },
         });
+        //confirmFilledFormToday
+        confirmFilledToday = await PersonalInfo.countDocuments({
+          "currentState.confirmFormFilled": { $gte: today, $lt: tomorrow },
+        });
+
         recoveredToday = await PersonalInfo.countDocuments({
           "currentState.recoveredAt": { $gte: today, $lt: tomorrow },
         });
-        deathToday = await PersonalInfo.countDocuments({
-          "currentState.deathAt": { $gte: today, $lt: tomorrow },
+
+        //recoveredFilledFromToday
+        recoveredFilledToday = await PersonalInfo.countDocuments({
+          "currentState.recoveredFormFilled": { $gte: today, $lt: tomorrow },
         });
 
+        
         deathToday = await PersonalInfo.countDocuments({
           "currentState.deathAt": { $gte: today, $lt: tomorrow },
         });
+        ////deathFilledFromToday
+        deathFilledFromToday = await PersonalInfo.countDocuments({
+          "currentState.deathFormFilled": { $gte: today, $lt: tomorrow },
+        });
+
+
+        // deathToday = await PersonalInfo.countDocuments({
+        //   "currentState.deathAt": { $gte: today, $lt: tomorrow },
+        // });
       } else {
 
         totalAffectedPeople = await PersonalInfo.countDocuments({$and:[{"affectedFrom.patientCode": {$ne:null}},{district:district}]});
@@ -228,6 +262,15 @@ export default {
 
 
         deltaToday = await PersonalInfo.countDocuments({
+          $and: [
+            { "currentState.confirm": true },
+            { "currentState.covidVariant": "DELTA" },
+            { "currentState.confirmedAt": { $gte: today, $lt: tomorrow } },
+            { district: district },
+          ],
+        });
+
+        deltaConfirmFilledFromToday = await PersonalInfo.countDocuments({
           $and: [
             { "currentState.confirm": true },
             { "currentState.covidVariant": "DELTA" },
@@ -289,18 +332,47 @@ export default {
           ],
         });
 
+        //confirmFilledToday
+        confirmFilledToday = await PersonalInfo.countDocuments({
+          $and: [
+            { "currentState.confirmFormFilled": { $gte: today, $lt: tomorrow } },
+            { district: district },
+          ],
+        });
+
+
         recoveredToday = await PersonalInfo.countDocuments({
           $and: [
             { "currentState.recoveredAt": { $gte: today, $lt: tomorrow } },
             { district: district },
           ],
         });
+
+        //recoveredFilledToday
+  recoveredFilledToday = await PersonalInfo.countDocuments({
+    $and: [
+      { "currentState.recoveredFormFilled": { $gte: today, $lt: tomorrow } },
+      { district: district },
+    ],
+  });
+        
         deathToday = await PersonalInfo.countDocuments({
           $and: [
             { "currentState.deathAt": { $gte: today, $lt: tomorrow } },
             { district: district },
           ],
         });
+
+  ///deathFilledFromToday
+  deathFilledFromToday =  await PersonalInfo.countDocuments({
+    $and: [
+      { "currentState.deathAt": { $gte: today, $lt: tomorrow } },
+      { district: district },
+    ],
+  });
+
+
+
 
         sampleTestToday = await PersonalInfo.countDocuments({
           $and: [
@@ -369,7 +441,11 @@ export default {
         totalAffectedLocationClosed: totalAffectedLocationClosed,
         totalAffectedLocationClosedToday: totalAffectedLocationClosedToday,
         totalAffectedPeople:totalAffectedPeople,
-        totalAffectedPeopleToday:totalAffectedPeopleToday
+        totalAffectedPeopleToday:totalAffectedPeopleToday,
+         confirmFilledToday,
+         recoveredFilledToday,
+         deathFilledFromToday,
+         deltaConfirmFilledFromToday
         // totalAffectedLocationOn:totalAffectedLocationOn,
         // totalAffectedLocationClose:totalAffectedLocationClose,
         // totalAffectedLocationNew:totalAffectedLocationNew
@@ -378,13 +454,13 @@ export default {
         // totalAffectedLocation,
       };
 
+
       return dataForBoxes;
     },
 
     getAllDistrictForMap: async (_, {}, { PersonalInfo }) => {
       var today = new Date(new Date().setUTCHours(0, 0, 0, 0));
       // var tomorrow= new Date(new Date(endDate).setUTCHours(23,59,59,59));
-
       const data = await PersonalInfo.aggregate([
         {
           $project: {
@@ -496,7 +572,7 @@ export default {
         },
         {$limit:60}
       ]);
-console.log(convert(confirm))
+
       return {
         cases: convert(confirm),
         recovered: convert(recovered),
@@ -937,7 +1013,7 @@ console.log(convert(confirm))
       ////
       var today = new Date(new Date(startDate).setUTCHours(0, 0, 0, 0));
       var tomorrow = new Date(new Date(endDate).setUTCHours(23, 59, 59, 59));
-      console.log(today, tomorrow)
+
       const data = await PersonalInfo.aggregate([
         {
           $project: {

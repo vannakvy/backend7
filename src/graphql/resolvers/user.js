@@ -380,10 +380,6 @@ export default {
             userExist.username = username;
             userExist.password = await hash(password, 10);
             let result = await userExist.save();
-            //       console.log(result,"result")
-            //    result = await serializeUser(result);
-            //  let a = await issueAuthToken(result);
-            //  console.log(a)
 
             return {
               message: "Successfully update the Account",
