@@ -349,7 +349,7 @@ export default gql`
     travelOverCountryHistoryHistory:TravelOverCountryHistoryInput
     affectedFrom: AffectedFromInput
     historyWithin14daysInput:HistoryWithin14daysInput
-    vaccination:VaccinationInput
+    vaccination:[VaccinationInput]
     sampleTest:SampleTestInput
   }
   type PersonalInfoResponse {
