@@ -13,7 +13,7 @@ export default gql`
     getAffectedPersonalListWithPagination(page:Int, limit:Int, keyword:String,patientId:ID!):PaginateResponse!
     # for the doctor 
     getPatientForHospitalWithPagination(page:Int, limit:Int, keyword:String,startDate:Date, endDate:Date,hospitalId:ID!,patientType:String,numberOfSampleTest:Int,nextTest:Date): PaginateResponse!
-    getPeopleForSampleTestWithPagination(page:Int, limit:Int, keyword:String,startDate:String, endDate:String,testLocation:String): PaginateResponse!
+    getPeopleForSampleTestWithPagination(page:Int, limit:Int, keyword:String,startDate:String, endDate:String,testLocation:String,fillStartDate:Date,fillEndDate:Date): PaginateResponse!
   
     getConfirmedPersonalInfoByInterviewWithPagination(
       interview:Boolean, 

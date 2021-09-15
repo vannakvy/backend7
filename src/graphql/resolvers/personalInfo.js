@@ -76,27 +76,11 @@ export default {
     //@Access police
     getPeopleForSampleTestWithPagination: async (
       _,
-      { page, limit, keyword, startDate, endDate, testLocation },
+      { page, limit, keyword, startDate, endDate, testLocation,fillStartDate,fillEndDate },
       { PersonalInfo, roles }
     ) => {
   
-    //   await PersonalInfo.aggregate([
-    //     {$project: { "name" : { $concat : [ "$lastName", " ", "$firstName" ] } }},
-    //     {$match: {"name": {$regex: /bob j/i}}}
-    //   ]).exec(function(err, result){
-    //     console.log(result,"ddg");
-    //   });
 
-
-    // let a = await PersonalInfo.find({
-    //     "$expr": {
-    //       "$regexMatch": {
-    //         "input": { "$concat": ["$lastName"," ","$firstName"] },
-    //         "regex": keyword,  //Your text search here
-    //         "options": "i"
-    //       }
-    //     }
-    //   })
 
       const options = {
         page: page || 1,
@@ -111,6 +95,11 @@ export default {
       let start;
       let end;
       let testLocationQuery = {};
+      let fillDateQuery = {};
+      if(fillStartDate!==null && fillEndDate !==null){
+        fillDateQuery = {"currentState.confirmFormFilled":{$gte:new Date(new Date(fillStartDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(fillEndDate).setUTCHours(23,59,59,59))}}; 
+      }
+ 
       if (testLocation !== null) {
         if(testLocation===""){
           testLocationQuery = {
@@ -128,8 +117,6 @@ export default {
       if (startDate !== null || endDate !== null) {
         start = formatDate(startDate) + "T00:00:00.00";
         end = formatDate(endDate) + "T23:59:59.00";
-
-    
         // start = startDate;
         // end = endDate;
         query = {
@@ -145,29 +132,14 @@ export default {
                     }
                   }
                 },
-                // { patientId: { $regex: keyword, $options: "i" } },
-                // { englishName: { $regex: keyword, $options: "i" } },
-                // { firstName: { $regex: keyword, $options: "i" } },
-                // { lastName: { $regex: keyword, $options: "i" } },
-                // { village: { $regex: keyword, $options: "i" } },
-                // { commune: { $regex: keyword, $options: "i" } },
-                // { disctrict: { $regex: keyword, $options: "i" } },
-                // { province: { $regex: keyword, $options: "i" } },
-                // { patientId: { $regex: keyword, $options: "i" } },
-                // { idCard: { $regex: keyword, $options: "i" } },
-                // { tel: { $regex: keyword, $options: "i" } },
+           
               ],
             },
 
             
-            // { "currentState.confirm": false },
-            //  { "sampleTest": { $ne: []} },
-            //  { "district": { $ne: []} },
-            // { "sampleTest.date": { $gte: startDate, $lt: endDate } },
-            // { sampleTest: { $elemMatch: {  } }
-            //  2021-08-05T17:00:00.032Z 2021-08-06T16:59:59.033Z date
             { sampleTest: { $elemMatch: { date: { $gte: start, $lt: end } } } },
             testLocationQuery,
+            fillDateQuery
           ],
         };
       } else {
@@ -184,24 +156,11 @@ export default {
                     }
                   }
                 },
-                // { patientId: { $regex: keyword, $options: "i" } },
-                // { englishName: { $regex: keyword, $options: "i" } },
-                // { firstName: { $regex: keyword, $options: "i" } },
-                // { lastName: { $regex: keyword, $options: "i" } },
-                // { village: { $regex: keyword, $options: "i" } },
-                // { commune: { $regex: keyword, $options: "i" } },
-                // { disctrict: { $regex: keyword, $options: "i" } },
-                // { province: { $regex: keyword, $options: "i" } },
-                // { patientId: { $regex: keyword, $options: "i" } },
-                // { idCard: { $regex: keyword, $options: "i" } },
-                // { tel: { $regex: keyword, $options: "i" } },
+
               ],
             },
             testLocationQuery,
-            // { "currentState.confirm": false },
-            // { "sampleTest": { $ne: []} },
-            // { "sampleTest.date": { $gte: startDate, $lt: endDate } },
-            // { sampleTest: { $elemMatch: {  } }
+            fillDateQuery
           ],
         };
       }
@@ -619,11 +578,11 @@ export default {
       // ស្វែងរកតាមរយះថ្ងៃទីបង្កើត
       if(createStartDate !== null ||  createEndDate !== null)  createDateAt = {"createdAt":{$gte:new Date(new Date(createStartDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(createEndDate).setUTCHours(23,59,59,59))}};
       // ្វែងរកតាមរយះថ្ងៃទីឆ្លង
-      if(confirmStartDate !==null && confirmEndDate !==null) confirmDate = {"currentState.confirmedAt":{$gte:confirmStartDate,$lt:confirmEndDate}};
+      if(confirmStartDate !==null && confirmEndDate !==null) confirmDate ={"currentState.confirmedAt":{$gte:new Date(new Date(confirmStartDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(confirmEndDate).setUTCHours(23,59,59,59))}}; 
       // ្វែងរកតាមរយះថ្ងៃទីស្លាប់
-      if( deathStartDate !==null || deathEndDate!==null) deathDate ={"currentState.recoveredAt":{$gte:deathStartDate,$lt:deathEndDate}}; 
+      if( deathStartDate !==null || deathEndDate!==null) deathDate ={"currentState.recoveredAt":{$gte:new Date(new Date(deathStartDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(deathEndDate).setUTCHours(23,59,59,59))}};
       // ្វែងរកតាមរយះថ្ងៃទីជា
-      if(recoveredStartDate !==null || recoveredEndDate!==null)  recoveredDate ={"currentState.deathAt":{$gte:recoveredStartDate,$lt:recoveredEndDate}};
+      if(recoveredStartDate !==null || recoveredEndDate!==null)  recoveredDate ={"currentState.deathAt":{$gte:new Date(new Date(recoveredStartDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(recoveredEndDate).setUTCHours(23,59,59,59))}};
         // ស្វែងរកតាមរយះថ្ងៃទីការធ្វើតេស្ត
       if(sampleTestStartDate !==null || sampleTestEndDate !==null) sampleTestAtDate = {"sampleTest":{$elemMatch:{"date":{$gte:new Date(new Date(sampleTestStartDate).setUTCHours(0,0,0,0)),$lt:new Date(new Date(sampleTestEndDate).setUTCHours(23,59,59,59))}}}};
 
