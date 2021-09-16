@@ -20,7 +20,7 @@ export default gql`
       page: Int!
       limit: Int!
       keyword: String,
-      startDate: Date, endDate:Date, district:String
+      startDate: Date, endDate:Date, district:String,village:String, commune:String,recovered:Boolean,death:Boolean,isFillDate:Boolean
       ): PaginateResponse!
     getPersonalInfoWithPagination(
       page: Int!
@@ -111,6 +111,20 @@ export default gql`
 
   # //update left 
   }
+
+  extend type Subscription {
+    userActionWithPersonalInfo: Actions
+    # newOrder: Order!
+    # orderStateChange(orderId:ID!):NotiticationResponse!
+    # updateOrderonTheway(orderId:ID!): Order!
+}
+
+type Actions {
+  username:String,
+  userAction:String,
+  date:Date,
+  type:String,
+}
 
   type SampleTestLocation{
     _id:String

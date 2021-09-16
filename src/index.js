@@ -41,16 +41,17 @@ const server = new ApolloServer({
   schemaDirectives,
   uploads: true,
   context: ({ req }) => {
-    const isAuth = req.isAuth
-    const user = req.user
-    const roles = req.role
+    // const isAuth = req.isAuth
+    // const user = req.user
+    // const roles = req.role
     // console.log(roles,"sgsg")
-    return { req,roles,isAuth,user, pubsub, ...AppModels };
+    // console.log(isAuth)
+    return { req,pubsub, ...AppModels };
   },
   subscriptions: {
     path: "/graphql",
     onConnect: async (connectionParams, webSocket, context) => {
-      console.log("connection");
+      console.log("connected");
     },
     onDisconnect: async () => {
       console.log("disc");
@@ -68,7 +69,7 @@ const startApp = async () => {
       cors: true,
     });   
 
-//     var env = process.env.NODE_ENV || 'development';
+// var env = process.env.NODE_ENV || 'development';
 // loadConfigFile(env + '.json', doStuff);
 
     const httpServer = http.createServer(app);

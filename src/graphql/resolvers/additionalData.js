@@ -11,26 +11,6 @@ const AffectedLocationLabels = {
     totalPages: "totalPages",
   };
 
-  
-
-//   district: String,
-//   positive:Number,
-//   positiveWomen:Number,
-
-//   hospitalizing:Number,
-//   hospitalizingWomen:Number,
-
-//   death:Number,
-//   deathWomen:Number,
-
-//   recover:Number,
-//   recoverWomen:Number,
-
-//   sampleTest:Number,
-//   sampleTestWomen:Number,
-
-//   affected:Number,
-//   affectedWomen:Number,
 
 export default {
     Query:{

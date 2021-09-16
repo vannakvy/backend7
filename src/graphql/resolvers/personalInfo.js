@@ -3,6 +3,9 @@ import crypto from 'crypto'
 import aws from 'aws-sdk'
 import { promisify } from "util"
 import mongoose from 'mongoose'
+import { PubSub, withFilter } from "graphql-subscriptions";
+const pubsub = new PubSub();
+
 const randomBytes = promisify(crypto.randomBytes)
 import {
   config
@@ -40,15 +43,21 @@ export default {
  
     //For Doctor
 
-    
-
     //@Desc Get location of the sample test
     //@Access Auth
-    getSampleTestLocation: async (_, {}, { PersonalInfo }) => {
+    getSampleTestLocation: async (_, {}, { PersonalInfo,pubsub,req  }) => {
       let locationName = await PersonalInfo.aggregate([
         { $unwind: "$sampleTest" },
         { $group: { _id: "$sampleTest.testLocation" } },
       ]);
+      pubsub.publish("USER_ACTION", {
+        userActionWithPersonalInfo: {
+          username:req.user.username,
+          userAction:"get the sample test",
+          date:new Date(),
+          type:"READ",
+        },
+      });
       return locationName;
     },
 
@@ -418,22 +427,39 @@ export default {
     // @Access Auth
     getConfirmedPersonalInfoByInterviewWithPagination: async (
       _,
-      { page, limit, keyword = "", interview, startDate, endDate, district},
+      { page, limit, keyword = "", interview, startDate, endDate, district,village, commune,recovered,death,isFillDate},
       { PersonalInfo }
     ) => {
 
       let dateQuery = {}
       if(startDate !== null && endDate !== null && startDate !== undefined && endDate !== undefined){
-        // console.log(startDate, endDate, district)
         var today = new Date(new Date(startDate).setUTCHours(0,0,0,0));
         var tomorrow= new Date(new Date(endDate).setUTCHours(23,59,59,59));
-        dateQuery = { "currentState.confirmedAt": { $gte: today, $lt: tomorrow } }
+          if(isFillDate){
+            dateQuery = { "currentState.confirmFormFilled": { $gte: today, $lt: tomorrow } }
+          }else{
+            dateQuery = { "currentState.confirmedAt": { $gte: today, $lt: tomorrow } }
+          }
       }
 
-      let districtQuery = {}
-      if(district !== ""){
-   
+
+      let districtQuery = {};
+      let villageQuery = {};
+      let communeQuery = {};
+      let interviewQuery ={};
+      if(district){
         districtQuery={ district: district}
+      }
+
+      if(village){
+        villageQuery = {village:village}
+      }
+      if(commune){
+        communeQuery = {commune:commune}
+      }
+
+      if(interview !==null){
+       interviewQuery = { interviewed: interview };
       }
       const options = {
         page: page || 1,
@@ -460,11 +486,13 @@ export default {
             ],
           },
           { "currentState.confirm": true },
-          { "currentState.recovered": false },
-          { "currentState.death": false },
-          { interviewed: interview },
+          { "currentState.recovered": recovered },
+          { "currentState.death": death },
+         interviewQuery,
           districtQuery,
           dateQuery,
+          villageQuery,
+          communeQuery
         ],
       };
       const personalInfos = await PersonalInfo.paginate(query, options);
@@ -484,10 +512,8 @@ export default {
     //@Access auth
     allPersonalInfosForThatNegative: async (_, {}, { PersonalInfo }) => {
       const personalInfos = await PersonalInfo.find({"currentState.confirm":false})
-     
       return personalInfos;
     },
-
 
     getPersonalInfoWithPaginations: async (
       _,
@@ -551,8 +577,6 @@ export default {
       let covidCon = {}
 
 
-
-
     con = {"currentState.confirm":confirm};
     rec = {"currentState.recovered":recovered};
     dea = {"currentState.death": death};
@@ -597,31 +621,7 @@ export default {
       
       //
 
-console.log(
-  covidType,
-  village,
-  commune,
-  district,
-  province,
-  firstName,
-  lastName,
-  confirm,
-  death, 
-  recovered,
-  createdthisBy,
-  updatedthisBy,
-  createdSampleTestBy,
-  createdSampleTestupdatedBy,
-  createStartDate,
-  createEndDate,
-  confirmStartDate,
-  confirmEndDate,
-  recoveredStartDate,
-  recoveredEndDate,
-  deathStartDate,
-  deathEndDate,
-  sampleTestStartDate,  
-  sampleTestEndDate)
+
       let query = {
         $and: [
           con,
@@ -799,6 +799,50 @@ console.log(
     },
   },
 
+  Subscription: {
+    userActionWithPersonalInfo: {
+      subscribe: (_, __, { pubsub }) => pubsub.asyncIterator("USER_ACTION"),
+    },
+
+    // updateOrderonTheway: {
+    //   //  subscribe: (_, userId, { pubsub }) => pubsub.asyncIterator(UPDATE_ORDER_CONFIRM,{userId:userId}),
+    //   subscribe: withFilter(
+    //     (_, orderId, { pubsub, Order }) => {
+       
+    //       // if (!user) throw new AuthenticationError('Unauthenticated')
+    //       return pubsub.asyncIterator(UPDATE_ORDER_CONFIRM);
+    //     },
+
+    //     //comparing the order id from the subscription with the the order id being updated from the admin page 
+    //     async({ updateOrderonTheway }, {orderId}, { Order }) => {
+    //       // const orderExist = await Order.findById(orderId);
+    //       // console.log(updateOrderonTheway._id, orderId)
+    //       let id = updateOrderonTheway._id.toString()
+    //       if (id === orderId) {
+    //         return true;
+    //       }
+    //       return false;
+    //     }
+    //   ),
+    // },
+    // orderStateChange: {
+    //   //  subscribe: (_, userId, { pubsub }) => pubsub.asyncIterator(UPDATE_ORDER_CONFIRM,{userId:userId}),
+    //   subscribe: withFilter(
+    //     (_, orderId, { pubsub, Order }) => {
+    //       // if (!user) throw new AuthenticationError('Unauthenticated')
+    //       return pubsub.asyncIterator(ORDER_STATE_CHANGE);
+    //     },
+    //     async({ orderStateChange }, {orderId}, { Order }) => {
+    //       let id = orderStateChange.id
+    //       if (id === orderId) {
+    //         return true;
+    //       }
+    //       return false;
+    //     }
+    //   ),
+    // },
+  },
+
   Mutation: {
     // @Desc upload image url 
 
@@ -959,11 +1003,11 @@ console.log(
     updateSampleTest: async (
       _,
       { personalInfoId, sampleTestId, sampleTest },
-      { PersonalInfo,user }
+      { PersonalInfo,req }
     ) => {
    
       try {
-       if(!user){
+       if(!req.user){
          return {
            success: false,
            message:"មិនអាចបានកែបានទេ"
@@ -993,7 +1037,7 @@ console.log(
                 sampleTest.labFormCompletedByTel,
               "sampleTest.$.formFillerTel": sampleTest.formFillerTel,
               "sampleTest.$.nextSampleTestDate": sampleTest.nextSampleTestDate,
-              "sampleTest.$.updatedBy": user.id,
+              "sampleTest.$.updatedBy": req.user.id,
               
             },
           }
@@ -1421,16 +1465,16 @@ console.log(
     recordSampleTest: async (
       _,
       { sampleTest, personalInfoId },
-      { PersonalInfo,user }
+      { PersonalInfo,req }
     ) => {
       try {
-        if(!user){
+        if(!req.user){
           return {
             success: false, 
             message: "សូមមេត្តា lOGIN ម្តងទៀត រឺ​ refresh "
           }
         }
-        let newSampleTest = {...sampleTest,createdBy:user.id};
+        let newSampleTest = {...sampleTest,createdBy:req.user.id};
         const updatedData = await PersonalInfo.findByIdAndUpdate(
           personalInfoId,
           { $push: { sampleTest: newSampleTest } }
@@ -1518,10 +1562,11 @@ console.log(
     deleteSampleTest: async (
       _,
       { personalInfoId, sampleTestId },
-      { PersonalInfo,user }
+
+      { PersonalInfo,req }
     ) => {
       try {
-        if(!user){
+        if(!req.user){
           return {
             success: false,
             message: "មិនអាចលុបបានទេ"
@@ -1576,10 +1621,10 @@ console.log(
 
     //@Desc create new Personal Info
     //@access auth
-    createPersonalInfo: async (_, { newInfo }, { PersonalInfo,user }) => {
+    createPersonalInfo: async (_, { newInfo }, { PersonalInfo,req }) => {
       
       try {
-        if(!user){
+        if(!req.user){
           return {
             response: {
               message: "សូមមេត្តា refresh រឺ login ជាថ្មី",
@@ -1588,7 +1633,7 @@ console.log(
             personalInfo: {},
           };
         }
-        let newPersonalInfo = {...newInfo,createdBy: user.id}
+        let newPersonalInfo = {...newInfo,createdBy: req.user.id}
         if(newInfo.patientId){
           let patientIdExist = await PersonalInfo.findOne({patientId:newInfo.patientId});
           if (patientIdExist) {
@@ -1649,17 +1694,16 @@ console.log(
     //@Desc delete the personal info
     //@access admin
 
-    deletePersonalInfo: async (_, { id }, { PersonalInfo,user }) => {
+    deletePersonalInfo: async (_, { id }, { PersonalInfo,req }) => {
       try {
 
-        if(!user){
+        if(!req.user){
           return {
             success: false,
             message:"មិនអាចលុបបានទេ"
           }
         }
 
-        
         const deletedInfo = await PersonalInfo.findByIdAndDelete(id);
 
         if (!deletedInfo) {
@@ -1683,10 +1727,10 @@ console.log(
     //@Desc update the personal info
     //@access auth
 
-    updatePersonalInfo: async (_, { id, updatedInfo }, { PersonalInfo,user }) => {
+    updatePersonalInfo: async (_, { id, updatedInfo }, { PersonalInfo,req }) => {
       try {
 
-        if(!user){
+        if(!req.user){
           return {
           
               message: "សូមមេត្តា refresh រឺ login ជាថ្មី",
@@ -1696,11 +1740,11 @@ console.log(
         }
         logger.info({
           level:"info",
-          message:`personalInfo updated ${user.id}`,
-          meta:user.id
+          message:`personalInfo updated ${req.user.id}`,
+          meta:req.user.id
         })
 
-        let newPersonalInfo = {...updatedInfo,updatedBy:user.id}
+        let newPersonalInfo = {...updatedInfo,updatedBy:req.user.id}
         const isUpdated = await PersonalInfo.findByIdAndUpdate(id, newPersonalInfo);
         
         if (!isUpdated) {
