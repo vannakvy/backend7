@@ -64,4 +64,5 @@ const AuthMiddleware = async (req, res, next) => {
     req.role = newRoles
     return next();
 }
+
 export default AuthMiddleware;

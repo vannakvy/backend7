@@ -2,6 +2,284 @@ import moment from "moment";
 import PersonalInfo from "../typeDefs/PersonalInfo";
 export default {
   Query: {
+
+    //auth and private
+    getDataForBarChart: async (_, { startDate, endDate,district,commune,village}, { PersonalInfo }) => {
+      console.log(startDate, endDate,district,commune,village)
+     let confirmDateStart ={ };
+      let confirmEndDateQuery ={ };
+      let recoveredDateStart ={};
+      let  recoveredEndDateQuery ={};
+      let deathDateStart ={ };
+      let deathEndDateQuery ={ };
+      var start = new Date(new Date(startDate).setUTCHours(0, 0, 0, 0));
+      var end = new Date(new Date(endDate).setUTCHours(23, 59, 59, 59));
+
+
+      if(startDate!==null && endDate !==null){
+        confirmDateStart ={ $gte: ["$currentState.confirmedAt", start] };
+        confirmEndDateQuery ={ $lt: ["$currentState.confirmedAt", end] };
+        recoveredDateStart ={ $gte: ["$currentState.recoveredAt", start] };
+        recoveredEndDateQuery ={ $lt: ["$currentState.recoveredAt", end] };
+        deathDateStart ={ $gte: ["$currentState.deathAt", start] };
+        deathEndDateQuery ={ $lt: ["$currentState.deathAt", end] };
+      }
+
+      let query = {};
+      if(district===null){
+        query = [
+          {
+            $project: {
+              district: 1,
+              confirm: {
+                $cond: [
+                  {
+                    $and: [
+                      { $eq: ["$currentState.confirm", true] },
+                      confirmDateStart,
+                      confirmEndDateQuery
+                    ],
+                  },
+                  1,
+                  0,
+                ],
+              },
+              recovered: {
+                $cond: [
+                  {
+                    $and: [
+                      
+                      { $eq: ["$currentState.recovered", true] },
+                      recoveredDateStart,
+                      recoveredEndDateQuery
+               
+                    ],
+                  },
+                  1,
+                  0,
+                ],
+              },
+              death: {
+                $cond: [
+                  {
+                    $and: [
+  
+                      { $eq: ["$currentState.death", true] },
+                      deathDateStart,
+                      deathEndDateQuery
+           
+                    ],
+                  },
+                  1,
+                  0,
+                ],
+              },
+              //
+            },
+          },
+          {
+            $group: {
+              _id: "$district",
+              confirm: { $sum: "$confirm" },
+              recovered: { $sum: "$recovered" },
+              death: { $sum: "$death" },
+            },
+          },
+        ]
+      }else{
+        if(village){
+          query = [
+            {$match:{district:district}},
+            {
+              $project: {
+                village: 1,
+                confirm: {
+                  $cond: [
+                    {
+                      $and: [
+                        { $eq: ["$currentState.confirm", true] },
+                        confirmDateStart,
+                        confirmEndDateQuery
+                      ],
+                    },
+                    1,
+                    0,
+                  ],
+                },
+                recovered: {
+                  $cond: [
+                    {
+                      $and: [
+                        
+                        { $eq: ["$currentState.recovered", true] },
+                        recoveredDateStart,
+                        recoveredEndDateQuery
+                 
+                      ],
+                    },
+                    1,
+                    0,
+                  ],
+                },
+                death: {
+                  $cond: [
+                    {
+                      $and: [
+    
+                        { $eq: ["$currentState.death", true] },
+                        deathDateStart,
+                        deathEndDateQuery
+             
+                      ],
+                    },
+                    1,
+                    0,
+                  ],
+                },
+                //
+              },
+            },
+            {
+              $group: {
+                _id: "$village",
+                confirm: { $sum: "$confirm" },
+                recovered: { $sum: "$recovered" },
+                death: { $sum: "$death" },
+              },
+            },
+          ]
+        }else{
+          query = [
+            {$match:{district:district}},
+            {
+              $project: {
+                commune: 1,
+                confirm: {
+                  $cond: [
+                    {
+                      $and: [
+                        { $eq: ["$currentState.confirm", true] },
+                        confirmDateStart,
+                        confirmEndDateQuery
+                      ],
+                    },
+                    1,
+                    0,
+                  ],
+                },
+                recovered: {
+                  $cond: [
+                    {
+                      $and: [
+                        
+                        { $eq: ["$currentState.recovered", true] },
+                        recoveredDateStart,
+                        recoveredEndDateQuery
+                 
+                      ],
+                    },
+                    1,
+                    0,
+                  ],
+                },
+                death: {
+                  $cond: [
+                    {
+                      $and: [
+    
+                        { $eq: ["$currentState.death", true] },
+                        deathDateStart,
+                        deathEndDateQuery
+             
+                      ],
+                    },
+                    1,
+                    0,
+                  ],
+                },
+                //
+              },
+            },
+            {
+              $group: {
+                _id: "$commune",
+                confirm: { $sum: "$confirm" },
+                recovered: { $sum: "$recovered" },
+                death: { $sum: "$death" },
+              },
+            },
+          ]
+        }
+        
+      }
+
+
+      const data = await PersonalInfo.aggregate(query);
+      console.log(data)
+      return data;
+    },
+
+
+    // query = [
+    //   {
+    //     $project: {
+    //       district: 1,
+    //       confirm: {
+    //         $cond: [
+    //           {
+    //             $and: [
+    //               { $eq: ["$currentState.confirm", true] },
+    //               { $gte: ["$currentState.confirmedAt", start] },
+    //               { $lt: ["$currentState.confirmedAt", end] }
+    //             ],
+    //           },
+    //           1,
+    //           0,
+    //         ],
+    //       },
+    //       recovered: {
+    //         $cond: [
+    //           {
+    //             $and: [
+                  
+    //               { $eq: ["$currentState.recovered", true] },
+    //               { $gte: ["$currentState.recovered", start] },
+    //               { $lt: ["$currentState.recovered", end] }
+    //             ],
+    //           },
+    //           1,
+    //           0,
+    //         ],
+    //       },
+    //       death: {
+    //         $cond: [
+    //           {
+    //             $and: [
+
+    //               { $eq: ["$currentState.death", true] },
+    //               { $gte: ["$currentState.death", start] },
+    //               { $lt: ["$currentState.death", end] }
+    //             ],
+    //           },
+    //           1,
+    //           0,
+    //         ],
+    //       },
+    //       //
+    //     },
+    //   },
+    //   {
+    //     $group: {
+    //       _id: "$district",
+    //       confirm: { $sum: "$confirm" },
+    //       recovered: { $sum: "$recovered" },
+    //       death: { $sum: "$death" },
+
+    //     },
+    //   },
+    // ]
+
+
     //@Desc get all positive confirm and death
 
     getPeopeleConfirmRecoverAndDeath: async (
@@ -1201,14 +1479,6 @@ export default {
       }
 
 
-      // interviewTotal: interview[0].interviewTotal? interview[0].interviewTotal:0 ,
-      // totalKhmer: interview[0].totalKhmer?interview[0].totalKhmer:0,
-      // totalWomenKhmer: interview[0].totalWomenKhmer?interview[0].totalWomenKhmer:0,
-      // totalWomenKhmerToday: interview[0].totalWomenKhmerToday? interview[0].totalWomenKhmerToday:0,
-
-      // totalChina: interview[0].totalChina? interview[0].totalChina :0,
-      // totalChinaToday: interview[0].totalChinaToday? interview[0].totalChinaToday:0,
-      // totalChinaWomen: interview[0].totalChinaWomen ? interview[0].totalChinaWomen:0,
 const res = {
         interviewTotal,
         totalKhmer,

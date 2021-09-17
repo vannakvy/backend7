@@ -10,8 +10,17 @@ extend type Query {
     getDataForReport(startDate:Date,endDate:Date):[Report]
     affectedLocationReport(startDate:Date,endDate:Date):AffectedData 
     InterViewReport(startDate:Date, endDate:Date):Inter
-    getDataForGrapBottom:GraphResponse
+    getDataForGrapBottom:GraphResponse,
+    getDataForBarChart(district:String,commune:Boolean,village:Boolean,startDate:Date,endDate:Date):[graphDateBarChart]
 }
+
+type graphDateBarChart{
+    _id:String
+    confirm:Int
+    recovered:Int 
+    death:Int
+}
+
 type reportData{
     recovered:[PersonalInfo!]!
     death:[PersonalInfo!]!

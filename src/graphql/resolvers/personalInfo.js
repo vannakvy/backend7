@@ -52,7 +52,7 @@ export default {
       ]);
       pubsub.publish("USER_ACTION", {
         userActionWithPersonalInfo: {
-          username:req.user.username,
+          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
           userAction:"get the sample test",
           date:new Date(),
           type:"READ",
@@ -620,7 +620,8 @@ export default {
        if(createdSampleTestupdatedBy) sampleTestUpdatedBy = {"sampleTest":{$elemMatch:{"updatedBy": mongoose.Types.ObjectId(createdSampleTestupdatedBy)}}};
       
       //
-
+console.log(createdthisBy)
+console.log(createdBy)
 
       let query = {
         $and: [
