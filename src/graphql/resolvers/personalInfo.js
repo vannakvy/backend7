@@ -49,14 +49,7 @@ export default {
         { $unwind: "$sampleTest" },
         { $group: { _id: "$sampleTest.testLocation" } },
       ]);
-      pubsub.publish("USER_ACTION", {
-        userActionWithPersonalInfo: {
-          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
-          userAction:"get the sample test",
-          date:new Date(),
-          type:"READ",
-        },
-      });
+
       return locationName;
     },
 
@@ -172,14 +165,7 @@ export default {
         };
       }
 
-      pubsub.publish("USER_ACTION", {
-        userActionWithPersonalInfo: {
-          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
-          userAction:" getPeopleForSampleTestWithPagination ",
-          date:new Date(),
-          type:"READ",
-        },
-      });
+
 
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
@@ -302,14 +288,7 @@ export default {
         ],
       };
 
-      pubsub.publish("USER_ACTION", {
-        userActionWithPersonalInfo: {
-          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
-          userAction:" Get patient for the hospital",
-          date:new Date(),
-          type:"READ",
-        },
-      });
+
       
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
@@ -354,14 +333,6 @@ export default {
         ],
       };
 
-      pubsub.publish("USER_ACTION", {
-        userActionWithPersonalInfo: {
-          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
-          userAction:" Get people for quarantine ",
-          date:new Date(),
-          type:"READ",
-        },
-      });
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
     },
@@ -405,14 +376,14 @@ export default {
         ],
       };
 
-      pubsub.publish("USER_ACTION", {
-        userActionWithPersonalInfo: {
-          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
-          userAction:" get patients for police to interview ",
-          date:new Date(),
-          type:"READ",
-        },
-      });
+      // pubsub.publish("USER_ACTION", {
+      //   userActionWithPersonalInfo: {
+      //     username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+      //     userAction:" get patients for police to interview ",
+      //     date:new Date(),
+      //     type:"READ",
+      //   },
+      // });
 
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
@@ -456,14 +427,14 @@ export default {
           { "affectedFrom.patientCode": patientId },
         ],
       };
-      pubsub.publish("USER_ACTION", {
-        userActionWithPersonalInfo: {
-          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
-          userAction:" getAffectedPersonalListWithPagination ",
-          date:new Date(),
-          type:"READ",
-        },
-      });
+      // pubsub.publish("USER_ACTION", {
+      //   userActionWithPersonalInfo: {
+      //     username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+      //     userAction:" getAffectedPersonalListWithPagination ",
+      //     date:new Date(),
+      //     type:"READ",
+      //   },
+      // });
 
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
@@ -540,14 +511,14 @@ export default {
           communeQuery
         ],
       };
-      pubsub.publish("USER_ACTION", {
-        userActionWithPersonalInfo: {
-          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
-          userAction:"getConfirmedPersonalInfoByInterviewWithPagination ",
-          date:new Date(),
-          type:"READ",
-        },
-      });
+      // pubsub.publish("USER_ACTION", {
+      //   userActionWithPersonalInfo: {
+      //     username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+      //     userAction:"getConfirmedPersonalInfoByInterviewWithPagination ",
+      //     date:new Date(),
+      //     type:"READ",
+      //   },
+      // });
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
     },
@@ -697,14 +668,14 @@ export default {
           covidCon
         ],
       };
-      pubsub.publish("USER_ACTION", {
-        userActionWithPersonalInfo: {
-          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
-          userAction:"getPersonalInfoWithPaginations ",
-          date:new Date(),
-          type:"READ",
-        },
-      });
+      // pubsub.publish("USER_ACTION", {
+      //   userActionWithPersonalInfo: {
+      //     username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+      //     userAction:"getPersonalInfoWithPaginations ",
+      //     date:new Date(),
+      //     type:"READ",
+      //   },
+      // });
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
     },
@@ -804,14 +775,15 @@ export default {
           // {'currentState.confirmedAt': {$gte: '2021-08-13T00:00:00+07:00',$lt: '2021-08-14T00:00:00+07:00'}}
         ],
       };
-      pubsub.publish("USER_ACTION", {
-        userActionWithPersonalInfo: {
-          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
-          userAction:"getPersonalInfoWithPagination ",
-          date:new Date(),
-          type:"READ",
-        },
-      });
+      // pubsub.publish("USER_ACTION", {
+      //   userActionWithPersonalInfo: {
+      //     username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+      //     userAction:"getPersonalInfoWithPagination ",
+      //     date:new Date(),
+      //     type:"READ",
+      //   },
+      // });
+
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
     },
@@ -853,14 +825,14 @@ export default {
         ],
       };
 
-      pubsub.publish("USER_ACTION", {
-        userActionWithPersonalInfo: {
-          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
-          userAction:"getPersonalInfoByCaseWithPagination ",
-          date:new Date(),
-          type:"READ",
-        },
-      });
+      // pubsub.publish("USER_ACTION", {
+      //   userActionWithPersonalInfo: {
+      //     username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+      //     userAction:"getPersonalInfoByCaseWithPagination ",
+      //     date:new Date(),
+      //     type:"READ",
+      //   },
+      // });
 
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
@@ -871,14 +843,14 @@ export default {
 
     getPersonalInfoById: async (_, { id }, { PersonalInfo,pubsub,req }) => {
       const persoanalInfo = await PersonalInfo.findOne({ _id: id });
-      pubsub.publish("USER_ACTION", {
-        userActionWithPersonalInfo: {
-          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
-          userAction:"getPersonalInfoByCaseWithPagination ",
-          date:new Date(),
-          type:"READ",
-        },
-      });
+      // pubsub.publish("USER_ACTION", {
+      //   userActionWithPersonalInfo: {
+      //     username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+      //     userAction:"getPersonalInfoByCaseWithPagination ",
+      //     date:new Date(),
+      //     type:"READ",
+      //   },
+      // });
 
       return persoanalInfo;
     },
@@ -956,7 +928,7 @@ export default {
 
   pubsub.publish("USER_ACTION", {
     userActionWithPersonalInfo: {
-      username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+      username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
       userAction:"បញ្ចូលរូបភាព",
       date:new Date(),
       type:"CREATE",
@@ -991,7 +963,7 @@ export default {
 
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"កែប្រែអ្នកប្រវត្តដំណើរក្នុងពេល ១៤ ថ្ងៃ",
             date:new Date(),
             type:"UPDATE",
@@ -1028,7 +1000,7 @@ export default {
         }
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"បញ្ចូលការចាក់វ៉ាក់សាំង",
             date:new Date(),
             type:"CREATE",
@@ -1065,7 +1037,7 @@ export default {
         );
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"លុបអ្នកជំងឺចេញ់ពីមន្ទីពេទ្យ",
             date:new Date(),
             type:"DELETE",
@@ -1104,7 +1076,7 @@ export default {
 
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"លុបអ្នកពាក់ពន្ធចេញ់ពីមណ្ឌលចត្តឡីស័ក ",
             date:new Date(),
             type:"DELETE",
@@ -1169,7 +1141,7 @@ export default {
         );
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"កែប្រែការយកសំណាក ",
             date:new Date(),
             type:"UPDATE",
@@ -1247,7 +1219,7 @@ export default {
 
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"បញ្ចូលអ្នកជំងឺចូលក្នងមទ្ទីរពេទ្យ",
             date:new Date(),
             type:"CREATE",
@@ -1343,7 +1315,7 @@ export default {
 
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"កែប្រែការបញ្ចូលអ្នកពាក់ព័ន្ធ",
             date:new Date(),
             type:"UPDATE",
@@ -1395,7 +1367,7 @@ export default {
 
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"កែប្រែការបញ្ចូលអ្នកជំងឺ",
             date:new Date(),
             type:"UPDATE",
@@ -1460,7 +1432,7 @@ export default {
         );
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"បញ្ចូលអ្នកពាក់ព័ន្ធទៅក្នុងមណ្ឌលចត្តឡីស័ក",
             date:new Date(),
             type:"CREATE",
@@ -1507,7 +1479,7 @@ export default {
         );
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"បញ្ចូលប្រវត្តដំណើរក្នុងរយះពេល ១៤​ថ្ងៃ",
             date:new Date(),
             type:"WRITE",
@@ -1551,7 +1523,7 @@ export default {
 
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"កែប្រែប្រវត្តដំណើរ ក្រៅប្រទេសក្នុងរយះពេល ១៤​ថ្ងៃ",
             date:new Date(),
             type:"UPDATE",
@@ -1595,7 +1567,7 @@ export default {
         }
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"កែប្រែស្ថានភាពបចប្បន្នរបស់អ្នកជំងឺ",
             date:new Date(),
             type:"UPDATE",
@@ -1639,7 +1611,7 @@ export default {
         }
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"កែប្រែអ្នកពាក់ព័ន្ធ",
             date:new Date(),
             type:"UPDATE",
@@ -1685,7 +1657,7 @@ export default {
 
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"បញ្ចូលការយកសំណាក",
             date:new Date(),
             type:"WRITE",
@@ -1721,7 +1693,7 @@ export default {
         );
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"លុបប្រវត្តដំណើរក្នុង ១៤ថ្ងៃ",
             date:new Date(),
             type:"DELETE",
@@ -1793,7 +1765,7 @@ export default {
         );
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"លុបការយកសំណាក",
             date:new Date(),
             type:"DELETE",
@@ -1827,7 +1799,7 @@ export default {
         );
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"លុបការចាក់វ៉ាក់សាំង",
             date:new Date(),
             type:"DELETE",
@@ -1902,7 +1874,7 @@ export default {
         }
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"បង្កើតប្រជាជនថ្មី",
             date:new Date(),
             type:"CREATE",
@@ -1949,7 +1921,7 @@ export default {
         }
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"លុបប្រជាជន",
             date:new Date(),
             type:"DELETE",
@@ -1998,7 +1970,7 @@ export default {
         }
         pubsub.publish("USER_ACTION", {
           userActionWithPersonalInfo: {
-            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            username:"ឈ្មោះ​៖ "+ req.user.lastName +" "+req.user.firstName,
             userAction:"កែប្រែប្រជាជន",
             date:new Date(),
             type:"UPDATE",
