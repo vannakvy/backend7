@@ -42,7 +42,6 @@ export default {
 
  
     //For Doctor
-
     //@Desc Get location of the sample test
     //@Access Auth
     getSampleTestLocation: async (_, {}, { PersonalInfo,pubsub,req  }) => {
@@ -86,10 +85,9 @@ export default {
     getPeopleForSampleTestWithPagination: async (
       _,
       { page, limit, keyword, startDate, endDate, testLocation,fillStartDate,fillEndDate },
-      { PersonalInfo, roles }
+      { PersonalInfo,pubsub,req}
     ) => {
   
-
 
       const options = {
         page: page || 1,
@@ -174,6 +172,15 @@ export default {
         };
       }
 
+      pubsub.publish("USER_ACTION", {
+        userActionWithPersonalInfo: {
+          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+          userAction:" getPeopleForSampleTestWithPagination ",
+          date:new Date(),
+          type:"READ",
+        },
+      });
+
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
     },
@@ -184,7 +191,7 @@ export default {
     getPatientForHospitalWithPagination: async (
       _,
       { page, limit, keyword = "", startDate, endDate, hospitalId,patientType,numberOfSampleTest,nextTest },
-      { PersonalInfo }
+      { PersonalInfo,req, pubsub }
     ) => {
       const options = {
         page: page || 1,
@@ -294,6 +301,16 @@ export default {
           bySampletTestNext
         ],
       };
+
+      pubsub.publish("USER_ACTION", {
+        userActionWithPersonalInfo: {
+          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+          userAction:" Get patient for the hospital",
+          date:new Date(),
+          type:"READ",
+        },
+      });
+      
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
     },
@@ -305,7 +322,7 @@ export default {
     getPeopleForQuarantineWithPagination: async (
       _,
       { quarantineInfoId, limit, page, keyword },
-      { PersonalInfo }
+      { PersonalInfo,req,pubsub }
     ) => {
       const options = {
         page: page || 1,
@@ -336,6 +353,15 @@ export default {
         
         ],
       };
+
+      pubsub.publish("USER_ACTION", {
+        userActionWithPersonalInfo: {
+          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+          userAction:" Get people for quarantine ",
+          date:new Date(),
+          type:"READ",
+        },
+      });
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
     },
@@ -345,8 +371,8 @@ export default {
 
     getPatientForInterviewWithPagination: async (
       _,
-      { page, limit, keyword = "",disctrict, interview, startDate, endDate },
-      { PersonalInfo }
+      { page, limit, keyword = "", interview, startDate, endDate },
+      { PersonalInfo,req,pubsub }
     ) => {
 
       const options = {
@@ -378,6 +404,16 @@ export default {
           // { "currentState.confirmedAt": { $gte: today, $lt: tomorrow } },
         ],
       };
+
+      pubsub.publish("USER_ACTION", {
+        userActionWithPersonalInfo: {
+          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+          userAction:" get patients for police to interview ",
+          date:new Date(),
+          type:"READ",
+        },
+      });
+
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
     },
@@ -389,7 +425,7 @@ export default {
     getAffectedPersonalListWithPagination: async (
       _,
       { page, limit, keyword = "", patientId },
-      { PersonalInfo }
+      { PersonalInfo,pubsub,req }
     ) => {
       const options = {
         page: page || 1,
@@ -420,6 +456,15 @@ export default {
           { "affectedFrom.patientCode": patientId },
         ],
       };
+      pubsub.publish("USER_ACTION", {
+        userActionWithPersonalInfo: {
+          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+          userAction:" getAffectedPersonalListWithPagination ",
+          date:new Date(),
+          type:"READ",
+        },
+      });
+
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
     },
@@ -428,7 +473,7 @@ export default {
     getConfirmedPersonalInfoByInterviewWithPagination: async (
       _,
       { page, limit, keyword = "", interview, startDate, endDate, district,village, commune,recovered,death,isFillDate},
-      { PersonalInfo }
+      { PersonalInfo,req,pubsub }
     ) => {
 
       let dateQuery = {}
@@ -495,6 +540,14 @@ export default {
           communeQuery
         ],
       };
+      pubsub.publish("USER_ACTION", {
+        userActionWithPersonalInfo: {
+          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+          userAction:"getConfirmedPersonalInfoByInterviewWithPagination ",
+          date:new Date(),
+          type:"READ",
+        },
+      });
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
     },
@@ -544,7 +597,7 @@ export default {
           sampleTestStartDate,  
           sampleTestEndDate
        },
-      { PersonalInfo }
+      { PersonalInfo,req,pubsub }
     ) => {
       const options = {
         page: page || 1,
@@ -620,8 +673,6 @@ export default {
        if(createdSampleTestupdatedBy) sampleTestUpdatedBy = {"sampleTest":{$elemMatch:{"updatedBy": mongoose.Types.ObjectId(createdSampleTestupdatedBy)}}};
       
       //
-console.log(createdthisBy)
-console.log(createdBy)
 
       let query = {
         $and: [
@@ -646,6 +697,14 @@ console.log(createdBy)
           covidCon
         ],
       };
+      pubsub.publish("USER_ACTION", {
+        userActionWithPersonalInfo: {
+          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+          userAction:"getPersonalInfoWithPaginations ",
+          date:new Date(),
+          type:"READ",
+        },
+      });
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
     },
@@ -657,7 +716,7 @@ console.log(createdBy)
     getPersonalInfoWithPagination: async (
       _,
       { page, limit, keyword, currentState, startDate,endDate,covidType="" },
-      { PersonalInfo }
+      { PersonalInfo,req,pubsub }
     ) => {
       const options = {
         page: page || 1,
@@ -745,8 +804,15 @@ console.log(createdBy)
           // {'currentState.confirmedAt': {$gte: '2021-08-13T00:00:00+07:00',$lt: '2021-08-14T00:00:00+07:00'}}
         ],
       };
+      pubsub.publish("USER_ACTION", {
+        userActionWithPersonalInfo: {
+          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+          userAction:"getPersonalInfoWithPagination ",
+          date:new Date(),
+          type:"READ",
+        },
+      });
       const personalInfos = await PersonalInfo.paginate(query, options);
-
       return personalInfos;
     },
 
@@ -756,7 +822,7 @@ console.log(createdBy)
     getPersonalInfoByCaseWithPagination: async (
       _,
       { page, limit, keyword, caseId },
-      { PersonalInfo }
+      { PersonalInfo,req,pubsub }
     ) => {
       const options = {
         page: page || 1,
@@ -787,6 +853,15 @@ console.log(createdBy)
         ],
       };
 
+      pubsub.publish("USER_ACTION", {
+        userActionWithPersonalInfo: {
+          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+          userAction:"getPersonalInfoByCaseWithPagination ",
+          date:new Date(),
+          type:"READ",
+        },
+      });
+
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
     },
@@ -794,8 +869,17 @@ console.log(createdBy)
     //@Desc getting the personalInfo by id
     //@access auth
 
-    getPersonalInfoById: async (_, { id }, { PersonalInfo }) => {
+    getPersonalInfoById: async (_, { id }, { PersonalInfo,pubsub,req }) => {
       const persoanalInfo = await PersonalInfo.findOne({ _id: id });
+      pubsub.publish("USER_ACTION", {
+        userActionWithPersonalInfo: {
+          username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+          userAction:"getPersonalInfoByCaseWithPagination ",
+          date:new Date(),
+          type:"READ",
+        },
+      });
+
       return persoanalInfo;
     },
   },
@@ -847,8 +931,7 @@ console.log(createdBy)
   Mutation: {
     // @Desc upload image url 
 
-    uploadImageUrl:async(_,{},{})=>{
-
+    uploadImageUrl:async(_,{},{req,pubsub})=>{
       const region = process.env.REGION
       const bucketName = process.env.BUCKET_NAME
       const accessKeyId = process.env.AWS_ACCESS_KEY_ID
@@ -871,6 +954,15 @@ console.log(createdBy)
     Expires: 60
   })
 
+  pubsub.publish("USER_ACTION", {
+    userActionWithPersonalInfo: {
+      username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+      userAction:"បញ្ចូលរូបភាព",
+      date:new Date(),
+      type:"CREATE",
+    },
+  });
+
   const uploadURL = await s3.getSignedUrlPromise('putObject', params)
   return uploadURL
 
@@ -878,9 +970,8 @@ console.log(createdBy)
 
     //@Desc update the the historywithin14 days 
     //@access polic 
-    updateHistoryWithin14days:async(_,{personalInfoId,historyWithin14Id,updateInfo},{PersonalInfo})=>{
+    updateHistoryWithin14days:async(_,{personalInfoId,historyWithin14Id,updateInfo},{PersonalInfo,req,pubsub})=>{
       try {
-      
         await PersonalInfo.findOneAndUpdate(
           { _id: personalInfoId, "historyWithin14days._id": historyWithin14Id },
           {
@@ -898,7 +989,14 @@ console.log(createdBy)
           }
         );
 
-
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"កែប្រែអ្នកប្រវត្តដំណើរក្នុងពេល ១៤ ថ្ងៃ",
+            date:new Date(),
+            type:"UPDATE",
+          },
+        });
         return {
           success: true,
           message: "កែរប្រែបានជោគជ័យ",
@@ -915,7 +1013,7 @@ console.log(createdBy)
     addVaccination: async (
       _,
       { vaccination, personalInfoId },
-      { PersonalInfo }
+      { PersonalInfo,pubsub,req }
     ) => {
       try {
         const updatedData = await PersonalInfo.findByIdAndUpdate(
@@ -928,11 +1026,20 @@ console.log(createdBy)
             message: "មិនទាន់មានអ្នកកំណត់ត្រានេះទេ",
           };
         }
-
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"បញ្ចូលការចាក់វ៉ាក់សាំង",
+            date:new Date(),
+            type:"CREATE",
+          },
+        });
         return {
           success: true,
           message: "ជោគជ័យ",
         };
+
+
       } catch (error) {
         return {
           success: false,
@@ -946,7 +1053,7 @@ console.log(createdBy)
     deletePatientFromHospital: async (
       _,
       { personalInfoId, hospitalId },
-      { PersonalInfo }
+      { PersonalInfo,pubsub,req }
     ) => {
       try {
   
@@ -956,6 +1063,14 @@ console.log(createdBy)
             $pull: { hospitalizations: { _id: hospitalId } },
           }
         );
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"លុបអ្នកជំងឺចេញ់ពីមន្ទីពេទ្យ",
+            date:new Date(),
+            type:"DELETE",
+          },
+        });
       
         return {
           success: true,
@@ -976,7 +1091,7 @@ console.log(createdBy)
     deletePeopleFromQuarantine: async (
       _,
       { personalInfoId, quarantingId },
-      { PersonalInfo }
+      { PersonalInfo,pubsub,req }
     ) => {
       try {
       
@@ -986,6 +1101,15 @@ console.log(createdBy)
             $pull: { quaranting: { _id: quarantingId } },
           }
         );
+
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"លុបអ្នកពាក់ពន្ធចេញ់ពីមណ្ឌលចត្តឡីស័ក ",
+            date:new Date(),
+            type:"DELETE",
+          },
+        });
 
         return {
           success: true,
@@ -1004,7 +1128,7 @@ console.log(createdBy)
     updateSampleTest: async (
       _,
       { personalInfoId, sampleTestId, sampleTest },
-      { PersonalInfo,req }
+      { PersonalInfo,req,pubsub }
     ) => {
    
       try {
@@ -1043,8 +1167,15 @@ console.log(createdBy)
             },
           }
         );
-
-
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"កែប្រែការយកសំណាក ",
+            date:new Date(),
+            type:"UPDATE",
+          },
+        });
+        
         return {
           success: true,
           message: "Update Successfully",
@@ -1075,11 +1206,9 @@ console.log(createdBy)
     addPatientToHospital: async (
       _,
       { personalInfoId, newHospitalization },
-      { PersonalInfo }
+      { PersonalInfo,req,pubsub }
     ) => {
       try {
-
-    console.log(newHospitalization,personalInfoId)
 
         let isExisted = await PersonalInfo.findById(personalInfoId);
         if (!isExisted) {
@@ -1115,6 +1244,15 @@ console.log(createdBy)
             message: "មិនទាន់មានអ្នកកំណត់ត្រានេះទេ",
           };
         }
+
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"បញ្ចូលអ្នកជំងឺចូលក្នងមទ្ទីរពេទ្យ",
+            date:new Date(),
+            type:"CREATE",
+          },
+        });
 
         return {
           message: "បញ្ចូលបានជោកជ័យ",
@@ -1179,11 +1317,9 @@ console.log(createdBy)
     updatePeopleFromQuarantine: async (
       _,
       {personalInfoId,quarantineInfoInnerId,updateInfo},
-      { PersonalInfo }
+      { PersonalInfo,req,pubsub }
     ) => {
-   
       try {
-      
    await PersonalInfo.findOneAndUpdate(
           { _id: personalInfoId, "quaranting._id": quarantineInfoInnerId },
           {
@@ -1204,6 +1340,15 @@ console.log(createdBy)
             },
           }
         )
+
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"កែប្រែការបញ្ចូលអ្នកពាក់ព័ន្ធ",
+            date:new Date(),
+            type:"UPDATE",
+          },
+        });
         return {
           success: true,
           message: "ការកែប្រែទទួលបានជោគជ័យ",
@@ -1221,7 +1366,7 @@ console.log(createdBy)
     updatePatientFromHospital: async (
       _,
       { personalInfoId,hospitalId,updateInfo},
-      { PersonalInfo }
+      { PersonalInfo,pubsub,req }
     ) => {
      
       try {
@@ -1248,6 +1393,15 @@ console.log(createdBy)
           }
         )
 
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"កែប្រែការបញ្ចូលអ្នកជំងឺ",
+            date:new Date(),
+            type:"UPDATE",
+          },
+        });
+
         return {
           success: true,
           message: "Update Successfully",
@@ -1265,7 +1419,7 @@ console.log(createdBy)
     addPeopleToQuarantine: async (
       _,
       { personalInfo, newQuarantine },
-      { PersonalInfo }
+      { PersonalInfo,pubsub,req }
     ) => {
       try {
         let isExisted = await PersonalInfo.findById(personalInfo);
@@ -1304,6 +1458,15 @@ console.log(createdBy)
             },
           }
         );
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"បញ្ចូលអ្នកពាក់ព័ន្ធទៅក្នុងមណ្ឌលចត្តឡីស័ក",
+            date:new Date(),
+            type:"CREATE",
+          },
+        });
+    
         return {
           message: "បញ្ចូលបានជោកជ័យ",
           success: true,
@@ -1321,7 +1484,7 @@ console.log(createdBy)
     addHistoryWithin14days: async (
       _,
       { createLocation, personalInfoId },
-      { PersonalInfo }
+      { PersonalInfo,req,pubsub }
     ) => {
       try {
         let isExisted = await PersonalInfo.findById(personalInfoId);
@@ -1342,6 +1505,14 @@ console.log(createdBy)
             },
           }
         );
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"បញ្ចូលប្រវត្តដំណើរក្នុងរយះពេល ១៤​ថ្ងៃ",
+            date:new Date(),
+            type:"WRITE",
+          },
+        });
         return {
           message: "បញ្ចូលបានជោកជ័យ",
           success: true,
@@ -1360,7 +1531,7 @@ console.log(createdBy)
     updateTravelOverCountryHistory: async (
       _,
       { personalInfoId, updateValue },
-      { PersonalInfo }
+      { PersonalInfo,req,pubsub }
     ) => {
       try {
         const updated = await PersonalInfo.updateOne(
@@ -1377,6 +1548,15 @@ console.log(createdBy)
             message: "មិនអាចកែប្រែបានទេ ",
           };
         }
+
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"កែប្រែប្រវត្តដំណើរ ក្រៅប្រទេសក្នុងរយះពេល ១៤​ថ្ងៃ",
+            date:new Date(),
+            type:"UPDATE",
+          },
+        });
         return {
           success: true,
           message: "កែប្រែបានជោគជ័យ",
@@ -1396,7 +1576,7 @@ console.log(createdBy)
     updateCurrentState: async (
       _,
       { personalInfoId, updateValue },
-      { PersonalInfo }
+      { PersonalInfo,req,pubsub}
     ) => {
       try {
         const updated = await PersonalInfo.updateOne(
@@ -1413,6 +1593,14 @@ console.log(createdBy)
             message: "មិនអាចកែប្រែបានទេ  ",
           };
         }
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"កែប្រែស្ថានភាពបចប្បន្នរបស់អ្នកជំងឺ",
+            date:new Date(),
+            type:"UPDATE",
+          },
+        });
         return {
           success: true,
           message: "កែប្រែបានជោគជ័យ ",
@@ -1428,10 +1616,10 @@ console.log(createdBy)
 
       //@Desc update the current State
     //@Access auth
-    updateAffectedFrom: async (
+    updateAffectedFrom: async(
       _,
       { personalInfoId, updateValue },
-      { PersonalInfo }
+      { PersonalInfo,req,pubsub }
     ) => {
       try {
         const updated = await PersonalInfo.updateOne(
@@ -1449,6 +1637,14 @@ console.log(createdBy)
             message: "Cannot this status ",
           };
         }
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"កែប្រែអ្នកពាក់ព័ន្ធ",
+            date:new Date(),
+            type:"UPDATE",
+          },
+        });
         return {
           success: true,
           message: "Updated successfully ",
@@ -1466,7 +1662,7 @@ console.log(createdBy)
     recordSampleTest: async (
       _,
       { sampleTest, personalInfoId },
-      { PersonalInfo,req }
+      { PersonalInfo,req,PubSub }
     ) => {
       try {
         if(!req.user){
@@ -1486,6 +1682,15 @@ console.log(createdBy)
             message: "មិនទាន់មានអ្នកកំណត់ត្រានេះទេ",
           };
         }
+
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"បញ្ចូលការយកសំណាក",
+            date:new Date(),
+            type:"WRITE",
+          },
+        });
     
         return {
           success: true,
@@ -1505,7 +1710,7 @@ console.log(createdBy)
     deleteHistoryWithin14days: async (
       _,
       { personalInfoId, historyWithin14Id },
-      { PersonalInfo }
+      { PersonalInfo,req,pubsub }
     ) => {
       try {
         let a = await PersonalInfo.updateOne(
@@ -1514,7 +1719,14 @@ console.log(createdBy)
             $pull: { historyWithin14days: { _id: historyWithin14Id } },
           }
         );
-
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"លុបប្រវត្តដំណើរក្នុង ១៤ថ្ងៃ",
+            date:new Date(),
+            type:"DELETE",
+          },
+        });
         return {
           success: true,
           message: "Deleted Successfully",
@@ -1564,7 +1776,7 @@ console.log(createdBy)
       _,
       { personalInfoId, sampleTestId },
 
-      { PersonalInfo,req }
+      { PersonalInfo,req ,pubsub}
     ) => {
       try {
         if(!req.user){
@@ -1579,10 +1791,17 @@ console.log(createdBy)
             $pull: { sampleTest: { _id: sampleTestId } },
           }
         );
-
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"លុបការយកសំណាក",
+            date:new Date(),
+            type:"DELETE",
+          },
+        });
         return {
           success: true,
-          message: "មិនអាច លុបបានទេ",
+          message: "លុបបានជោគជ័យ",
         };
       } catch (error) {
         return {
@@ -1597,7 +1816,7 @@ console.log(createdBy)
     deleteVaccination: async (
       _,
       { personalInfoId, vaccinationId },
-      { PersonalInfo }
+      { PersonalInfo,req,pubsub }
     ) => {
       try {
         let a = await PersonalInfo.updateOne(
@@ -1606,7 +1825,14 @@ console.log(createdBy)
             $pull: { vaccination: { _id: vaccinationId } },
           }
         );
-
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"លុបការចាក់វ៉ាក់សាំង",
+            date:new Date(),
+            type:"DELETE",
+          },
+        });
         return {
           success: true,
           message: "មិនអាច លុបបានទេ",
@@ -1622,7 +1848,7 @@ console.log(createdBy)
 
     //@Desc create new Personal Info
     //@access auth
-    createPersonalInfo: async (_, { newInfo }, { PersonalInfo,req }) => {
+    createPersonalInfo: async (_, { newInfo }, { PersonalInfo,req,pubsub }) => {
       
       try {
         if(!req.user){
@@ -1674,6 +1900,14 @@ console.log(createdBy)
             personalInfo: {},
           };
         }
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"បង្កើតប្រជាជនថ្មី",
+            date:new Date(),
+            type:"CREATE",
+          },
+        });
         return {
           response: {
             message: "success",
@@ -1695,7 +1929,7 @@ console.log(createdBy)
     //@Desc delete the personal info
     //@access admin
 
-    deletePersonalInfo: async (_, { id }, { PersonalInfo,req }) => {
+    deletePersonalInfo: async (_, { id }, { PersonalInfo,req,PubSub }) => {
       try {
 
         if(!req.user){
@@ -1713,6 +1947,14 @@ console.log(createdBy)
             message: "cannot delete this record",
           };
         }
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"លុបប្រជាជន",
+            date:new Date(),
+            type:"DELETE",
+          },
+        });
         return {
           success: true,
           message: "Personal Info deleted successfully",
@@ -1728,7 +1970,7 @@ console.log(createdBy)
     //@Desc update the personal info
     //@access auth
 
-    updatePersonalInfo: async (_, { id, updatedInfo }, { PersonalInfo,req }) => {
+    updatePersonalInfo: async (_, { id, updatedInfo }, { PersonalInfo,req,pubsub }) => {
       try {
 
         if(!req.user){
@@ -1754,6 +1996,14 @@ console.log(createdBy)
             message: "Personal Info updated not successfully",
           };
         }
+        pubsub.publish("USER_ACTION", {
+          userActionWithPersonalInfo: {
+            username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
+            userAction:"កែប្រែប្រជាជន",
+            date:new Date(),
+            type:"UPDATE",
+          },
+        });
         return {
           success: true,
           message: "Cannot update this record please contact the admin",

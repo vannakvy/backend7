@@ -5,7 +5,6 @@ export default {
 
     //auth and private
     getDataForBarChart: async (_, { startDate, endDate,district,commune,village}, { PersonalInfo }) => {
-      console.log(startDate, endDate,district,commune,village)
      let confirmDateStart ={ };
       let confirmEndDateQuery ={ };
       let recoveredDateStart ={};
@@ -215,7 +214,6 @@ export default {
 
 
       const data = await PersonalInfo.aggregate(query);
-      console.log(data)
       return data;
     },
 
