@@ -10,12 +10,13 @@ export const {
     DB,
     PORT,
     PROD,
-    SECRET,
-    IN_PROD = PROD === 'prod',
+    SECRET_ACCESS_KEY,
+    SECRET_REFRESH_TIME,
+    SECRET_REFRESH_KEY,
+    SECRET_ACCESS_TIME,
+    IN_PROD = PROD === 'dev',
     BASE_URL = `http://localhost:${PORT}`,
 } = parsed;
-
-
 
 
 

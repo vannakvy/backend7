@@ -1,6 +1,9 @@
 import {gql} from 'apollo-server-express'
 export default gql`
 extend type Query {
+    getGraphByage(startDate:Date, endDate:Date): [reData!]!
+    getGraphByday(startDate:Date,endDate:Date,district:String):GraphByDay
+
     getPeopeleConfirmRecoverAndDeath(startDate:Date, endDate:Date):reportData 
     getAllAllSampleTest:Test
     getAllProvince(district:String): AllProvince!
@@ -12,6 +15,29 @@ extend type Query {
     InterViewReport(startDate:Date, endDate:Date):Inter
     getDataForGrapBottom:GraphResponse,
     getDataForBarChart(district:String,commune:Boolean,village:Boolean,startDate:Date,endDate:Date):[graphDateBarChart]
+}
+type GraphByDay {
+confirm:[con]
+recovered:[recv]
+death:[dea]
+}
+
+type con{
+    _id:String,
+    confirm:Int
+    
+}
+type recv{
+    _id:String,
+    recovered:Int
+ 
+    
+}
+type dea{
+    _id:String,
+    death:Int
+
+    
 }
 
 type graphDateBarChart{
@@ -30,6 +56,12 @@ type Test{
 today:Int 
 all:Int
 }
+type reData{
+  label:String,
+  confirm:Int
+  death:Int 
+  recovered:Int
+  }
 type Inter{
    interviewTotal: Int,
    totalKhmer: Int,

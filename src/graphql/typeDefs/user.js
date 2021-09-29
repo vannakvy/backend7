@@ -22,12 +22,14 @@ export default gql`
         updateAccount(userId:ID!,password:String!,username:String!):userResponse! @isAuth(requires:ADMIN) 
         updateUserDetail(userId:ID!,tel:String!,firstName:String!,lastName:String!,email:String!):userResponse! @isAuth(requires:ADMIN) 
         updateProfileImage(userId:ID!,image:String!):userResponse!
+        refreshToken(refreshToken:String):String,
+        logoutUser:userResponse!
     }
 
     type Loggineduser{
-        token:String,
+        token:String
+        refreshToken:String
          user:User
-
     }
     input UserInput {
         email:String!

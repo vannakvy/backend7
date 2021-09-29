@@ -2,7 +2,11 @@ import { hash, compare } from "bcryptjs";
 
 import { ApolloError } from "apollo-server-express";
 
-import { serializeUser, issueAuthToken } from "../../helpers/Userfunctions";
+import {
+  serializeUser,
+  issueAuthToken,
+  issueAuthRefreshToken,
+} from "../../helpers/Userfunctions";
 
 import {
   UserRegisterationRules,
@@ -40,7 +44,7 @@ export default {
       // throw new ApolloError("Username not found", "404");
       return users;
     },
-    getCurrentUser: async (_, {}, {user }) => {
+    getCurrentUser: async (_, {}, { user }) => {
       if (!user) {
         throw new ApolloError("សូមមេត្តា login ជាថ្មី");
       }
@@ -54,7 +58,6 @@ export default {
       { page, limit, keyword = "" },
       { User }
     ) => {
-
       let key = keyword.toString();
       const options = {
         page: page || 1,
@@ -87,7 +90,7 @@ export default {
      * @Params { username, password }
      * @Access Public
      */
-    loginUser: async (_, { username, password }, { User }) => {
+    loginUser: async (_, { username, password }, { User, RefreshToken }) => {
       // Validate Incoming User Credentials
       await UserAuthenticationRules.validate(
         { username, password },
@@ -97,7 +100,7 @@ export default {
       let user = await User.findOne({
         username,
       });
-      
+
       // If User is not found
       if (!user) {
         throw new ApolloError("Username not found", "404");
@@ -112,10 +115,49 @@ export default {
 
       // Issue Token
       let token = await issueAuthToken(user);
+      let refreshToken = await issueAuthRefreshToken(user);
+
+      let refresh_token = new RefreshToken({
+        refreshToken: refreshToken.refreshToken,
+        user: user.id,
+      });
+      let savedRefresh_token = await refresh_token.save();
+      if (!savedRefresh_token) {
+        throw new ApolloError("មានបញ្ហាបច្ចេកទេស RFT_ សូមទាក់ទងខាង IT");
+      }
       return {
         token: token,
-        user:user
+        refreshToken: refreshToken,
+        user: user,
+      };
+    },
+    /**
+     * @DESC to refresh token
+     * @Params { username, password }
+     * @Access Public
+     */
+    refreshToken: async (_, { requestToken }, { User, RefreshToken }) => {
+      try {
+        if (!requestToken) {
+          throw new ApolloError("មានបញ្ហាបច្ចេកទេស RFT_ សូមទាក់ទងខាង IT");
+        }
+        let get_token = await RefreshToken.findOne({
+          refreshToken: requestToken,
+        });
+        if (!get_token) {
+          throw new ApolloError("មានបញ្ហាបច្ចេកទេស RFT_ សូមទាក់ទងខាង IT");
+        }
+
+        let user = await User.findById(get_token.user);
+        // regenerate access token
+        let token = await issueAuthToken(user);
+
+        return token;
+      } catch (error) {
+        throw new ApolloError("មានបញ្ហាបច្ចេកទេស RFT_ សូមទាក់ទងខាង IT");
       }
+      // Find the user from the database
+      // If User is not found
     },
 
     /**
@@ -135,12 +177,9 @@ export default {
         }
 
         let isAlreadyIn = await User.findOne({
-          $and: [
-            {"_id": userId},
-            {roles:{$elemMatch:{role:role}}}
-          ]
-        } );   
-       
+          $and: [{ _id: userId }, { roles: { $elemMatch: { role: role } } }],
+        });
+
         if (isAlreadyIn) {
           return {
             message: "role នេះបានបញ្ចូលរួចហើយ",
@@ -148,11 +187,11 @@ export default {
           };
         }
         await User.updateOne(
-          { _id:userId },
+          { _id: userId },
           {
             $push: {
               roles: {
-                $each: [{role}],
+                $each: [{ role }],
                 // $sort: { score: 1 },
                 $slice: -10,
               },
@@ -164,7 +203,6 @@ export default {
           success: true,
         };
       } catch (error) {
-      
         return {
           message: "មិនអាចបញ្ចូលបានទេ",
           success: error.message,
@@ -172,7 +210,7 @@ export default {
       }
     },
 
-    //@Desc add page 
+    //@Desc add page
     //@Access auth
 
     addPage: async (_, { userId, page }, { User }) => {
@@ -186,12 +224,9 @@ export default {
         }
 
         let isAlreadyIn = await User.findOne({
-          $and: [
-            {"_id": userId},
-            {pages:{$elemMatch:{page:page}}}
-          ]
-        } );   
-       
+          $and: [{ _id: userId }, { pages: { $elemMatch: { page: page } } }],
+        });
+
         if (isAlreadyIn) {
           return {
             message: "page នេះបានបញ្ចូលរួចហើយ",
@@ -199,11 +234,11 @@ export default {
           };
         }
         await User.updateOne(
-          { _id:userId },
+          { _id: userId },
           {
             $push: {
               pages: {
-                $each: [{page}],
+                $each: [{ page }],
                 // $sort: { score: 1 },
                 $slice: -10,
               },
@@ -215,7 +250,6 @@ export default {
           success: true,
         };
       } catch (error) {
-      
         return {
           message: "មិនអាចបញ្ចូលបានទេ",
           success: error.message,
@@ -226,8 +260,7 @@ export default {
     // @DESC deleteRole
     // @params userid , role id
     // @access Admin
-    deleteRole: async (_, { userId, roleId }, { User }
-    ) => {
+    deleteRole: async (_, { userId, roleId }, { User }) => {
       try {
         let a = await User.updateOne(
           { _id: userId },
@@ -235,7 +268,7 @@ export default {
             $pull: { roles: { _id: roleId } },
           }
         );
-      
+
         return {
           success: true,
           message: "លុបបានជោគជ័យ",
@@ -248,19 +281,17 @@ export default {
       }
     },
 
-    //Desc delete the page they can see 
-    //@Access auth 
-    deletePages: async (_, { userId, pageId }, { User }
-    ) => {
+    //Desc delete the page they can see
+    //@Access auth
+    deletePages: async (_, { userId, pageId }, { User }) => {
       try {
-  
         let a = await User.updateOne(
           { _id: userId },
           {
             $pull: { pages: { _id: pageId } },
           }
         );
-      
+
         return {
           success: true,
           message: "លុបបានជោគជ័យ",
@@ -474,8 +505,7 @@ export default {
           user.firstName = firstName;
           user.lastName = lastName;
           await user.save();
-    
-          
+
           return {
             success: true,
             message: "User account detail updated successfully",
@@ -519,6 +549,34 @@ export default {
         };
       }
     },
+
+    logoutUser: async (_, { userId }, { User,req,RefreshToken }) => {
+      try {
+        let user = await RefreshToken.findByOneAndDelete({user:req.user._id});
+        if (user) {
+          return {
+            message: "Delete succesfully!",
+            success: true,
+          };
+        } else {
+          return {
+            message: "There is no this user to delete ",
+            success: false,
+          };
+        }
+      } catch (error) {
+        return {
+          message: error.message,
+          success: false,
+        };
+      }
+    },
+
+    // app.post("/api/logout", verify, (req, res) => {
+    //   const refreshToken = req.body.token;
+    //   refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+    //   res.status(200).json("You logged out successfully.");
+    // });
 
     /**
      * @DESC to update profile image of the staff

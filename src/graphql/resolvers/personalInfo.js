@@ -56,22 +56,36 @@ export default {
     //@Desc for export to the csv file
     //@Access  auth
     excelExport: async (_, { startDate, endDate }, { PersonalInfo }) => {
-      const allData = await PersonalInfo.find({
-        $and: [
-          {
-            sampleTest: {
-              $elemMatch: {
-                date: {
-                  $gte: new Date("2021-08-05T00:00:00"),
-                  $lt: new Date("2021-08-05T59:00:00"),
-                },
-              },
-            },
-          },
-          { commune: "ចារឈូក" },
-        ],
-      });
-      return allData;
+      // const allData = await PersonalInfo.find({
+      //   $and: [
+      //     {
+      //       sampleTest: {
+      //         $elemMatch: {
+      //           date: {
+      //             $gte: new Date("2021-08-05T00:00:00"),
+      //             $lt: new Date("2021-08-05T59:00:00"),
+      //           },
+      //         },
+      //       },
+      //     },
+      //     { commune: "ចារឈូក" },
+      //   ],
+      // });
+      // return allData;
+      const data = await PersonalInfo.aggregate([
+        // {$group:{
+        //   _id: "$currentState.confirmedAt" ,
+        //       y: { $sum : 1 }
+        // }}
+        {$match:{"currentState.confirm":true}},
+        { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$currentState.confirmedAt"} }, y: { $sum: 1 } } },
+        { $sort: { _id: 1} }
+      ]);
+
+      
+
+      
+      return data
     },
     //@Desc get perfornal info for the Hospital
     //@Access police
@@ -132,11 +146,18 @@ export default {
                     }
                   }
                 },
-           
+
+                { englishName: { $regex: keyword, $options: "i" } },
+                { tel: { $regex: keyword, $options: "i" } },
+                { village: { $regex: keyword, $options: "i" } },
+                { commune: { $regex: keyword, $options: "i" } },
+                { disctrict: { $regex: keyword, $options: "i" } },
+                { province: { $regex: keyword, $options: "i" } },
+                { patientId: { $regex: keyword, $options: "i" } },
+                { idCard: { $regex: keyword, $options: "i" } },
               ],
             },
 
-            
             { sampleTest: { $elemMatch: { date: { $gte: start, $lt: end } } } },
             testLocationQuery,
             fillDateQuery
@@ -156,6 +177,15 @@ export default {
                     }
                   }
                 },
+                { englishName: { $regex: keyword, $options: "i" } },
+                { tel: { $regex: keyword, $options: "i" } },
+                { village: { $regex: keyword, $options: "i" } },
+                { commune: { $regex: keyword, $options: "i" } },
+                { disctrict: { $regex: keyword, $options: "i" } },
+                { province: { $regex: keyword, $options: "i" } },
+                { patientId: { $regex: keyword, $options: "i" } },
+                { idCard: { $regex: keyword, $options: "i" } },
+               
 
               ],
             },
@@ -511,14 +541,7 @@ export default {
           communeQuery
         ],
       };
-      // pubsub.publish("USER_ACTION", {
-      //   userActionWithPersonalInfo: {
-      //     username:"Username :" +" "+ req.user.username +" "+ "Name :"+ req.user.firstName +" "+"LastName :"+req.user.lastName,
-      //     userAction:"getConfirmedPersonalInfoByInterviewWithPagination ",
-      //     date:new Date(),
-      //     type:"READ",
-      //   },
-      // });
+
       const personalInfos = await PersonalInfo.paginate(query, options);
       return personalInfos;
     },

@@ -2,30 +2,315 @@ import moment from "moment";
 import PersonalInfo from "../typeDefs/PersonalInfo";
 export default {
   Query: {
+    //group by age
+
+    getGraphByday: async (_, { startDate, endDate,district }, { PersonalInfo }) => {
+  
+      var start = new Date(new Date(startDate).setUTCHours(0, 0, 0, 0));
+      var end = new Date(new Date(endDate).setUTCHours(23, 59, 59, 59));
+      let confirmDateStart = {};
+      let confirmEndDateQuery = {};
+      let recoveredDateStart = {};
+      let recoveredEndDateQuery = {};
+      let deathDateStart = {};
+      let deathEndDateQuery = {};
+      let districtQuery={$match:{}};
+
+      if(district!==null){
+        districtQuery = {$match:{district:district}};
+      }
+      if (startDate !== null && endDate !== null) {
+        confirmDateStart = { $gte: ["$currentState.confirmedAt", start] };
+        confirmEndDateQuery = { $lt: ["$currentState.confirmedAt", end] };
+        recoveredDateStart = { $gte: ["$currentState.recoveredAt", start] };
+        recoveredEndDateQuery = { $lt: ["$currentState.recoveredAt", end] };
+        deathDateStart = { $gte: ["$currentState.deathAt", start] };
+        deathEndDateQuery = { $lt: ["$currentState.deathAt", end] };
+      }
+
+      const confirm = await PersonalInfo.aggregate([
+   
+
+        districtQuery,
+        {
+          $project: {
+            yearMonthDayUTC: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$currentState.confirmedAt",
+              },
+            },
+            confirm: {
+              $cond: [
+                {
+                  $and: [
+                    { $eq: ["$currentState.confirm", true] },
+                    confirmDateStart,
+                    confirmEndDateQuery,
+                  
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+          },
+        },
+      
+        {
+          $group: {
+            _id: "$yearMonthDayUTC",
+            confirm: { $sum: "$confirm" },
+         
+          },
+        },
+        {$match:{"confirm":{$ne:0}}},
+        {$sort:{"_id":1}},
+      ]);
+
+      const recovered = await PersonalInfo.aggregate([
+        // { $match: { "currentState.confirm": true } },
+        districtQuery,
+        {
+          $project: {
+            yearMonthDayUTC: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$currentState.recoveredAt",
+              },
+            },
+            recovered: {
+              $cond: [
+                {
+                  $and: [
+                    { $eq: ["$currentState.recovered", true] },
+                    recoveredDateStart,
+                    recoveredEndDateQuery,
+                 
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+
+          },
+        },
+      
+        {
+          $group: {
+            _id: "$yearMonthDayUTC",
+            recovered: { $sum: "$recovered" },
+       
+          },
+        },
+        {$match:{"recovered":{$ne:0}}},
+        {$sort:{"_id":1}},
+      ]);
+      const death = await PersonalInfo.aggregate([
+   
+        // { $match: { "currentState.confirm": true } },
+        districtQuery,
+        {
+          $project: {
+            yearMonthDayUTC: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$currentState.deathAt",
+              },
+            },
+
+            death: {
+              $cond: [
+                {
+                  $and: [
+                    { $eq: ["$currentState.death", true] },
+                    deathDateStart,
+                    deathEndDateQuery,
+             
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+          },
+        },
+        {
+          $group: {
+            _id: "$yearMonthDayUTC",
+            death: { $sum: "$death" },
+          },
+        },
+        {$match:{"death":{$ne:0}}},
+        {$sort:{"_id":1}},
+      ]);
+
+      return {
+        confirm,
+        recovered,
+        death
+      }
+    },
+
+    getGraphByage: async (_, { startDate, endDate }, { PersonalInfo }) => {
+      var start = new Date(new Date(startDate).setUTCHours(0, 0, 0, 0));
+      var end = new Date(new Date(endDate).setUTCHours(23, 59, 59, 59));
+      let confirmDateStart = {};
+      let confirmEndDateQuery = {};
+      let recoveredDateStart = {};
+      let recoveredEndDateQuery = {};
+      let deathDateStart = {};
+      let deathEndDateQuery = {};
+
+      if (startDate !== null && endDate !== null) {
+        confirmDateStart = { $gte: ["$currentState.confirmedAt", start] };
+        confirmEndDateQuery = { $lt: ["$currentState.confirmedAt", end] };
+        recoveredDateStart = { $gte: ["$currentState.recoveredAt", start] };
+        recoveredEndDateQuery = { $lt: ["$currentState.recoveredAt", end] };
+        deathDateStart = { $gte: ["$currentState.deathAt", start] };
+        deathEndDateQuery = { $lt: ["$currentState.deathAt", end] };
+      }
+      let d = [
+        {
+          $project: {
+            age: 1,
+            confirm: {
+              $cond: [
+                {
+                  $and: [
+                    { $eq: ["$currentState.confirm", true] },
+                    confirmDateStart,
+                    confirmEndDateQuery,
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+            recovered: {
+              $cond: [
+                {
+                  $and: [
+                    { $eq: ["$currentState.recovered", true] },
+                    recoveredDateStart,
+                    recoveredEndDateQuery,
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+            death: {
+              $cond: [
+                {
+                  $and: [
+                    { $eq: ["$currentState.death", true] },
+                    deathDateStart,
+                    deathEndDateQuery,
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+            //
+          },
+        },
+        {
+          $group: {
+            _id: "$age",
+            confirm: { $sum: "$confirm" },
+            recovered: { $sum: "$recovered" },
+            death: { $sum: "$death" },
+          },
+        },
+      ];
+
+      const data = await PersonalInfo.aggregate(d);
+      let keys = [
+        { label: "1-10", death: 0, recovered: 0, confirm: 0 },
+        { label: "11-19", death: 0, recovered: 0, confirm: 0 },
+        { label: "20-30", death: 0, recovered: 0, confirm: 0 },
+        { label: "31-45", death: 0, recovered: 0, confirm: 0 },
+        { label: "46-60", death: 0, recovered: 0, confirm: 0 },
+        { label: "61-80", death: 0, recovered: 0, confirm: 0 },
+        { label: "81-95", death: 0, recovered: 0, confirm: 0 },
+        { label: "96-UP", death: 0, recovered: 0, confirm: 0 },
+      ];
+
+      data.map((el) => {
+        if (el._id <= 10) {
+          keys[0].death += el.death;
+          keys[0].recovered += el.recovered;
+          keys[0].confirm += el.confirm;
+        }
+        if (el._id >= 11 && el._id <= 19) {
+          keys[1].death += el.death;
+          keys[1].recovered += el.recovered;
+          keys[1].confirm += el.confirm;
+        }
+        if (el._id >= 20 && el._id <= 30) {
+          keys[2].death += el.death;
+          keys[2].recovered += el.recovered;
+          keys[2].confirm += el.confirm;
+        }
+        if (el._id >= 31 && el._id <= 45) {
+          keys[3].death += el.death;
+          keys[3].recovered += el.recovered;
+          keys[3].confirm += el.confirm;
+        }
+        if (el._id >= 46 && el._id <= 60) {
+          keys[4].death += el.death;
+          keys[4].recovered += el.recovered;
+          keys[4].confirm += el.confirm;
+        }
+        if (el._id >= 61 && el._id <= 80) {
+          keys[5].death += el.death;
+          keys[5].recovered += el.recovered;
+          keys[5].confirm += el.confirm;
+        }
+        if (el._id >= 81 && el._id <= 95) {
+          keys[6].death += el.death;
+          keys[6].recovered += el.recovered;
+          keys[6].confirm += el.confirm;
+        }
+        if (el._id >= 96) {
+          keys[7].death += el.death;
+          keys[7].recovered += el.recovered;
+          keys[7].confirm += el.confirm;
+        }
+      });
+
+      return keys;
+    },
 
     //auth and private
-    getDataForBarChart: async (_, { startDate, endDate,district,commune,village}, { PersonalInfo }) => {
-     let confirmDateStart ={ };
-      let confirmEndDateQuery ={ };
-      let recoveredDateStart ={};
-      let  recoveredEndDateQuery ={};
-      let deathDateStart ={ };
-      let deathEndDateQuery ={ };
+    getDataForBarChart: async (
+      _,
+      { startDate, endDate, district, commune, village },
+      { PersonalInfo }
+    ) => {
+      let confirmDateStart = {};
+      let confirmEndDateQuery = {};
+      let recoveredDateStart = {};
+      let recoveredEndDateQuery = {};
+      let deathDateStart = {};
+      let deathEndDateQuery = {};
       var start = new Date(new Date(startDate).setUTCHours(0, 0, 0, 0));
       var end = new Date(new Date(endDate).setUTCHours(23, 59, 59, 59));
 
-
-      if(startDate!==null && endDate !==null){
-        confirmDateStart ={ $gte: ["$currentState.confirmedAt", start] };
-        confirmEndDateQuery ={ $lt: ["$currentState.confirmedAt", end] };
-        recoveredDateStart ={ $gte: ["$currentState.recoveredAt", start] };
-        recoveredEndDateQuery ={ $lt: ["$currentState.recoveredAt", end] };
-        deathDateStart ={ $gte: ["$currentState.deathAt", start] };
-        deathEndDateQuery ={ $lt: ["$currentState.deathAt", end] };
+      if (startDate !== null && endDate !== null) {
+        confirmDateStart = { $gte: ["$currentState.confirmedAt", start] };
+        confirmEndDateQuery = { $lt: ["$currentState.confirmedAt", end] };
+        recoveredDateStart = { $gte: ["$currentState.recoveredAt", start] };
+        recoveredEndDateQuery = { $lt: ["$currentState.recoveredAt", end] };
+        deathDateStart = { $gte: ["$currentState.deathAt", start] };
+        deathEndDateQuery = { $lt: ["$currentState.deathAt", end] };
       }
 
       let query = {};
-      if(district===null){
+      if (district === null) {
         query = [
           {
             $project: {
@@ -36,7 +321,7 @@ export default {
                     $and: [
                       { $eq: ["$currentState.confirm", true] },
                       confirmDateStart,
-                      confirmEndDateQuery
+                      confirmEndDateQuery,
                     ],
                   },
                   1,
@@ -47,11 +332,9 @@ export default {
                 $cond: [
                   {
                     $and: [
-                      
                       { $eq: ["$currentState.recovered", true] },
                       recoveredDateStart,
-                      recoveredEndDateQuery
-               
+                      recoveredEndDateQuery,
                     ],
                   },
                   1,
@@ -62,11 +345,9 @@ export default {
                 $cond: [
                   {
                     $and: [
-  
                       { $eq: ["$currentState.death", true] },
                       deathDateStart,
-                      deathEndDateQuery
-           
+                      deathEndDateQuery,
                     ],
                   },
                   1,
@@ -84,11 +365,11 @@ export default {
               death: { $sum: "$death" },
             },
           },
-        ]
-      }else{
-        if(village){
+        ];
+      } else {
+        if (village) {
           query = [
-            {$match:{district:district}},
+            { $match: { district: district } },
             {
               $project: {
                 village: 1,
@@ -98,7 +379,7 @@ export default {
                       $and: [
                         { $eq: ["$currentState.confirm", true] },
                         confirmDateStart,
-                        confirmEndDateQuery
+                        confirmEndDateQuery,
                       ],
                     },
                     1,
@@ -109,11 +390,9 @@ export default {
                   $cond: [
                     {
                       $and: [
-                        
                         { $eq: ["$currentState.recovered", true] },
                         recoveredDateStart,
-                        recoveredEndDateQuery
-                 
+                        recoveredEndDateQuery,
                       ],
                     },
                     1,
@@ -124,11 +403,9 @@ export default {
                   $cond: [
                     {
                       $and: [
-    
                         { $eq: ["$currentState.death", true] },
                         deathDateStart,
-                        deathEndDateQuery
-             
+                        deathEndDateQuery,
                       ],
                     },
                     1,
@@ -146,10 +423,10 @@ export default {
                 death: { $sum: "$death" },
               },
             },
-          ]
-        }else{
+          ];
+        } else {
           query = [
-            {$match:{district:district}},
+            { $match: { district: district } },
             {
               $project: {
                 commune: 1,
@@ -159,7 +436,7 @@ export default {
                       $and: [
                         { $eq: ["$currentState.confirm", true] },
                         confirmDateStart,
-                        confirmEndDateQuery
+                        confirmEndDateQuery,
                       ],
                     },
                     1,
@@ -170,11 +447,9 @@ export default {
                   $cond: [
                     {
                       $and: [
-                        
                         { $eq: ["$currentState.recovered", true] },
                         recoveredDateStart,
-                        recoveredEndDateQuery
-                 
+                        recoveredEndDateQuery,
                       ],
                     },
                     1,
@@ -185,11 +460,9 @@ export default {
                   $cond: [
                     {
                       $and: [
-    
                         { $eq: ["$currentState.death", true] },
                         deathDateStart,
-                        deathEndDateQuery
-             
+                        deathEndDateQuery,
                       ],
                     },
                     1,
@@ -207,16 +480,13 @@ export default {
                 death: { $sum: "$death" },
               },
             },
-          ]
+          ];
         }
-        
       }
-
 
       const data = await PersonalInfo.aggregate(query);
       return data;
     },
-
 
     // query = [
     //   {
@@ -239,7 +509,7 @@ export default {
     //         $cond: [
     //           {
     //             $and: [
-                  
+
     //               { $eq: ["$currentState.recovered", true] },
     //               { $gte: ["$currentState.recovered", start] },
     //               { $lt: ["$currentState.recovered", end] }
@@ -276,7 +546,6 @@ export default {
     //     },
     //   },
     // ]
-
 
     //@Desc get all positive confirm and death
 
@@ -384,26 +653,32 @@ export default {
       let totalAffectedLocationToday = 0;
       let totalAffectedLocationClosed = 0;
       let totalAffectedLocationClosedToday = 0;
-      let totalAffectedPeople =0;
-      let totalAffectedPeopleToday =0;
+      let totalAffectedPeople = 0;
+      let totalAffectedPeopleToday = 0;
 
-      let deltaConfirmFilledFromToday =0;
-      let confirmFilledToday =0;
-      let recoveredFilledToday =0;
-      let deathFilledFromToday=0;
+      let deltaConfirmFilledFromToday = 0;
+      let confirmFilledToday = 0;
+      let recoveredFilledToday = 0;
+      let deathFilledFromToday = 0;
 
       var today = new Date(new Date().setUTCHours(0, 0, 0, 0));
       var tomorrow = new Date(new Date().setUTCHours(23, 59, 59, 59));
 
       let totalHospital = await HospitalInfo.countDocuments({});
       let totalQuarantine = await QuarantineInfo.countDocuments({});
-  
 
       if (district === "" || district === "ករំីណីទាំងអស់") {
-        // 
+        //
 
-        totalAffectedPeople = await PersonalInfo.countDocuments({"affectedFrom.patientCode": {$ne:null}});
-        totalAffectedPeopleToday = await PersonalInfo.countDocuments({$and:[{"affectedFrom.patientCode": {$ne:null}},{"affectedDate":{$gte:today,$lt:tomorrow}}]});
+        totalAffectedPeople = await PersonalInfo.countDocuments({
+          "affectedFrom.patientCode": { $ne: null },
+        });
+        totalAffectedPeopleToday = await PersonalInfo.countDocuments({
+          $and: [
+            { "affectedFrom.patientCode": { $ne: null } },
+            { affectedDate: { $gte: today, $lt: tomorrow } },
+          ],
+        });
         //ទីតាំងពាក់ព័នសរុប
         totalAffectedLocation = await AffectedLocation.countDocuments({});
         // ទីតាំងពាក់ព័នសរុបថ្ងៃនេះ
@@ -446,16 +721,13 @@ export default {
           },
         ]);
 
-        // អ្នកពាក់ព័នសរុប 
+        // អ្នកពាក់ព័នសរុប
 
-      let totalAffectedPersoanl = await PersonalInfo.aggregate([
-        {$match:{"currentState.confirm": false}},
-        {$match:{"affectedFrom": false}},
-        { $group: { _id: 1, count: { $sum: 1 } } },
-      ]);
-
-
-     
+        let totalAffectedPersoanl = await PersonalInfo.aggregate([
+          { $match: { "currentState.confirm": false } },
+          { $match: { affectedFrom: false } },
+          { $group: { _id: 1, count: { $sum: 1 } } },
+        ]);
 
         //អ្នកពាក់ព័នសរុបថ្ងៃនេះ
 
@@ -467,13 +739,14 @@ export default {
           ],
         });
 
-
-        //deltaConfirmFilledFromToday 
+        //deltaConfirmFilledFromToday
         deltaConfirmFilledFromToday = await PersonalInfo.countDocuments({
           $and: [
             { "currentState.confirm": true },
             { "currentState.covidVariant": "DELTA" },
-            { "currentState.confirmFormFilled": { $gte: today, $lt: tomorrow } },
+            {
+              "currentState.confirmFormFilled": { $gte: today, $lt: tomorrow },
+            },
           ],
         });
 
@@ -483,8 +756,6 @@ export default {
             { "currentState.covidVariant": "DELTA" },
           ],
         });
-
-        
 
         confirm = await PersonalInfo.countDocuments({
           "currentState.confirm": true,
@@ -514,7 +785,6 @@ export default {
           "currentState.recoveredFormFilled": { $gte: today, $lt: tomorrow },
         });
 
-        
         deathToday = await PersonalInfo.countDocuments({
           "currentState.deathAt": { $gte: today, $lt: tomorrow },
         });
@@ -523,19 +793,23 @@ export default {
           "currentState.deathFormFilled": { $gte: today, $lt: tomorrow },
         });
 
-
         // deathToday = await PersonalInfo.countDocuments({
         //   "currentState.deathAt": { $gte: today, $lt: tomorrow },
         // });
       } else {
-
-        totalAffectedPeople = await PersonalInfo.countDocuments({$and:[{"affectedFrom.patientCode": {$ne:null}},{district:district}]});
-        totalAffectedPeopleToday = await PersonalInfo.countDocuments({$and:[{"affectedFrom.patientCode": {$ne:null}},{"affectedDate":{$gte:today,$lt:tomorrow}},{district:district}]});
-
-
-
-
-
+        totalAffectedPeople = await PersonalInfo.countDocuments({
+          $and: [
+            { "affectedFrom.patientCode": { $ne: null } },
+            { district: district },
+          ],
+        });
+        totalAffectedPeopleToday = await PersonalInfo.countDocuments({
+          $and: [
+            { "affectedFrom.patientCode": { $ne: null } },
+            { affectedDate: { $gte: today, $lt: tomorrow } },
+            { district: district },
+          ],
+        });
 
         deltaToday = await PersonalInfo.countDocuments({
           $and: [
@@ -562,7 +836,6 @@ export default {
             { district: district },
           ],
         });
-
 
         totalAffectedLocation = await AffectedLocation.countDocuments({
           district: district,
@@ -611,11 +884,12 @@ export default {
         //confirmFilledToday
         confirmFilledToday = await PersonalInfo.countDocuments({
           $and: [
-            { "currentState.confirmFormFilled": { $gte: today, $lt: tomorrow } },
+            {
+              "currentState.confirmFormFilled": { $gte: today, $lt: tomorrow },
+            },
             { district: district },
           ],
         });
-
 
         recoveredToday = await PersonalInfo.countDocuments({
           $and: [
@@ -625,13 +899,18 @@ export default {
         });
 
         //recoveredFilledToday
-  recoveredFilledToday = await PersonalInfo.countDocuments({
-    $and: [
-      { "currentState.recoveredFormFilled": { $gte: today, $lt: tomorrow } },
-      { district: district },
-    ],
-  });
-        
+        recoveredFilledToday = await PersonalInfo.countDocuments({
+          $and: [
+            {
+              "currentState.recoveredFormFilled": {
+                $gte: today,
+                $lt: tomorrow,
+              },
+            },
+            { district: district },
+          ],
+        });
+
         deathToday = await PersonalInfo.countDocuments({
           $and: [
             { "currentState.deathAt": { $gte: today, $lt: tomorrow } },
@@ -639,16 +918,13 @@ export default {
           ],
         });
 
-  ///deathFilledFromToday
-  deathFilledFromToday =  await PersonalInfo.countDocuments({
-    $and: [
-      { "currentState.deathAt": { $gte: today, $lt: tomorrow } },
-      { district: district },
-    ],
-  });
-
-
-
+        ///deathFilledFromToday
+        deathFilledFromToday = await PersonalInfo.countDocuments({
+          $and: [
+            { "currentState.deathAt": { $gte: today, $lt: tomorrow } },
+            { district: district },
+          ],
+        });
 
         sampleTestToday = await PersonalInfo.countDocuments({
           $and: [
@@ -686,8 +962,6 @@ export default {
             },
           },
         ]);
-
-
       }
 
       if (dataAll.length !== 0) {
@@ -700,8 +974,8 @@ export default {
       // console.log(dataToday[0].count,"dataToday",dataAll[0].count)
 
       let dataForBoxes = {
-        delta:delta,
-        deltaToday:deltaToday,
+        delta: delta,
+        deltaToday: deltaToday,
         sampleTest: sampleTest,
         sampleTestToday: sampleTestToday,
         confirmedCase: confirm,
@@ -716,12 +990,12 @@ export default {
         totalAffectedLocationToday: totalAffectedLocationToday,
         totalAffectedLocationClosed: totalAffectedLocationClosed,
         totalAffectedLocationClosedToday: totalAffectedLocationClosedToday,
-        totalAffectedPeople:totalAffectedPeople,
-        totalAffectedPeopleToday:totalAffectedPeopleToday,
-         confirmFilledToday,
-         recoveredFilledToday,
-         deathFilledFromToday,
-         deltaConfirmFilledFromToday
+        totalAffectedPeople: totalAffectedPeople,
+        totalAffectedPeopleToday: totalAffectedPeopleToday,
+        confirmFilledToday,
+        recoveredFilledToday,
+        deathFilledFromToday,
+        deltaConfirmFilledFromToday,
         // totalAffectedLocationOn:totalAffectedLocationOn,
         // totalAffectedLocationClose:totalAffectedLocationClose,
         // totalAffectedLocationNew:totalAffectedLocationNew
@@ -729,7 +1003,6 @@ export default {
         // totalQuarantine,
         // totalAffectedLocation,
       };
-
 
       return dataForBoxes;
     },
@@ -805,7 +1078,6 @@ export default {
         return a;
       };
 
-
       let confirm = await PersonalInfo.aggregate([
         { $sort: { "currentState.confirmAt": -1 } },
         {
@@ -817,7 +1089,8 @@ export default {
             },
             value: { $sum: 1 },
           },
-        },{$limit:60}
+        },
+        { $limit: 60 },
       ]);
 
       let recovered = await PersonalInfo.aggregate([
@@ -832,7 +1105,7 @@ export default {
             value: { $sum: 1 },
           },
         },
-        {$limit:60}
+        { $limit: 60 },
       ]);
       let deathAt = await PersonalInfo.aggregate([
         { $sort: { "currentState.deathAt": 1 } },
@@ -846,7 +1119,7 @@ export default {
             value: { $sum: 1 },
           },
         },
-        {$limit:60}
+        { $limit: 60 },
       ]);
 
       return {
@@ -909,7 +1182,6 @@ export default {
     //     },
     //   ]);
 
-     
     //   let deathAt = await PersonalInfo.aggregate([
     //     {
     //       $group: {
@@ -923,7 +1195,6 @@ export default {
     //     },
     //     // {$sort : { "$currentState.deathAt": 1 }}
     //   ]);
-
 
     //   return {
     //     cases: convert(confirm),
@@ -948,9 +1219,6 @@ export default {
         deaths,
       };
     },
-
-
-
 
     // @Desc getting the data for report
     //auth and private
@@ -1283,9 +1551,11 @@ export default {
       };
     },
 
-    InterViewReport: async (_, { startDate, endDate }, { PersonalInfo,AffectedLocation }) => {
-
-     
+    InterViewReport: async (
+      _,
+      { startDate, endDate },
+      { PersonalInfo, AffectedLocation }
+    ) => {
       ////
       var today = new Date(new Date(startDate).setUTCHours(0, 0, 0, 0));
       var tomorrow = new Date(new Date(endDate).setUTCHours(23, 59, 59, 59));
@@ -1418,20 +1688,30 @@ export default {
         },
       ]);
 
-      let interview = data.filter(res=>res._id===true)
+      let interview = data.filter((res) => res._id === true);
       let totalAffectedLocation = await AffectedLocation.countDocuments({});
-      let fulltotalAffectedLocation = await AffectedLocation.countDocuments({$and:[{province:{$ne:null}},{district:{$ne:null}},{commune:{$ne:null}},{village:{$ne:null}}]});
-   
-          // get total sampletest location 
-          const totaSampleTestLocation = await PersonalInfo.aggregate([
-            { $unwind: "$sampleTest" },
-            { $group: { _id: "$sampleTest.testLocation", count: { $sum: 1 } } },
-          ]);
-         let totalSampleTestLocation = totaSampleTestLocation.reduce((init,data)=>{
-          return data.count + init
-         },0 )
- 
-      //get total sample test 
+      let fulltotalAffectedLocation = await AffectedLocation.countDocuments({
+        $and: [
+          { province: { $ne: null } },
+          { district: { $ne: null } },
+          { commune: { $ne: null } },
+          { village: { $ne: null } },
+        ],
+      });
+
+      // get total sampletest location
+      const totaSampleTestLocation = await PersonalInfo.aggregate([
+        { $unwind: "$sampleTest" },
+        { $group: { _id: "$sampleTest.testLocation", count: { $sum: 1 } } },
+      ]);
+      let totalSampleTestLocation = totaSampleTestLocation.reduce(
+        (init, data) => {
+          return data.count + init;
+        },
+        0
+      );
+
+      //get total sample test
       let totalSampleTest = await PersonalInfo.aggregate([
         // { "$match":{ "district": district } },
         {
@@ -1444,7 +1724,7 @@ export default {
 
       //get total sample test which is a women
       let totalSampleTestWomen = await PersonalInfo.aggregate([
-        { "$match":{ "gender": "ស្រី" } },
+        { $match: { gender: "ស្រី" } },
         {
           $project: {
             all: { $size: "$sampleTest" },
@@ -1454,30 +1734,32 @@ export default {
       ]);
 
       //
-      let totalSampleTests = totalSampleTest[0].totalSampleTest? totalSampleTest[0].totalSampleTest :0;
-      let totalSampleTestWomens = totalSampleTestWomen[0].totalSampleTest? totalSampleTestWomen[0].totalSampleTest :0;
+      let totalSampleTests = totalSampleTest[0].totalSampleTest
+        ? totalSampleTest[0].totalSampleTest
+        : 0;
+      let totalSampleTestWomens = totalSampleTestWomen[0].totalSampleTest
+        ? totalSampleTestWomen[0].totalSampleTest
+        : 0;
 
-      let interviewTotal= 0
-      let totalKhmer = 0
-      let totalWomenKhmer=  0
-      let totalWomenKhmerToday = 0
-      let totalChina = 0
-      let totalChinaToday=  0
-      let totalChinaWomen= 0
+      let interviewTotal = 0;
+      let totalKhmer = 0;
+      let totalWomenKhmer = 0;
+      let totalWomenKhmerToday = 0;
+      let totalChina = 0;
+      let totalChinaToday = 0;
+      let totalChinaWomen = 0;
 
-      if(interview.length > 0){
-        interviewTotal= interview[0].interviewTotal
-        totalKhmer = interview[0].totalKhmer
-        totalWomenKhmer=  interview[0].totalWomenKhmer
-        totalWomenKhmerToday = interview[0].totalWomenKhmerToday
-        totalChina = interview[0].totalChina
-        totalChinaToday=  interview[0].totalChinaToday
-        totalChinaWomen= interview[0].totalChinaWomen
-
+      if (interview.length > 0) {
+        interviewTotal = interview[0].interviewTotal;
+        totalKhmer = interview[0].totalKhmer;
+        totalWomenKhmer = interview[0].totalWomenKhmer;
+        totalWomenKhmerToday = interview[0].totalWomenKhmerToday;
+        totalChina = interview[0].totalChina;
+        totalChinaToday = interview[0].totalChinaToday;
+        totalChinaWomen = interview[0].totalChinaWomen;
       }
 
-
-const res = {
+      const res = {
         interviewTotal,
         totalKhmer,
         totalWomenKhmer,
@@ -1486,14 +1768,14 @@ const res = {
         totalChina,
         totalChinaToday,
         totalChinaWomen,
-        totalSampleTestLocation:totalSampleTestLocation,
-        totalSampleTest:totalSampleTests,
-        totalSampleTestWomen:totalSampleTestWomens,
+        totalSampleTestLocation: totalSampleTestLocation,
+        totalSampleTest: totalSampleTests,
+        totalSampleTestWomen: totalSampleTestWomens,
         totalAffectedLocation: totalAffectedLocation,
-        fulltotalAffectedLocation:fulltotalAffectedLocation
+        fulltotalAffectedLocation: fulltotalAffectedLocation,
       };
-  
-      return res
+
+      return res;
     },
   },
 };

@@ -7,15 +7,26 @@ import {
 } from 'jsonwebtoken';
 
 import {
-    SECRET
+    SECRET_ACCESS_KEY,
+    SECRET_REFRESH_KEY,
+    SECRET_ACCESS_TIME,  
+    SECRET_REFRESH_TIME
 } from '../config';
 
 export const issueAuthToken = async (jwtPayload) => {
-    let token = await sign(jwtPayload, SECRET, {
-        expiresIn: '1d'
+    let token = await sign(jwtPayload, SECRET_ACCESS_KEY, {
+        expiresIn:SECRET_ACCESS_TIME
     });
     return `Bearer ${token}`;
 };
+
+
+export const issueAuthRefreshToken = async (jwtPayload) => {
+    let token = await sign(jwtPayload, SECRET_REFRESH_KEY, {
+        expiresIn: SECRET_REFRESH_TIME
+    });
+    return `Bearer ${token}`;
+}
 
 export const serializeUser = user => pick(user, [
     'id',

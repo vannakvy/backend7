@@ -1,7 +1,10 @@
 import { gql } from "apollo-server-express";
 export default gql`
   extend type Query {
-    excelExport(startDate:Date, endDate:Date): [PersonalInfo!]!
+    # excelExport(startDate:Date, endDate:Date): [PersonalInfo!]!
+    excelExport(startDate:Date, endDate:Date): [test!]!
+
+
     allPersonalInfos: [PersonalInfo!]!
     allPersonalInfosForThatNegative: [PersonalInfo!]!
     getSampleTestLocation: [SampleTestLocation]
@@ -112,13 +115,19 @@ export default gql`
   # //update left 
   }
 
+
+
+
   extend type Subscription {
     userActionWithPersonalInfo: Actions
     # newOrder: Order!
     # orderStateChange(orderId:ID!):NotiticationResponse!
     # updateOrderonTheway(orderId:ID!): Order!
 }
-
+type test {
+  _id:String,
+  y:Int
+}
 type Actions {
   username:String,
   userAction:String,

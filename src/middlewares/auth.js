@@ -1,5 +1,5 @@
 import {
-    SECRET
+    SECRET_ACCESS_KEY
 } from '../config';
 
 import {
@@ -10,7 +10,6 @@ import {
     verify
 } from 'jsonwebtoken';
 
-const logger = require('../config/logger.js');
 
 // import {AuthenticationError} from 'apollo-server-express'
 
@@ -19,13 +18,17 @@ const logger = require('../config/logger.js');
  * Which Finds the user from the database using the request token 
  */
 const AuthMiddleware = async (req, res, next) => {
+    
     // Extract Authorization Header
     const authHeader = req.get("Authorization");
+   
 // console.log(authHeader,"ddddd")
     if (!authHeader) {
+        console.log("authHeader no");
         req.isAuth = false;
         return next();
     }
+    
     // Extract the token and check for token
     // console.log(authHeader)
     const token = authHeader.split(" ")[1];
@@ -37,7 +40,7 @@ const AuthMiddleware = async (req, res, next) => {
     let decodedToken;
     try {
         // console.log(token)
-        decodedToken = verify(token, SECRET);
+        decodedToken = verify(token, SECRET_ACCESS_KEY);
         // console.log("running")
     } catch (err) {
         req.isAuth = false;
@@ -64,5 +67,6 @@ const AuthMiddleware = async (req, res, next) => {
     req.role = newRoles
     return next();
 }
+
 
 export default AuthMiddleware;

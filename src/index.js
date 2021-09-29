@@ -15,7 +15,7 @@ import connectDB from "./config/db";
 import http from "http";
 import path from 'path'
 import dotenv from 'dotenv'
-const logger = require('./config/logger')
+
 
 const app = express();
 dotenv.config()
@@ -58,7 +58,8 @@ const server = new ApolloServer({
     },
   },
   tracing: true,
-  playground: IN_PROD,
+  // playground: IN_PROD,
+  playground: true,
 });
 
 const startApp = async () => {
