@@ -34,18 +34,12 @@ app.use(bodyParser.json());
 app.use(express.static(join(__dirname, "./uploads")));
 
 const pubsub = new PubSub();
-// Define the Apollo-Server
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   schemaDirectives,
   uploads: true,
   context: ({ req }) => {
-    // const isAuth = req.isAuth
-    // const user = req.user
-    // const roles = req.role
-    // console.log(roles,"sgsg")
-    // console.log(isAuth)
     return { req,pubsub, ...AppModels };
   },
   subscriptions: {
@@ -72,7 +66,6 @@ const startApp = async () => {
 
 // var env = process.env.NODE_ENV || 'development';
 // loadConfigFile(env + '.json', doStuff);
-
     const httpServer = http.createServer(app);
     server.installSubscriptionHandlers(httpServer);
     httpServer.listen(PORT, () => {
@@ -87,7 +80,5 @@ const startApp = async () => {
   }
 };
 
-// $and:[{commune:"ចាឈូក"},{sampleTest: { $elemMatch: { date: { $gte: "2021-08-05T00:00:00.000+00:00", $lt: "2021-08-05T00:00:00.000+00:00" } } }}]
-// Invoke Start Application Function
 startApp();
 

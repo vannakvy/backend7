@@ -242,7 +242,19 @@ const PersonalInfoShema = mongoose.Schema({
             default: false
         },
         deathAt:Date
-    }
+    },
+    // for shop owner 
+    personType:{
+        type:String,
+    },
+        shopId:String,
+        shopType:String,
+        shopName:String,
+        sprovince:String,
+        sdistrict:String,
+        scommune:String,
+        svillage:String,      
+  
 },{
     timestamps: true
 })

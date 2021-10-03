@@ -25,7 +25,6 @@ death:[dea]
 type con{
     _id:String,
     confirm:Int
-    
 }
 type recv{
     _id:String,

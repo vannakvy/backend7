@@ -27,10 +27,7 @@ export default {
         deathDateStart = { $gte: ["$currentState.deathAt", start] };
         deathEndDateQuery = { $lt: ["$currentState.deathAt", end] };
       }
-
       const confirm = await PersonalInfo.aggregate([
-   
-
         districtQuery,
         {
           $project: {
@@ -47,7 +44,6 @@ export default {
                     { $eq: ["$currentState.confirm", true] },
                     confirmDateStart,
                     confirmEndDateQuery,
-                  
                   ],
                 },
                 1,

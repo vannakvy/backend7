@@ -1,10 +1,8 @@
 import { gql } from "apollo-server-express";
 export default gql`
   extend type Query {
-    # excelExport(startDate:Date, endDate:Date): [PersonalInfo!]!
+ 
     excelExport(startDate:Date, endDate:Date): [test!]!
-
-
     allPersonalInfos: [PersonalInfo!]!
     allPersonalInfosForThatNegative: [PersonalInfo!]!
     getSampleTestLocation: [SampleTestLocation]
@@ -112,7 +110,6 @@ export default gql`
   # UPLOAD IMAGE URL 
   uploadImageUrl:String
 
-  # //update left 
   }
 
 
