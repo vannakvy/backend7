@@ -12,6 +12,7 @@ import dashboardAndReport from './dashboardAndReport';
 import affectedLocation from './affectedLocation';
 import additionalData from './additionalData';
 // import historyLocation from './historyLocation';
+import vendor from './vendor'
 
 export default [
     user,
@@ -25,7 +26,8 @@ export default [
     // quarantine,
     dashboardAndReport,
     affectedLocation,
-    additionalData
+    additionalData,
+    vendor 
     // historyLocation
 ]  
 

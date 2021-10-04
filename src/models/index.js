@@ -9,6 +9,8 @@ export {default as AffectedLocation} from './affectedLocation'
 export {default as Additional} from './additionalData'
 export {default as AdditionalTwo} from './additionalDataTwo'
 export {default as RefreshToken} from './refreshTokens'
+export {default as Transaction} from './transaction'
+export {default as Shop} from './shop'
 // export {default as HistoryLocation} from './historyLocation'
 
 

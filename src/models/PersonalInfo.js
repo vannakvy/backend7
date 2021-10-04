@@ -193,7 +193,7 @@ const PersonalInfoShema = mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'
         },
-        //
+        
         province:String,
         personTypes:String,
  
@@ -243,17 +243,26 @@ const PersonalInfoShema = mongoose.Schema({
         },
         deathAt:Date
     },
-    // for shop owner 
-    personType:{
-        type:String,
+    seller:{
+        type:Boolean,
+        default:false
     },
-        shopId:String,
-        shopType:String,
-        shopName:String,
-        sprovince:String,
-        sdistrict:String,
-        scommune:String,
-        svillage:String,      
+    buyer:{
+        type:Boolean,
+        default: false
+    }
+
+    // for shop owner 
+    // personType:{
+    //     type:String,
+    // },
+    //     shopId:String,
+    //     shopType:String,
+    //     shopName:String,
+    //     sprovince:String,
+    //     sdistrict:String,
+    //     scommune:String,
+    //     svillage:String,      
   
 },{
     timestamps: true

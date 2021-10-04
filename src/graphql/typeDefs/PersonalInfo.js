@@ -190,6 +190,7 @@ type Actions {
     historyWithin14days:[HistoryWithin14days]
     affectedFrom: AffectedFrom
     quaranting:[Quarantings]
+    seller:Boolean
   }
   type Vaccination{
     id:ID
@@ -371,6 +372,7 @@ type Actions {
     historyWithin14daysInput:HistoryWithin14daysInput
     vaccination:[VaccinationInput]
     sampleTest:SampleTestInput
+    seller:Boolean
   }
   type PersonalInfoResponse {
     success: Boolean

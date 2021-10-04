@@ -41,6 +41,7 @@ export default {
             return data
         },
 
+        
         //@Desc get data for the dashboard int each hopital 
         //@access auth 
 
