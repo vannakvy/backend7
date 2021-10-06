@@ -41,7 +41,6 @@ export default {
     //A
     getShopById: async(_,{shopId},{Shop})=>{
       const shop = await Shop.findById(shopId).populate("personalInfoId");
-     
       return shop;
     },
     // getSellerWithpagination
@@ -119,7 +118,7 @@ getAffectedShopBypatientIdWithPagination: async (_, {page,limit,keyword,marketNa
 
           if(startDate !== null ||  endDate !== null)  createDateAt = {"createdAt":{$gte:new Date(new Date(startDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(endDate).setUTCHours(23,59,59,59))}};
           let query = {
-              $and:[createDateAt]
+              $and:[createDateAt,{"personalInfoId":personalInfoId}]
           };
           const shops = await Transaction.paginate(query, options);
           return shops;
@@ -141,10 +140,9 @@ getAffectedShopBypatientIdWithPagination: async (_, {page,limit,keyword,marketNa
 
       if(startDate !== null ||  endDate !== null)  createDateAt = {"createdAt":{$gte:new Date(new Date(startDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(endDate).setUTCHours(23,59,59,59))}};
       let query = {
-          $and:[createDateAt]
+          $and:[createDateAt,{"shopId":shopId}]
       };
       const shops = await Transaction.paginate(query, options);
-      console.log(shops);
       return shops;
 },
   },
@@ -157,11 +155,13 @@ getAffectedShopBypatientIdWithPagination: async (_, {page,limit,keyword,marketNa
       { Transaction }
     ) => {
       try {
+      
         const transaction = new Transaction({
           shopId: shopId,
           personalInfoId: personalInfoId,
+
         });
-        console.log(transaction);
+       
         const created = await transaction.save();
         if (!created) {
           return {
@@ -295,7 +295,7 @@ deleteShop:async(_,{shopId},{Shop})=>{
               id: null,
             };
           }
-
+// const exist = await PersonalInfo.findOne({$and:[{tel:phonenumber}]})
           const buyer = new PersonalInfo({
             firstName: firstName,
             lastName: lastName,

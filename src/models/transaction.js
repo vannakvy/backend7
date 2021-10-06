@@ -10,7 +10,8 @@ const transactionSchema = new mongoose.Schema({
     personalInfoId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"PersonalInfo"
-    }
+    },
+ 
 },{
     timestamps:true
 });
