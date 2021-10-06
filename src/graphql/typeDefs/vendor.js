@@ -2,10 +2,10 @@ import { gql } from "apollo-server-express";
 
 export default gql`
   extend type Query {
-    getShopWithPagination(province:String,district:String,commune:String,village:String,marketName:String,keyword:String,limit:Int,page:Int):[Shop!]!
+    getShopWithPagination(province:String,district:String,commune:String,village:String,marketName:String,keyword:String,limit:Int,page:Int):ShopPaginator!
     getShopById(shopId:ID!):Shop!
-    getAffectedShopWithBypatientIdPagination(marketName:String,keyword:String,limit:Int,page:Int,startDate:Date,endDate:Date,personalInfoId:ID!):[Shop!]!
-    getAffectedPeopleByShopIdWithPagination(marketName:String,keyword:String,limit:Int,page:Int,startDate:Date,endDate:Date,shopId:ID!):PaginateResponse
+    getAffectedShopBypatientIdWithPagination(marketName:String,keyword:String,limit:Int,page:Int,startDate:Date,endDate:Date,personalInfoId:ID!):ShopPaginator!
+    getAffectedPeopleByShopIdWithPagination(marketName:String,keyword:String,limit:Int,page:Int,startDate:Date,endDate:Date,shopId:ID!):PeoplePaginator!
     # excelExport(startDate:Date, endDate:Date): [PersonalInfo!]!
     getSellerWithpagination(keyword:String,limit:Int,page:Int):PaginateResponse
   }
@@ -22,6 +22,7 @@ export default gql`
   }
   input shopInput{
     name: String,
+    shopNumber:String
     registrationNumber: String,
     acknowledgeAs: String,
     registerDate: Date,
@@ -32,9 +33,11 @@ export default gql`
     firstName: String,
     lastName: String,
     personalInfoId:ID
+    tel:String
   }
   type Shop{
-    id:ID
+    shopNumber:String
+    _id:ID
     name: String,
     registrationNumber: String,
     acknowledgeAs: String,
@@ -46,7 +49,18 @@ export default gql`
     firstName: String,
     lastName: String,
     personalInfoId:PersonalInfo
+    tel:String
   }
+
+  type ShopPaginator{
+  shops:[Shop]
+  paginator:Paginator
+  }
+  type PeoplePaginator{
+    transactions:[Transaction]
+    paginator:Paginator
+  }
+
   type responseWithData{
   success: Boolean,
   message:String,
@@ -67,6 +81,11 @@ type TransactionResponse{
     success: Boolean 
     message:String
     personalInfoId:ID
+}
+type Transaction{
+  personalInfoId:PersonalInfo
+  shopId:ID 
+  createdAt:Date 
 }
 
 `;

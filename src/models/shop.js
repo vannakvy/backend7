@@ -4,6 +4,8 @@ import Paginate from "mongoose-paginate-v2";
 const shopSchema = mongoose.Schema(
   {
     name: String,
+    shopNumber:String,
+    tel:String,
     registrationNumber: String,
     acknowledgeAs: String,
     registerDate: Date,

@@ -37,6 +37,13 @@ const Transactionlabels = {
 
 export default {
   Query: {
+    //get shop by id 
+    //A
+    getShopById: async(_,{shopId},{Shop})=>{
+      const shop = await Shop.findById(shopId).populate("personalInfoId");
+     
+      return shop;
+    },
     // getSellerWithpagination
     //getShop
     getSellerWithpagination:async(_,{page,limit,keyword},{PersonalInfo})=>{
@@ -66,9 +73,7 @@ export default {
                   }
               ]
           };
-          console.log(query)
           const sellers = await PersonalInfo.paginate(query, options);
-          console.log(sellers);
           return sellers;
     },
     getShopWithPagination:async(_,{page,limit,keyword,marketName},{Shop})=>{
@@ -100,7 +105,7 @@ export default {
 //@Desc get the shop by patient id for finding the shops that the the patient went to
 //@Desc private 
 
-    getAffectedShopWithBypatientIdPagination: async (_, {page,limit,keyword,marketName,startDate,endDate,personalInfoId}, {Transaction}) => {
+getAffectedShopBypatientIdWithPagination: async (_, {page,limit,keyword,marketName,startDate,endDate,personalInfoId}, {Transaction}) => {
         let createDateAt = {};
         const options = {
             page: page || 1,
@@ -139,6 +144,7 @@ export default {
           $and:[createDateAt]
       };
       const shops = await Transaction.paginate(query, options);
+      console.log(shops);
       return shops;
 },
   },
@@ -151,10 +157,11 @@ export default {
       { Transaction }
     ) => {
       try {
-        const transaction = await Transaction({
+        const transaction = new Transaction({
           shopId: shopId,
-          PersonalInfoId: personalInfoId,
+          personalInfoId: personalInfoId,
         });
+        console.log(transaction);
         const created = await transaction.save();
         if (!created) {
           return {
@@ -202,7 +209,7 @@ export default {
     //@Access private 
 updateShop:async(_,{updatedShop,shopId},{Shop})=>{
     try {
-        const updated = await Shop.findByIdAndUpdate(updatedShop);
+        const updated = await Shop.findByIdAndUpdate({_id:shopId},updatedShop);
         if(!updated){
             return {
                 success:false,
