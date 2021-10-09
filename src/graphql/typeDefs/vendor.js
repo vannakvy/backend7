@@ -4,10 +4,10 @@ export default gql`
   extend type Query {
     getShopWithPagination(province:String,district:String,commune:String,village:String,marketName:String,keyword:String,limit:Int,page:Int):ShopPaginator!
     getShopById(shopId:ID!):Shop!
-    getAffectedShopBypatientIdWithPagination(marketName:String,keyword:String,limit:Int,page:Int,startDate:Date,endDate:Date,personalInfoId:ID!):ShopPaginator!
+    getAffectedShopBypatientIdWithPagination(marketName:String,keyword:String,limit:Int,page:Int,startDate:Date,endDate:Date,personalInfoId:ID!):Paginator1!
     getAffectedPeopleByShopIdWithPagination(marketName:String,keyword:String,limit:Int,page:Int,startDate:Date,endDate:Date,shopId:ID!):PeoplePaginator!
     # excelExport(startDate:Date, endDate:Date): [PersonalInfo!]!
-    getSellerWithpagination(keyword:String,limit:Int,page:Int):PaginateResponse
+    getSellerWithpagination(keyword:String,limit:Int,page:Int,isSeller:Boolean):PaginateResponse
   }
  
   extend type Mutation {
@@ -19,6 +19,11 @@ export default gql`
   verifyCode(phonenumber:String,code:String,firstName:String, lastName:String):responseWithData
   createTransaction(personalInfoId:ID!,shopId:ID!):vendorResponse
   deleteTrasaction(transactionId:ID!):vendorResponse
+  }
+
+  type Paginator1{
+    shops:[Transaction]
+    paginator:Paginator!
   }
   input shopInput{
     name: String,
@@ -34,6 +39,7 @@ export default gql`
     lastName: String,
     personalInfoId:ID
     tel:String
+    marketName:String
   }
   type Shop{
     shopNumber:String
@@ -50,6 +56,7 @@ export default gql`
     lastName: String,
     personalInfoId:PersonalInfo
     tel:String
+    marketName:String
   }
 
   type ShopPaginator{
@@ -84,7 +91,7 @@ type TransactionResponse{
 }
 type Transaction{
   personalInfoId:PersonalInfo
-  shopId:ID 
+  shopId:Shop
   createdAt:Date 
 }
 

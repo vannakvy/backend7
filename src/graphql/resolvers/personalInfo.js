@@ -1924,18 +1924,15 @@ export default {
     //@Desc delete the personal info
     //@access admin
 
-    deletePersonalInfo: async (_, { id }, { PersonalInfo,req,PubSub }) => {
+    deletePersonalInfo: async (_, { id }, { PersonalInfo,req,PubSub,Transaction }) => {
       try {
-
         if(!req.user){
           return {
             success: false,
             message:"មិនអាចលុបបានទេ"
           }
         }
-
         const deletedInfo = await PersonalInfo.findByIdAndDelete(id);
-
         if (!deletedInfo) {
           return {
             success: false,

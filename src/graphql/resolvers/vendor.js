@@ -45,7 +45,7 @@ export default {
     },
     // getSellerWithpagination
     //getShop
-    getSellerWithpagination:async(_,{page,limit,keyword},{PersonalInfo})=>{
+    getSellerWithpagination:async(_,{page,limit,keyword,isSeller},{PersonalInfo})=>{
         const options = {
             page: page || 1,
             limit: limit || 10,
@@ -55,10 +55,15 @@ export default {
             },
             populate: "personalInfoId",
           };
+          let sellerQuery = {};
+
+          if(isSeller){
+            sellerQuery = {"seller":true};
+          }
 
           let query = {
               $and:[
-                  {seller:true},
+                sellerQuery,
                   {
                     $or: [
                         { name: { $regex: keyword, $options: "i" } },
@@ -109,19 +114,20 @@ getAffectedShopBypatientIdWithPagination: async (_, {page,limit,keyword,marketNa
         const options = {
             page: page || 1,
             limit: limit || 10,
-            customLabels: Transactionlabels,
+            customLabels: Shoplabels,
             sort: {
               createdAt: -1,
             },
-            populate: "personalInfoId",
+            populate: "shopId personalInfoId",
           };
 
           if(startDate !== null ||  endDate !== null)  createDateAt = {"createdAt":{$gte:new Date(new Date(startDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(endDate).setUTCHours(23,59,59,59))}};
           let query = {
               $and:[createDateAt,{"personalInfoId":personalInfoId}]
           };
-          const shops = await Transaction.paginate(query, options);
-          return shops;
+          const personals = await Transaction.paginate(query, options);
+       
+          return personals;
     },
     //@Desc get the people by shop id for finding the people went the affected shops
     //@Desc private 
@@ -135,7 +141,7 @@ getAffectedShopBypatientIdWithPagination: async (_, {page,limit,keyword,marketNa
         sort: {
           createdAt: -1,
         },
-        populate: "personalInfoId",
+        populate: "shopId personalInfoId",
       };
 
       if(startDate !== null ||  endDate !== null)  createDateAt = {"createdAt":{$gte:new Date(new Date(startDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(endDate).setUTCHours(23,59,59,59))}};
@@ -143,23 +149,37 @@ getAffectedShopBypatientIdWithPagination: async (_, {page,limit,keyword,marketNa
           $and:[createDateAt,{"shopId":shopId}]
       };
       const shops = await Transaction.paginate(query, options);
-      return shops;
-},
+    return shops;
+    }
   },
   Mutation: {
     //@Desc Create transaction between the seller and the buyer
     //@Access public
     createTransaction: async (
       _,
-      { shopId, personalInfoId },
+      { shopId, personalInfoId ,PersonalInfo},
       { Transaction }
     ) => {
       try {
-      
+      const personExisted = await PersonalInfo(shopId);
+      if(!personExisted){
+        return {
+          success:false,
+          message:"SNE"
+        }
+      }
+// SNE = shop is not existed
+      const shopExisted = await PersonalInfo(personalInfoId);
+      if(!shopExisted){
+        return {
+          success:false,
+          message:"PNE"
+        }
+      }
+      //PNE = personalInfoId is not existed
         const transaction = new Transaction({
           shopId: shopId,
           personalInfoId: personalInfoId,
-
         });
        
         const created = await transaction.save();
@@ -295,13 +315,17 @@ deleteShop:async(_,{shopId},{Shop})=>{
               id: null,
             };
           }
-// const exist = await PersonalInfo.findOne({$and:[{tel:phonenumber}]})
-          const buyer = new PersonalInfo({
-            firstName: firstName,
-            lastName: lastName,
-            tel: phonenumber,
-            buyer: true,
-          });
+const exist = await PersonalInfo.findOne({$and:[{"tel":phonenumber},{"firstName":firstName},{lastName:lastName}]});
+let buyer;
+if(exist){
+    buyer = new PersonalInfo({
+        firstName: firstName,
+        lastName: lastName,
+        tel: phonenumber,
+        buyer: true,
+    });
+}
+         
 
           const created = await buyer.save();
           if (created) {

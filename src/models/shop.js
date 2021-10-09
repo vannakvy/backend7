@@ -3,6 +3,7 @@ import Paginate from "mongoose-paginate-v2";
 
 const shopSchema = mongoose.Schema(
   {
+    marketName:String,
     name: String,
     shopNumber:String,
     tel:String,
