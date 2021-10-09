@@ -32,7 +32,8 @@ export default gql`
             VIEW_BUYER_DETAIL,
             VIEW_ALL_SHOP,
             VIEW_SELLER,
-            VIEW_ONE_SHOP
+            VIEW_ONE_SHOP,
+            SHOP
 
 
 
