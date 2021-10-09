@@ -5,7 +5,6 @@ import {
 export default gql`
         # directive @isAuth on FIELD_DEFINITION
         # directive @isDeveloper on FIELD_DEFINITION
-
         directive @isAuth(
             requires: Roles = BASIC,
           ) on OBJECT | FIELD_DEFINITION
@@ -18,7 +17,25 @@ export default gql`
             POLICE,
             DOCTOR,
             OFFICER,
-            QUARANTINECONTROLLER
+            QUARANTINECONTROLLER,
+            DELETE_TRANSACTION,
+            CREATE_TRANSACTION,
+            UPDATE_TRANSACTION,
+            CREATE_SHOP,
+            DELETE_SHOP,
+            UPDATE_SHOP,
+            CREATE_PERSONALINFO,
+            UPDATE_PERSONALINFO,
+            DELETE_PERSONALINFO,
+            PRINT_QRCODE,
+            VIEW_SHOP_DETAIL,
+            VIEW_BUYER_DETAIL,
+            VIEW_ALL_SHOP,
+            VIEW_SELLER,
+            VIEW_ONE_SHOP
+
+
+
           }
                                 
         type Query {

@@ -157,25 +157,19 @@ getAffectedShopBypatientIdWithPagination: async (_, {page,limit,keyword,marketNa
     //@Access public
     createTransaction: async (
       _,
-      { shopId, personalInfoId ,PersonalInfo},
-      { Transaction }
+      { shopId, personalInfoId },
+      { Transaction ,PersonalInfo}
     ) => {
       try {
-      const personExisted = await PersonalInfo(shopId);
+        console.log(shopId,personalInfoId,)
+      const personExisted = await PersonalInfo.findById(personalInfoId);
       if(!personExisted){
-        return {
-          success:false,
-          message:"SNE"
-        }
-      }
-// SNE = shop is not existed
-      const shopExisted = await PersonalInfo(personalInfoId);
-      if(!shopExisted){
         return {
           success:false,
           message:"PNE"
         }
       }
+
       //PNE = personalInfoId is not existed
         const transaction = new Transaction({
           shopId: shopId,
@@ -186,17 +180,17 @@ getAffectedShopBypatientIdWithPagination: async (_, {page,limit,keyword,marketNa
         if (!created) {
           return {
             success: false,
-            message: "cannot create transaction",
+            message: "cannot create transaction 1",
           };
         }
         return {
           success: true,
-          message: "transaction created successfully!",
+          message: "transaction created successfully! ",
         };
       } catch (error) {
         return {
           success: false,
-          message: "cannot create transaction",
+          message: "cannot create transaction " + error,
         };
       }
     },
@@ -213,6 +207,7 @@ getAffectedShopBypatientIdWithPagination: async (_, {page,limit,keyword,marketNa
                 success: false
             }
         }
+
         return {
             message:"new Shop created",
             success: true
@@ -276,20 +271,26 @@ deleteShop:async(_,{shopId},{Shop})=>{
     //@Desc sending the telephone to verify with the twilio compnay
     //@Access public
     sendingPhone: async (_, { phonenumber }, {}) => {
-      if (phonenumber) {
-        let a = await client.verify
-          .services(process.env.SERVICE_ID)
-          .verifications.create({
-            to: `+${phonenumber}`,
-            channel: "sms",
-          });
-        if (a) {
-          return {
-            success: true,
-            message: "message sent",
-          };
+      console.log(phonenumber);
+      try {
+        if (phonenumber) {
+          let a = await client.verify
+            .services(process.env.SERVICE_ID)
+            .verifications.create({
+              to: `+${phonenumber}`,
+              channel: "sms",
+            });
+          if (a) {
+            return {
+              success: true,
+              message: "message sent",
+            };
+          }
         }
+      } catch (error) {
+        console.log(error)
       }
+  
     },
 
     //@Desc send the code to verify (code and the telephone number )
@@ -301,32 +302,36 @@ deleteShop:async(_,{shopId},{Shop})=>{
       { PersonalInfo }
     ) => {
       try {
-        if (phonenumber && code.length === 6) {
-          const verified = await client.verify
-            .services(process.env.SERVICE_ID)
-            .verificationChecks.create({
-              to: `+${phonenumber}`,
-              code: code,
-            });
-          if (!verified) {
-            return {
-              success: false,
-              message: "Verified not success",
-              id: null,
-            };
-          }
+        // if (phonenumber && code.length === 6) {
+        //   const verified = await client.verify
+        //     .services(process.env.SERVICE_ID)
+        //     .verificationChecks.create({
+        //       to: `+${phonenumber}`,
+        //       code: code,
+        //     });
+        //   if (!verified) {
+        //     return {
+        //       success: false,
+        //       message: "Verified not success",
+        //       id: null,
+        //     };
+        //   }
 const exist = await PersonalInfo.findOne({$and:[{"tel":phonenumber},{"firstName":firstName},{lastName:lastName}]});
 let buyer;
-if(exist){
+if(!exist){
     buyer = new PersonalInfo({
         firstName: firstName,
         lastName: lastName,
         tel: phonenumber,
         buyer: true,
     });
+}else{
+  return {
+    success: true,
+    message: "Verified",
+    id: exist._id,
+  }
 }
-         
-
           const created = await buyer.save();
           if (created) {
             return {
@@ -335,7 +340,7 @@ if(exist){
               id: created._id,
             };
           }
-        }
+        
       } catch (error) {
         return {
           success: false,

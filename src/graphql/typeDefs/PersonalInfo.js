@@ -75,13 +75,13 @@ export default gql`
   }
   
   extend type Mutation {
-    createPersonalInfo(newInfo: PersonalInfoInput!): PersonalInfoResponseWithData @isAuth(requires:SUPPER) 
+    createPersonalInfo(newInfo: PersonalInfoInput!): PersonalInfoResponseWithData @isAuth(requires:CREATE_PERSONALINFO) 
     recordSampleTest(sampleTest:SampleTestInput!,personalInfoId:ID!):PersonalInfoResponse! @isAuth(requires:SUPPER) 
     updatePersonalInfo(
       updatedInfo: PersonalInfoInput!
       id: ID!
-    ): PersonalInfoResponse @isAuth(requires:SUPPER) 
-    deletePersonalInfo(id: ID!): PersonalInfoResponse @isAuth(requires:ADMIN) 
+    ): PersonalInfoResponse @isAuth(requires:UPDATE_PERSONALINFO) 
+    deletePersonalInfo(id: ID!): PersonalInfoResponse @isAuth(requires:DELETE_PERSONALINFO) 
     deleteSampleTest(personalInfoId:ID!,sampleTestId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 
     updateSampleTest(personalInfoId:ID!,sampleTestId:ID!,sampleTest:SampleTestInput):PersonalInfoResponse 
     updateCurrentState(personalInfoId:ID!,updateValue:currentStatusInput):PersonalInfoResponse 
@@ -91,7 +91,6 @@ export default gql`
   addHistoryWithin14days(createLocation:HistoryWithin14daysInput,personalInfoId:ID!):PersonalInfoResponse @isAuth(requires:POLICE) 
   deleteHistoryWithin14days(personalInfoId:ID!,historyWithin14Id:ID!):PersonalInfoResponse @isAuth(requires:POLICE) 
   updateHistoryWithin14days(personalInfoId:ID!,historyWithin14Id:ID!,updateInfo:HistoryWithin14daysInput): PersonalInfoResponse  @isAuth(requires:POLICE) 
-
 
   addPeopleToQuarantine(newQuarantine:QuarantingInput,personalInfo:ID!):PersonalInfoResponse @isAuth(requires:SUPPER) 
   deletePeopleFromQuarantine(personalInfoId:ID!,quarantingId:ID!):PersonalInfoResponse @isAuth(requires:ADMIN) 

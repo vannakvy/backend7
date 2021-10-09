@@ -20,13 +20,11 @@ export default [
     Case,
     quarantineInfo,
     hospitalInfo,
-    // quantine,
-    // hospitalization,
     dashboardAndReport,
     affectedLocation,
     additionalData,
     vendor
-    // historyLocation
+
 ];
 
  

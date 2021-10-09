@@ -2,23 +2,24 @@ import { gql } from "apollo-server-express";
 
 export default gql`
   extend type Query {
-    getShopWithPagination(province:String,district:String,commune:String,village:String,marketName:String,keyword:String,limit:Int,page:Int):ShopPaginator!
+    getShopWithPagination(province:String,district:String,commune:String,village:String,marketName:String,keyword:String,limit:Int,page:Int):ShopPaginator! @isAuth(requires:VIEW_ALL_SHOP)
     getShopById(shopId:ID!):Shop!
-    getAffectedShopBypatientIdWithPagination(marketName:String,keyword:String,limit:Int,page:Int,startDate:Date,endDate:Date,personalInfoId:ID!):Paginator1!
-    getAffectedPeopleByShopIdWithPagination(marketName:String,keyword:String,limit:Int,page:Int,startDate:Date,endDate:Date,shopId:ID!):PeoplePaginator!
+    getAffectedShopBypatientIdWithPagination(marketName:String,keyword:String,limit:Int,page:Int,startDate:Date,endDate:Date,personalInfoId:ID!):Paginator1! @isAuth(requires:VIEW_BUYER_DETAIL)
+    getAffectedPeopleByShopIdWithPagination(marketName:String,keyword:String,limit:Int,page:Int,startDate:Date,endDate:Date,shopId:ID!):PeoplePaginator! @isAuth(requires:VIEW_SHOP_DETAIL)
     # excelExport(startDate:Date, endDate:Date): [PersonalInfo!]!
-    getSellerWithpagination(keyword:String,limit:Int,page:Int,isSeller:Boolean):PaginateResponse
+    getSellerWithpagination(keyword:String,limit:Int,page:Int,isSeller:Boolean):PaginateResponse @isAuth(requires:VIEW_SELLER)
   }
- 
+
+       
   extend type Mutation {
-  createShop(newShop:shopInput):vendorResponse
-  updateShop(updatedShop:shopInput,shopId:ID):vendorResponse
-  deleteShop(shopId:ID):vendorResponse
+  createShop(newShop:shopInput):vendorResponse @isAuth(requires:CREATE_SHOP)
+  updateShop(updatedShop:shopInput,shopId:ID):vendorResponse @isAuth(requires:UPDATE_SHOP)
+  deleteShop(shopId:ID):vendorResponse @isAuth(requires: DELETE_SHOP)
   createPerson(newPersonal:newPersonalInfo):responseWithData
   sendingPhone(phonenumber:String):vendorResponse
   verifyCode(phonenumber:String,code:String,firstName:String, lastName:String):responseWithData
   createTransaction(personalInfoId:ID!,shopId:ID!):vendorResponse
-  deleteTrasaction(transactionId:ID!):vendorResponse
+  deleteTrasaction(transactionId:ID!):vendorResponse @isAuth(requires:DELETE_TRANSACTION)
   }
 
   type Paginator1{
