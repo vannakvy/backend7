@@ -8,7 +8,7 @@ export default gql`
         authUser: User! @isAuth(requires:ADMIN) 
         allUsers:[User!]
         getCurrentUser:User! 
-        getUserWithPagination(page:Int,limit:Int,keyword:String):UserPaginator!  @isAuth(requires:ADMIN) 
+        getUserWithPagination(page:Int,limit:Int,keyword:String):UserPaginator! 
     }
     
     extend type Mutation {
