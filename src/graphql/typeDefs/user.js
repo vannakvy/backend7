@@ -8,12 +8,12 @@ export default gql`
         authUser: User! @isAuth(requires:ADMIN) 
         allUsers:[User!]
         getCurrentUser:User! 
-        getUserWithPagination(page:Int,limit:Int,keyword:String):UserPaginator! 
+        getUserWithPagination(page:Int,limit:Int,keyword:String):UserPaginator! @isAuth(requires:ADMIN)
     }
     
     extend type Mutation {
         registerUser(newUser: UserInput!): userResponse! @isAuth(requires:ADMIN) 
-        addRole(userId:ID!role:String!): userResponse! @isAuth(requires:ADMIN) 
+        addRole(userId:ID!role:String!): userResponse! @isAuth(requires:ADMIN)
         addPage(userId:ID!page:String!): userResponse! @isAuth(requires:ADMIN) 
         deleteRole(userId:ID!,roleId:ID!): userResponse! @isAuth(requires:ADMIN) 
         deletePages(userId:ID!,pageId:ID!): userResponse! @isAuth(requires:ADMIN) 

@@ -60,24 +60,55 @@ export default {
           if(isSeller){
             sellerQuery = {"seller":true};
           }
-
-          let query = {
-              $and:[
-                sellerQuery,
+      let    query = {
+            $and: [
+              sellerQuery,
+              {
+                $or: [
                   {
-                    $or: [
-                        { name: { $regex: keyword, $options: "i" } },
-                        { lastName: { $regex: keyword, $options: "i" } },
-                        { firstName: { $regex: keyword, $options: "i" } },
-                        { village: { $regex: keyword, $options: "i" } },
-                        { commune: { $regex: keyword, $options: "i" } },
-                        { disctrict: { $regex: keyword, $options: "i" } },
-                        { province: { $regex: keyword, $options: "i" } },
-                      ],
-                  }
-              ]
+                    "$expr": {
+                      "$regexMatch": {
+                        "input": { "$concat": ["$lastName"," ","$firstName"] },
+                        "regex": keyword,  //Your text search here
+                        "options": "i"
+                      }
+                    }
+                  },
+  
+                  { englishName: { $regex: keyword, $options: "i" } },
+                  { tel: { $regex: keyword, $options: "i" } },
+                  { village: { $regex: keyword, $options: "i" } },
+                  { commune: { $regex: keyword, $options: "i" } },
+                  { disctrict: { $regex: keyword, $options: "i" } },
+                  { province: { $regex: keyword, $options: "i" } },
+                  { patientId: { $regex: keyword, $options: "i" } },
+                  { idCard: { $regex: keyword, $options: "i" } },
+                ],
+              },
+  
+          
+            
+            ],
           };
+
+          // let query = {
+          //     $and:[
+          //       sellerQuery,
+          //         {
+          //           $or: [
+          //               { name: { $regex: keyword, $options: "i" } },
+          //               { lastName: { $regex: keyword, $options: "i" } },
+          //               { firstName: { $regex: keyword, $options: "i" } },
+          //               { village: { $regex: keyword, $options: "i" } },
+          //               { commune: { $regex: keyword, $options: "i" } },
+          //               { disctrict: { $regex: keyword, $options: "i" } },
+          //               { province: { $regex: keyword, $options: "i" } },
+          //             ],
+          //         }
+          //     ]
+          // };
           const sellers = await PersonalInfo.paginate(query, options);
+          
           return sellers;
     },
     getShopWithPagination:async(_,{page,limit,keyword,marketName},{Shop})=>{
