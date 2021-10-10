@@ -45,7 +45,7 @@ export default {
     },
     // getSellerWithpagination
     //getShop
-    getSellerWithpagination:async(_,{page,limit,keyword,isSeller},{PersonalInfo})=>{
+    getSellerWithpagination:async(_,{page,limit,keyword,isSeller,marketName},{PersonalInfo})=>{
         const options = {
             page: page || 1,
             limit: limit || 10,
@@ -56,6 +56,10 @@ export default {
             populate: "personalInfoId",
           };
           let sellerQuery = {};
+          let marketNameQuery = {};
+          if(marketName!=="" && marketName!==undefined){
+            marketNameQuery = {"marketName":marketName};
+          }
 
           if(isSeller){
             sellerQuery = {"seller":true};
@@ -63,6 +67,7 @@ export default {
       let    query = {
             $and: [
               sellerQuery,
+              marketNameQuery,
               {
                 $or: [
                   {
@@ -83,6 +88,7 @@ export default {
                   { province: { $regex: keyword, $options: "i" } },
                   { patientId: { $regex: keyword, $options: "i" } },
                   { idCard: { $regex: keyword, $options: "i" } },
+
                 ],
               },
   
@@ -121,8 +127,15 @@ export default {
             },
             populate: "personalInfoId",
           };
+          let marketNameQuery ={};
+          if(marketName!==undefined && marketName !==""){
+            marketNameQuery = {"marketName":marketName};
+          }
 
           let query = {
+            $and:[
+              marketNameQuery,
+              {
             $or: [
               { name: { $regex: keyword, $options: "i" } },
               { lastName: { $regex: keyword, $options: "i" } },
@@ -132,7 +145,9 @@ export default {
               { disctrict: { $regex: keyword, $options: "i" } },
               { province: { $regex: keyword, $options: "i" } },
             ],
-          };
+          }
+        
+        ]};
 
           const shops = await Shop.paginate(query, options);
           return shops;

@@ -7,7 +7,7 @@ export default gql`
     getAffectedShopBypatientIdWithPagination(marketName:String,keyword:String,limit:Int,page:Int,startDate:Date,endDate:Date,personalInfoId:ID!):Paginator1! @isAuth(requires:VIEW_BUYER_DETAIL)
     getAffectedPeopleByShopIdWithPagination(marketName:String,keyword:String,limit:Int,page:Int,startDate:Date,endDate:Date,shopId:ID!):PeoplePaginator! @isAuth(requires:VIEW_SHOP_DETAIL)
     # excelExport(startDate:Date, endDate:Date): [PersonalInfo!]!
-    getSellerWithpagination(keyword:String,limit:Int,page:Int,isSeller:Boolean):PaginateResponse @isAuth(requires:VIEW_SELLER)
+    getSellerWithpagination(keyword:String,limit:Int,page:Int,isSeller:Boolean,marketName:String):PaginateResponse @isAuth(requires:VIEW_SELLER)
   }
 
        
