@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Transaction from "../../models/transaction";
 import personalInfo from "./personalInfo";
 const client = require("twilio")(process.env.ACCOUNT_ID, process.env.TOKEN_ID);
 const Shoplabels = {
@@ -39,6 +40,50 @@ export default {
   Query: {
     //
     //test query
+
+    getMarketWithTotalScan:async(_,{},{Transaction})=>{
+
+      var start = new Date(new Date().setUTCHours(0, 0, 0, 0));
+      var end = new Date(new Date().setUTCHours(23, 59, 59, 59));
+   
+     let   dateStart = { $gte: ["$createdAt", start] };
+     let   dateEnd = { $lt: ["$createdAt", end] };
+    
+
+   
+      let query = [
+        {
+          $project: {
+            marketName: 1,
+            total:1,
+            today: {
+              $cond: [
+                {
+                  $and: [
+                    dateStart,
+                    dateEnd,
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+            //
+          },
+        },
+        {
+          $group: {
+            _id: "$marketName",
+            total: { $sum: 1 },
+            today: { $sum: "$today" },
+          },
+        },
+      ];
+
+      const marketList = await Transaction.aggregate(query);
+     
+      return marketList;
+    },
 
     getDataForTotalBoxes: async (
       _,
@@ -401,7 +446,7 @@ export default {
       { Transaction, PersonalInfo, Shop }
     ) => {
       try {
-console.log(shopId,"shop id");
+
         const shopData = await Shop.findById(shopId);
 
         const personExisted = await PersonalInfo.findById(personalInfoId);
@@ -411,7 +456,7 @@ console.log(shopId,"shop id");
             message: "PNE",
           };
         }
-console.log(shopData)
+
         //PNE = personalInfoId is not existed
         const transaction = new Transaction({
           shopId: shopId,
