@@ -33,7 +33,8 @@ export default gql`
             VIEW_ALL_SHOP,
             VIEW_SELLER,
             VIEW_ONE_SHOP,
-            SHOP
+            SHOP,
+            VIEW_BUYER
 
 
 

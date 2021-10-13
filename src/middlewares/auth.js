@@ -40,7 +40,7 @@ const AuthMiddleware = async (req, res, next) => {
     let decodedToken;
     try {
         // console.log(token)
-        decodedToken = verify(token, SECRET_ACCESS_KEY);
+        decodedToken = verify(token, SECRET_ACCESS_KEY);   
         // console.log("running")
     } catch (err) {
         req.isAuth = false;

@@ -193,7 +193,7 @@ export default {
               roles: {
                 $each: [{ role }],
                 // $sort: { score: 1 },
-                $slice: -10,
+                $slice: -30,
               },
             },
           }
@@ -240,7 +240,7 @@ export default {
               pages: {
                 $each: [{ page }],
                 // $sort: { score: 1 },
-                $slice: -10,
+                $slice: -30,
               },
             },
           }

@@ -37,12 +37,86 @@ const Transactionlabels = {
 
 export default {
   Query: {
+
+    //test query 
+
+    getTransaction: async(_,{startDate, endDate, marketName},{Transaction})=>{
+      
+      let dateQuery = {};
+      if(startDate !== null ||  endDate !== null)  dateQuery ={"createdAt":{$gte:new Date(new Date(startDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(endDate).setUTCHours(23,59,59,59))}};
+
+      const transactions = await Transaction.find(dateQuery).populate({path:'personalInfoId', select: "tel firstName lastName"})
+      .populate({path:'shopId',select:"marketName,name,shopNumber"});
+     return transactions
+    },
+
+    // const options = { sort: [['personalInfo.name', 'asc' ]] };
+// UserModel.find({})
+//.populate({ path: 'group', select: 'nome', options })
     //get shop by id 
     //A
+    
     getShopById: async(_,{shopId},{Shop})=>{
       const shop = await Shop.findById(shopId).populate("personalInfoId");
       return shop;
     },
+
+    //getBuyerWithPagination 
+    getBuyerWithPagination:async(_,{page,limit,keyword,startDate,endDate},{PersonalInfo})=>{
+      const options = {
+          page: page || 1,
+          limit: limit || 10,
+          customLabels: PersonalInfoLabels,
+          sort: {
+            createdAt: -1,
+          },
+          // populate: "",
+        };
+        let dateQuery = {};
+
+        if(startDate !== null ||  endDate !== null)  dateQuery = {"createdAt":{$gte:new Date(new Date(startDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(endDate).setUTCHours(23,59,59,59))}};
+        
+  
+     
+    let    query = {
+          $and: [
+            dateQuery,
+            {buyer:true},
+            {
+              $or: [
+                {
+                  "$expr": {
+                    "$regexMatch": {
+                      "input": { "$concat": ["$lastName"," ","$firstName"] },
+                      "regex": keyword,  //Your text search here
+                      "options": "i"
+                    }
+                  }
+                },
+
+                { englishName: { $regex: keyword, $options: "i" } },
+                { tel: { $regex: keyword, $options: "i" } },
+                { village: { $regex: keyword, $options: "i" } },
+                { commune: { $regex: keyword, $options: "i" } },
+                { disctrict: { $regex: keyword, $options: "i" } },
+                { province: { $regex: keyword, $options: "i" } },
+                { patientId: { $regex: keyword, $options: "i" } },
+                { idCard: { $regex: keyword, $options: "i" } },
+
+              ],
+            },
+
+        
+          
+          ],
+        };
+
+      
+        const buyers = await PersonalInfo.paginate(query, options);
+        
+        return buyers;
+  },
+
     // getSellerWithpagination
     //getShop
     getSellerWithpagination:async(_,{page,limit,keyword,isSeller,marketName},{PersonalInfo})=>{
@@ -97,22 +171,7 @@ export default {
             ],
           };
 
-          // let query = {
-          //     $and:[
-          //       sellerQuery,
-          //         {
-          //           $or: [
-          //               { name: { $regex: keyword, $options: "i" } },
-          //               { lastName: { $regex: keyword, $options: "i" } },
-          //               { firstName: { $regex: keyword, $options: "i" } },
-          //               { village: { $regex: keyword, $options: "i" } },
-          //               { commune: { $regex: keyword, $options: "i" } },
-          //               { disctrict: { $regex: keyword, $options: "i" } },
-          //               { province: { $regex: keyword, $options: "i" } },
-          //             ],
-          //         }
-          //     ]
-          // };
+      
           const sellers = await PersonalInfo.paginate(query, options);
           
           return sellers;
@@ -348,20 +407,7 @@ deleteShop:async(_,{shopId},{Shop})=>{
       { PersonalInfo }
     ) => {
       try {
-        // if (phonenumber && code.length === 6) {
-        //   const verified = await client.verify
-        //     .services(process.env.SERVICE_ID)
-        //     .verificationChecks.create({
-        //       to: `+${phonenumber}`,
-        //       code: code,
-        //     });
-        //   if (!verified) {
-        //     return {
-        //       success: false,
-        //       message: "Verified not success",
-        //       id: null,
-        //     };
-        //   }
+
 const exist = await PersonalInfo.findOne({$and:[{"tel":phonenumber},{"firstName":firstName},{lastName:lastName}]});
 let buyer;
 if(!exist){

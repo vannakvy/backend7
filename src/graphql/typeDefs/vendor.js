@@ -8,9 +8,12 @@ export default gql`
     getAffectedPeopleByShopIdWithPagination(marketName:String,keyword:String,limit:Int,page:Int,startDate:Date,endDate:Date,shopId:ID!):PeoplePaginator! @isAuth(requires:VIEW_SHOP_DETAIL)
     # excelExport(startDate:Date, endDate:Date): [PersonalInfo!]!
     getSellerWithpagination(keyword:String,limit:Int,page:Int,isSeller:Boolean,marketName:String):PaginateResponse @isAuth(requires:VIEW_SELLER)
+    getBuyerWithPagination(keyword:String,limit:Int,page:Int,startDate:Date, endDate:Date):PaginateResponse @isAuth(requires:VIEW_BUYER)
+    getTransaction(startDate:Date, endDate:Date,market:String,limit:Int,marketName:String):[Transaction!]!
+    testPopulate:String
+    
   }
-
-       
+  
   extend type Mutation {
   createShop(newShop:shopInput):vendorResponse @isAuth(requires:CREATE_SHOP)
   updateShop(updatedShop:shopInput,shopId:ID):vendorResponse @isAuth(requires:UPDATE_SHOP)
@@ -20,7 +23,9 @@ export default gql`
   verifyCode(phonenumber:String,code:String,firstName:String, lastName:String):responseWithData
   createTransaction(personalInfoId:ID!,shopId:ID!):vendorResponse
   deleteTrasaction(transactionId:ID!):vendorResponse @isAuth(requires:DELETE_TRANSACTION)
+
   }
+
 
   type Paginator1{
     shops:[Transaction]
@@ -91,7 +96,7 @@ type TransactionResponse{
     personalInfoId:ID
 }
 type Transaction{
-  personalInfoId:PersonalInfo
+  personalInfoId:PersonalInfo,
   shopId:Shop
   createdAt:Date 
 }

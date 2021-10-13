@@ -75,7 +75,7 @@ export default gql`
   }
   
   extend type Mutation {
-    createPersonalInfo(newInfo: PersonalInfoInput!): PersonalInfoResponseWithData @isAuth(requires:CREATE_PERSONALINFO) 
+    createPersonalInfo(newInfo: PersonalInfoInput!): PersonalInfoResponseWithData @isAuth(requires:CREATE_PERSONALINFO)
     recordSampleTest(sampleTest:SampleTestInput!,personalInfoId:ID!):PersonalInfoResponse! @isAuth(requires:SUPPER) 
     updatePersonalInfo(
       updatedInfo: PersonalInfoInput!
