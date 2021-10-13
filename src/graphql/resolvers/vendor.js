@@ -13,248 +13,301 @@ const Shoplabels = {
   totalPages: "totalPages",
 };
 const Transactionlabels = {
-    docs: "transactions",
-    limit: "perPage",
-    nextPage: "next",
-    prevPage: "prev",
-    meta: "paginator",
-    page: "currentPage",
-    pagingCounter: "slNo",
-    totalDocs: "totalDocs",
-    totalPages: "totalPages",
-  };
-  const PersonalInfoLabels = {
-    docs: "personalInfos",
-    limit: "perPage",
-    nextPage: "next",
-    prevPage: "prev",
-    meta: "paginator",
-    page: "currentPage",
-    pagingCounter: "slNo",
-    totalDocs: "totalDocs",
-    totalPages: "totalPages",
-  };
+  docs: "transactions",
+  limit: "perPage",
+  nextPage: "next",
+  prevPage: "prev",
+  meta: "paginator",
+  page: "currentPage",
+  pagingCounter: "slNo",
+  totalDocs: "totalDocs",
+  totalPages: "totalPages",
+};
+const PersonalInfoLabels = {
+  docs: "personalInfos",
+  limit: "perPage",
+  nextPage: "next",
+  prevPage: "prev",
+  meta: "paginator",
+  page: "currentPage",
+  pagingCounter: "slNo",
+  totalDocs: "totalDocs",
+  totalPages: "totalPages",
+};
 
 export default {
   Query: {
+    //
+    //test query
 
-    //test query 
+    getDataForTotalBoxes: async (
+      _,
+      {},
+      { PersonalInfo, Shop, Transaction }
+    ) => {
+      var start = new Date(new Date().setUTCHours(0, 0, 0, 0));
+      var end = new Date(new Date().setUTCHours(23, 59, 59, 59));
+      const totalTransaction = await Transaction.countDocuments({});
+      const totalTransactionToday = await Transaction.countDocuments({
+        createdAt: { $gte: start, $lt: end },
+      });
+      const totalBuyer = await PersonalInfo.countDocuments({ buyer: true });
+      const totalBuyerToday = await PersonalInfo.countDocuments({
+        createdAt: { $gte: start, $lt: end },
+      });
+      const totalShops = await Shop.countDocuments({});
+      const totalShopToday = await Shop.countDocuments({
+        createdAt: { $gte: start, $lt: end },
+      });
+      const totalM = await Shop.aggregate([
+        { $group: { _id: "$marketName", total: { $sum: 1 } } },
+        { $match: { _id: { $ne: null } } },
+        { $match: { _id: { $ne: "" } } },
+      ]);
+      const totalMarket = totalM.length;
+      return {
+        totalTransaction,
+        totalTransactionToday,
+        totalBuyer,
+        totalBuyerToday,
+        totalShops,
+        totalShopToday,
+        totalMarket,
+      };
+    },
 
-    // getTransaction: async(_,{startDate, endDate, marketName, page,limit},{Transaction})=>{
-    //   let dateQuery = {};
-    //   if(startDate !== null ||  endDate !== null)  dateQuery ={"createdAt":{$gte:new Date(new Date(startDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(endDate).setUTCHours(23,59,59,59))}};
+    getTransactionForGraph: async (
+      _,
+      { marketName, startDate, endDate },
+      { Transaction }
+    ) => {
+ 
+      let dateQuery = {};
+      let marketNameQuery = {};
+      if (marketName !== "" && marketName !== null) {
+        marketNameQuery = { marketName: marketName };
+      }
 
-    //   const transactions = await Transaction.find(dateQuery).populate({path:'personalInfoId', select: "tel firstName lastName"})
-    //   .populate({path:'shopId',select:"marketName,name,shopNumber"});
-    //  return transactions
-    // },
-
-
-    getTransaction:async(_,{page,limit,keyword,startDate,endDate,marketName},{Transaction})=>{
-      const options = {
-          page: page || 1,
-          limit: limit || 10,
-          customLabels: Transactionlabels,
-          sort: {
-            createdAt: -1,
+      if (startDate !== null || endDate !== null)
+        dateQuery = {
+          createdAt: {
+            $gte: new Date(new Date(startDate).setUTCHours(0, 0, 0, 0)),
+            $lt: new Date(new Date(endDate).setUTCHours(23, 59, 59, 59)),
           },
-          populate: "personalInfoId shopId",
         };
-        let dateQuery = {};
-        let marketNameQuery ={}
-        if(marketName!=="" && marketName !==null){
-          marketNameQuery = {"marketName":marketName};
-        }
-
-        if(startDate !== null ||  endDate !== null)  dateQuery = {"createdAt":{$gte:new Date(new Date(startDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(endDate).setUTCHours(23,59,59,59))}};
-        
-     
-    let    query = {
-          $and: [
-            dateQuery,
-            {buyer:true},
-            {
-              $or: [
-                {
-                  "$expr": {
-                    "$regexMatch": {
-                      "input": { "$concat": ["$lastName"," ","$firstName"] },
-                      "regex": keyword,  //Your text search here
-                      "options": "i"
-                    }
-                  }
-                },
-
-                { englishName: { $regex: keyword, $options: "i" } },
-                { tel: { $regex: keyword, $options: "i" } },
-                { village: { $regex: keyword, $options: "i" } },
-                // { commune: { $regex: keyword, $options: "i" } },
-                // { disctrict: { $regex: keyword, $options: "i" } },
-                // { province: { $regex: keyword, $options: "i" } },
-                // { patientId: { $regex: keyword, $options: "i" } },
-                // { idCard: { $regex: keyword, $options: "i" } },
-
-              ],
-            },
-
-        
-          
-          ],
-        };
-
       
-        const transactions = await Transaction.paginate(query, options);
+      const transGraph = await Transaction.aggregate([
+        { $match: marketNameQuery },
+        { $match: dateQuery },
+        {
+          $project: {
+            yearMonthDayUTC: {
+              $dateToString: {
+                format: "%d-%m-%Y",
+                date: "$createdAt",
+              },
+            },
+          },
+        },
+        {
+          $group: {
+            _id: "$yearMonthDayUTC",
+            total: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+      ]);
+      return transGraph;
+    },
 
-        
-        return transactions;
-  },
+    getTransactionWithPagination: async (
+      _,
+      { page, limit, keyword, startDate, endDate, marketName, shopName },
+      { Transaction }
+    ) => {
+      const options = {
+        page: page || 1,
+        limit: limit || 10,
+        customLabels: Transactionlabels,
+        sort: {
+          createdAt: -1,
+        },
+        populate: "personalInfoId shopId",
+      };
+      let dateQuery = {};
+      let marketNameQuery = {};
+      let shopNameQuery = {};
 
+      if (shopName !== "" && shopName !== null) {
+        shopNameQuery = { shopName: shopName };
+      }
 
-    // const options = { sort: [['personalInfo.name', 'asc' ]] };
-// UserModel.find({})
-//.populate({ path: 'group', select: 'nome', options })
-    //get shop by id 
-    //A
-    
-    getShopById: async(_,{shopId},{Shop})=>{
+      if (marketName !== "" && marketName !== null) {
+        marketNameQuery = { marketName: marketName };
+      }
+
+      if (startDate !== null || endDate !== null)
+        dateQuery = {
+          createdAt: {
+            $gte: new Date(new Date(startDate).setUTCHours(0, 0, 0, 0)),
+            $lt: new Date(new Date(endDate).setUTCHours(23, 59, 59, 59)),
+          },
+        };
+
+      let query = {
+        $and: [dateQuery, shopNameQuery, marketNameQuery],
+      };
+
+      const transactions = await Transaction.paginate(query, options);
+
+      return transactions;
+    },
+
+    getShopById: async (_, { shopId }, { Shop }) => {
       const shop = await Shop.findById(shopId).populate("personalInfoId");
       return shop;
     },
 
-    //getBuyerWithPagination 
-    getBuyerWithPagination:async(_,{page,limit,keyword,startDate,endDate},{PersonalInfo})=>{
+    //getBuyerWithPagination
+    getBuyerWithPagination: async (
+      _,
+      { page, limit, keyword, startDate, endDate },
+      { PersonalInfo }
+    ) => {
       const options = {
-          page: page || 1,
-          limit: limit || 10,
-          customLabels: PersonalInfoLabels,
-          sort: {
-            createdAt: -1,
+        page: page || 1,
+        limit: limit || 10,
+        customLabels: PersonalInfoLabels,
+        sort: {
+          createdAt: -1,
+        },
+        // populate: "",
+      };
+      let dateQuery = {};
+
+      if (startDate !== null || endDate !== null)
+        dateQuery = {
+          createdAt: {
+            $gte: new Date(new Date(startDate).setUTCHours(0, 0, 0, 0)),
+            $lt: new Date(new Date(endDate).setUTCHours(23, 59, 59, 59)),
           },
-          // populate: "",
         };
-        let dateQuery = {};
 
-        if(startDate !== null ||  endDate !== null)  dateQuery = {"createdAt":{$gte:new Date(new Date(startDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(endDate).setUTCHours(23,59,59,59))}};
-        
-  
-     
-    let    query = {
-          $and: [
-            dateQuery,
-            {buyer:true},
-            {
-              $or: [
-                {
-                  "$expr": {
-                    "$regexMatch": {
-                      "input": { "$concat": ["$lastName"," ","$firstName"] },
-                      "regex": keyword,  //Your text search here
-                      "options": "i"
-                    }
-                  }
+      let query = {
+        $and: [
+          dateQuery,
+          { buyer: true },
+          {
+            $or: [
+              {
+                $expr: {
+                  $regexMatch: {
+                    input: { $concat: ["$lastName", " ", "$firstName"] },
+                    regex: keyword, //Your text search here
+                    options: "i",
+                  },
                 },
+              },
 
-                { englishName: { $regex: keyword, $options: "i" } },
-                { tel: { $regex: keyword, $options: "i" } },
-                { village: { $regex: keyword, $options: "i" } },
-                { commune: { $regex: keyword, $options: "i" } },
-                { disctrict: { $regex: keyword, $options: "i" } },
-                { province: { $regex: keyword, $options: "i" } },
-                { patientId: { $regex: keyword, $options: "i" } },
-                { idCard: { $regex: keyword, $options: "i" } },
+              { englishName: { $regex: keyword, $options: "i" } },
+              { tel: { $regex: keyword, $options: "i" } },
+              { village: { $regex: keyword, $options: "i" } },
+              { commune: { $regex: keyword, $options: "i" } },
+              { disctrict: { $regex: keyword, $options: "i" } },
+              { province: { $regex: keyword, $options: "i" } },
+              { patientId: { $regex: keyword, $options: "i" } },
+              { idCard: { $regex: keyword, $options: "i" } },
+            ],
+          },
+        ],
+      };
 
-              ],
-            },
+      const buyers = await PersonalInfo.paginate(query, options);
 
-        
-          
-          ],
-        };
-
-      
-        const buyers = await PersonalInfo.paginate(query, options);
-        
-        return buyers;
-  },
+      return buyers;
+    },
 
     // getSellerWithpagination
     //getShop
-    getSellerWithpagination:async(_,{page,limit,keyword,isSeller,marketName},{PersonalInfo})=>{
-        const options = {
-            page: page || 1,
-            limit: limit || 10,
-            customLabels: PersonalInfoLabels,
-            sort: {
-              createdAt: -1,
-            },
-            populate: "personalInfoId",
-          };
-          let sellerQuery = {};
-          let marketNameQuery = {};
-          if(marketName!=="" && marketName!==undefined){
-            marketNameQuery = {"marketName":marketName};
-          }
+    getSellerWithpagination: async (
+      _,
+      { page, limit, keyword, isSeller, marketName },
+      { PersonalInfo }
+    ) => {
+      const options = {
+        page: page || 1,
+        limit: limit || 10,
+        customLabels: PersonalInfoLabels,
+        sort: {
+          createdAt: -1,
+        },
+        populate: "personalInfoId",
+      };
+      let sellerQuery = {};
+      let marketNameQuery = {};
+      if (marketName !== "" && marketName !== undefined) {
+        marketNameQuery = { marketName: marketName };
+      }
 
-          if(isSeller){
-            sellerQuery = {"seller":true};
-          }
-      let    query = {
-            $and: [
-              sellerQuery,
-              marketNameQuery,
+      if (isSeller) {
+        sellerQuery = { seller: true };
+      }
+      let query = {
+        $and: [
+          sellerQuery,
+          marketNameQuery,
+          {
+            $or: [
               {
-                $or: [
-                  {
-                    "$expr": {
-                      "$regexMatch": {
-                        "input": { "$concat": ["$lastName"," ","$firstName"] },
-                        "regex": keyword,  //Your text search here
-                        "options": "i"
-                      }
-                    }
+                $expr: {
+                  $regexMatch: {
+                    input: { $concat: ["$lastName", " ", "$firstName"] },
+                    regex: keyword, //Your text search here
+                    options: "i",
                   },
-  
-                  { englishName: { $regex: keyword, $options: "i" } },
-                  { tel: { $regex: keyword, $options: "i" } },
-                  { village: { $regex: keyword, $options: "i" } },
-                  { commune: { $regex: keyword, $options: "i" } },
-                  { disctrict: { $regex: keyword, $options: "i" } },
-                  { province: { $regex: keyword, $options: "i" } },
-                  { patientId: { $regex: keyword, $options: "i" } },
-                  { idCard: { $regex: keyword, $options: "i" } },
-
-                ],
+                },
               },
-  
-          
-            
+
+              { englishName: { $regex: keyword, $options: "i" } },
+              { tel: { $regex: keyword, $options: "i" } },
+              { village: { $regex: keyword, $options: "i" } },
+              { commune: { $regex: keyword, $options: "i" } },
+              { disctrict: { $regex: keyword, $options: "i" } },
+              { province: { $regex: keyword, $options: "i" } },
+              { patientId: { $regex: keyword, $options: "i" } },
+              { idCard: { $regex: keyword, $options: "i" } },
             ],
-          };
+          },
+        ],
+      };
 
-      
-          const sellers = await PersonalInfo.paginate(query, options);
-          
-          return sellers;
+      const sellers = await PersonalInfo.paginate(query, options);
+
+      return sellers;
     },
-    getShopWithPagination:async(_,{page,limit,keyword,marketName},{Shop})=>{
-        const options = {
-            page: page || 1,
-            limit: limit || 10,
-            customLabels: Shoplabels,
-            sort: {
-              createdAt: -1,
-            },
-            populate: "personalInfoId",
-          };
-          let marketNameQuery ={};
-          if(marketName!==undefined && marketName !==""){
-            marketNameQuery = {"marketName":marketName};
-          }
+    getShopWithPagination: async (
+      _,
+      { page, limit, keyword, marketName },
+      { Shop }
+    ) => {
+      const options = {
+        page: page || 1,
+        limit: limit || 10,
+        customLabels: Shoplabels,
+        sort: {
+          createdAt: -1,
+        },
+        populate: "personalInfoId",
+      };
+      let marketNameQuery = {};
+      if (marketName !== undefined && marketName !== "") {
+        marketNameQuery = { marketName: marketName };
+      }
 
-          let query = {
-            $and:[
-              marketNameQuery,
-              {
+      let query = {
+        $and: [
+          marketNameQuery,
+          {
             $or: [
               { name: { $regex: keyword, $options: "i" } },
               { lastName: { $regex: keyword, $options: "i" } },
@@ -264,42 +317,56 @@ export default {
               { disctrict: { $regex: keyword, $options: "i" } },
               { province: { $regex: keyword, $options: "i" } },
             ],
-          }
-        
-        ]};
+          },
+        ],
+      };
 
-          const shops = await Shop.paginate(query, options);
-          return shops;
+      const shops = await Shop.paginate(query, options);
+      return shops;
     },
-//@Desc get the shop by patient id for finding the shops that the the patient went to
-//@Desc private 
+    //@Desc get the shop by patient id for finding the shops that the the patient went to
+    //@Desc private
 
-getAffectedShopBypatientIdWithPagination: async (_, {page,limit,keyword,marketName,startDate,endDate,personalInfoId}, {Transaction}) => {
-        let createDateAt = {};
-        const options = {
-            page: page || 1,
-            limit: limit || 10,
-            customLabels: Shoplabels,
-            sort: {
-              createdAt: -1,
-            },
-            populate: "shopId personalInfoId",
-          };
+    getAffectedShopBypatientIdWithPagination: async (
+      _,
+      { page, limit, keyword, marketName, startDate, endDate, personalInfoId },
+      { Transaction }
+    ) => {
+      let createDateAt = {};
+      const options = {
+        page: page || 1,
+        limit: limit || 10,
+        customLabels: Shoplabels,
+        sort: {
+          createdAt: -1,
+        },
+        populate: "shopId personalInfoId",
+      };
 
-          if(startDate !== null ||  endDate !== null)  createDateAt = {"createdAt":{$gte:new Date(new Date(startDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(endDate).setUTCHours(23,59,59,59))}};
-          let query = {
-              $and:[createDateAt,{"personalInfoId":personalInfoId}]
-          };
-          const personals = await Transaction.paginate(query, options);
-       
-          return personals;
+      if (startDate !== null || endDate !== null)
+        createDateAt = {
+          createdAt: {
+            $gte: new Date(new Date(startDate).setUTCHours(0, 0, 0, 0)),
+            $lt: new Date(new Date(endDate).setUTCHours(23, 59, 59, 59)),
+          },
+        };
+      let query = {
+        $and: [createDateAt, { personalInfoId: personalInfoId }],
+      };
+      const personals = await Transaction.paginate(query, options);
+
+      return personals;
     },
     //@Desc get the people by shop id for finding the people went the affected shops
-    //@Desc private 
+    //@Desc private
 
-    getAffectedPeopleByShopIdWithPagination: async (_, {page,limit,keyword,marketName,startDate,endDate,shopId}, {Transaction}) => {
-    let createDateAt = {};
-    const options = {
+    getAffectedPeopleByShopIdWithPagination: async (
+      _,
+      { page, limit, keyword, marketName, startDate, endDate, shopId },
+      { Transaction }
+    ) => {
+      let createDateAt = {};
+      const options = {
         page: page || 1,
         limit: limit || 10,
         customLabels: Transactionlabels,
@@ -309,13 +376,19 @@ getAffectedShopBypatientIdWithPagination: async (_, {page,limit,keyword,marketNa
         populate: "shopId personalInfoId",
       };
 
-      if(startDate !== null ||  endDate !== null)  createDateAt = {"createdAt":{$gte:new Date(new Date(startDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(endDate).setUTCHours(23,59,59,59))}};
+      if (startDate !== null || endDate !== null)
+        createDateAt = {
+          createdAt: {
+            $gte: new Date(new Date(startDate).setUTCHours(0, 0, 0, 0)),
+            $lt: new Date(new Date(endDate).setUTCHours(23, 59, 59, 59)),
+          },
+        };
       let query = {
-          $and:[createDateAt,{"shopId":shopId}]
+        $and: [createDateAt, { shopId: shopId }],
       };
       const shops = await Transaction.paginate(query, options);
-    return shops;
-    }
+      return shops;
+    },
   },
   Mutation: {
     //@Desc Create transaction between the seller and the buyer
@@ -323,24 +396,29 @@ getAffectedShopBypatientIdWithPagination: async (_, {page,limit,keyword,marketNa
     createTransaction: async (
       _,
       { shopId, personalInfoId },
-      { Transaction ,PersonalInfo}
+      { Transaction, PersonalInfo, Shop }
     ) => {
       try {
-        console.log(shopId,personalInfoId,)
-      const personExisted = await PersonalInfo.findById(personalInfoId);
-      if(!personExisted){
-        return {
-          success:false,
-          message:"PNE"
-        }
-      }
+        console.log(shopId, personalInfoId);
 
-      //PNE = personalInfoId is not existed
+        const shopData = await Shop.findById(shopId);
+
+        const personExisted = await PersonalInfo.findById(personalInfoId);
+        if (!personExisted) {
+          return {
+            success: false,
+            message: "PNE",
+          };
+        }
+
+        //PNE = personalInfoId is not existed
         const transaction = new Transaction({
           shopId: shopId,
           personalInfoId: personalInfoId,
+          marketName: shopData.marketName || "",
+          shopName: shopData.name || "",
         });
-       
+
         const created = await transaction.save();
         if (!created) {
           return {
@@ -366,72 +444,98 @@ getAffectedShopBypatientIdWithPagination: async (_, {page,limit,keyword,marketNa
       try {
         const shop = new Shop(newShop);
         const created = await shop.save();
-        if(!created){
-            return {
-                message:"Shop is not created",
-                success: false
-            }
+        if (!created) {
+          return {
+            message: "Shop is not created",
+            success: false,
+          };
         }
 
         return {
-            message:"new Shop created",
-            success: true
-        }
+          message: "new Shop created",
+          success: true,
+        };
       } catch (error) {
-          return {
-              message:"Shop is not created",
-              success: false
-          }
+        return {
+          message: "Shop is not created",
+          success: false,
+        };
       }
     },
 
-    //@Desc update the shop 
-    //@Access private 
-updateShop:async(_,{updatedShop,shopId},{Shop})=>{
-    try {
-        const updated = await Shop.findByIdAndUpdate({_id:shopId},updatedShop);
-        if(!updated){
-            return {
-                success:false,
-                message:"Cannot update the shop"
-            }
+    //@Desc update the shop
+    //@Access private
+    updateShop: async (_, { updatedShop, shopId }, { Shop }) => {
+      try {
+        const updated = await Shop.findByIdAndUpdate(
+          { _id: shopId },
+          updatedShop
+        );
+        if (!updated) {
+          return {
+            success: false,
+            message: "Cannot update the shop",
+          };
         }
         return {
-            success:true,
-            message:"updated successfully !"
-        }
-    } catch (error) {
+          success: true,
+          message: "updated successfully !",
+        };
+      } catch (error) {
         return {
-            success:false,
-            message:"Cannot update the shop"
+          success: false,
+          message: "Cannot update the shop",
+        };
+      }
+    },
+    //@Desct delete the transaction by id
+    //@acess admin
+
+    deleteTrasaction: async (_, { transactionId }, { Transaction }) => {
+      try {
+        const deleted = await Transaction.findByIdAndDelete(transactionId);
+        if (!deleted) {
+          return {
+            success: false,
+            message: "Deleted not successfully ",
+          };
         }
-    }
-},
 
-//@Desc delete the shop from the database 
-//@Access private 
+        return {
+          success: true,
+          message: "Deleted successfully ",
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: error.message,
+        };
+      }
+    },
 
-deleteShop:async(_,{shopId},{Shop})=>{
-    try {
+    //@Desc delete the shop from the database
+    //@Access private
+
+    deleteShop: async (_, { shopId }, { Shop }) => {
+      try {
         const deleted = await Shop.findByIdAndDelete(shopId);
-        if(!deleted){
-            return {
-                message:"Shop not deleted",
-                success: true
-            }
+        if (!deleted) {
+          return {
+            message: "Shop not deleted",
+            success: true,
+          };
         }
         return {
-            message:"Shop deleted successfully !",
-            success: true
-        }
-    } catch (error) {
+          message: "Shop deleted successfully !",
+          success: true,
+        };
+      } catch (error) {
         return {
-            message: "Shop not deleted !",
-            success: true
-        }
-    }
-},
-
+          message: "Shop not deleted !",
+          success: true,
+        };
+      }
+    },
 
     //@Desc sending the telephone to verify with the twilio compnay
     //@Access public
@@ -453,9 +557,8 @@ deleteShop:async(_,{shopId},{Shop})=>{
           }
         }
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-  
     },
 
     //@Desc send the code to verify (code and the telephone number )
@@ -467,32 +570,36 @@ deleteShop:async(_,{shopId},{Shop})=>{
       { PersonalInfo }
     ) => {
       try {
-
-const exist = await PersonalInfo.findOne({$and:[{"tel":phonenumber},{"firstName":firstName},{lastName:lastName}]});
-let buyer;
-if(!exist){
-    buyer = new PersonalInfo({
-        firstName: firstName,
-        lastName: lastName,
-        tel: phonenumber,
-        buyer: true,
-    });
-}else{
-  return {
-    success: true,
-    message: "Verified",
-    id: exist._id,
-  }
-}
-          const created = await buyer.save();
-          if (created) {
-            return {
-              success: true,
-              message: "Verified",
-              id: created._id,
-            };
-          }
-        
+        const exist = await PersonalInfo.findOne({
+          $and: [
+            { tel: phonenumber },
+            { firstName: firstName },
+            { lastName: lastName },
+          ],
+        });
+        let buyer;
+        if (!exist) {
+          buyer = new PersonalInfo({
+            firstName: firstName,
+            lastName: lastName,
+            tel: phonenumber,
+            buyer: true,
+          });
+        } else {
+          return {
+            success: true,
+            message: "Verified",
+            id: exist._id,
+          };
+        }
+        const created = await buyer.save();
+        if (created) {
+          return {
+            success: true,
+            message: "Verified",
+            id: created._id,
+          };
+        }
       } catch (error) {
         return {
           success: false,

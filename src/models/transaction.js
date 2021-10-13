@@ -11,7 +11,8 @@ const transactionSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"PersonalInfo"
     },
-
+    marketName:String,
+    shopName:String
 },{
     timestamps:true
 });

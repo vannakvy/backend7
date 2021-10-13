@@ -9,9 +9,10 @@ export default gql`
     # excelExport(startDate:Date, endDate:Date): [PersonalInfo!]!
     getSellerWithpagination(keyword:String,limit:Int,page:Int,isSeller:Boolean,marketName:String):PaginateResponse @isAuth(requires:VIEW_SELLER)
     getBuyerWithPagination(keyword:String,limit:Int,page:Int,startDate:Date, endDate:Date):PaginateResponse @isAuth(requires:VIEW_BUYER)
-    getTransaction(startDate:Date, endDate:Date,market:String,limit:Int,page:Int,marketName:String):[Transaction!]!
+    getTransactionWithPagination(startDate:Date, endDate:Date,market:String,limit:Int,page:Int,marketName:String,keyword:String,shopName:String):Paginator3!
+    getTransactionForGraph(startDate:Date,endDate:Date,marketName:String):[GraphTranResponse!]!
+    getDataForTotalBoxes:TotalResponse
     testPopulate:String
-
   }
   
   extend type Mutation {
@@ -25,10 +26,27 @@ export default gql`
   deleteTrasaction(transactionId:ID!):vendorResponse @isAuth(requires:DELETE_TRANSACTION)
 
   }
+  type TotalResponse{
+        totalTransaction: Int
+        totalTransactionToday: Int
+        totalBuyer: Int
+        totalBuyerToday: Int
+        totalShops: Int
+        totalShopToday: Int
+        totalMarket: Int
+  }
 
+type GraphTranResponse {
+  _id:String,
+  total:Int
+}
 
   type Paginator1{
     shops:[Transaction]
+    paginator:Paginator!
+  }
+  type Paginator3{
+    transactions: [Transaction],
     paginator:Paginator!
   }
   input shopInput{
@@ -96,7 +114,8 @@ type TransactionResponse{
     personalInfoId:ID
 }
 type Transaction{
-  personalInfoId:PersonalInfo,
+  _id:ID
+  personalInfoId:PersonalInfo
   shopId:Shop
   createdAt:Date 
 }
