@@ -125,6 +125,7 @@ export default {
       { page, limit, keyword, startDate, endDate, marketName, shopName },
       { Transaction }
     ) => {
+      console.log(marketName,"dd")
       const options = {
         page: page || 1,
         limit: limit || 10,
@@ -138,13 +139,14 @@ export default {
       let marketNameQuery = {};
       let shopNameQuery = {};
 
-      if (shopName !== "" && shopName !== null) {
-        shopNameQuery = { shopName: shopName };
-      }
+      // if (shopName !== "" && shopName !== null) {
+      //   shopNameQuery = { shopName: shopName };
+      // }
 
       if (marketName !== "" && marketName !== null) {
         marketNameQuery = { marketName: marketName };
       }
+      console.log(marketNameQuery)
 
       if (startDate !== null || endDate !== null)
         dateQuery = {
@@ -155,7 +157,7 @@ export default {
         };
 
       let query = {
-        $and: [dateQuery, shopNameQuery, marketNameQuery],
+        $and: [dateQuery, marketNameQuery],
       };
 
       const transactions = await Transaction.paginate(query, options);
@@ -399,8 +401,7 @@ export default {
       { Transaction, PersonalInfo, Shop }
     ) => {
       try {
-        console.log(shopId, personalInfoId);
-
+console.log(shopId,"shop id");
         const shopData = await Shop.findById(shopId);
 
         const personExisted = await PersonalInfo.findById(personalInfoId);
@@ -410,7 +411,7 @@ export default {
             message: "PNE",
           };
         }
-
+console.log(shopData)
         //PNE = personalInfoId is not existed
         const transaction = new Transaction({
           shopId: shopId,
@@ -418,7 +419,7 @@ export default {
           marketName: shopData.marketName || "",
           shopName: shopData.name || "",
         });
-
+console.log(transaction)
         const created = await transaction.save();
         if (!created) {
           return {
