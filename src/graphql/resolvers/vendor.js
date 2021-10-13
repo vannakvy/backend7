@@ -40,15 +40,75 @@ export default {
 
     //test query 
 
-    getTransaction: async(_,{startDate, endDate, marketName},{Transaction})=>{
-      
-      let dateQuery = {};
-      if(startDate !== null ||  endDate !== null)  dateQuery ={"createdAt":{$gte:new Date(new Date(startDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(endDate).setUTCHours(23,59,59,59))}};
+    // getTransaction: async(_,{startDate, endDate, marketName, page,limit},{Transaction})=>{
+    //   let dateQuery = {};
+    //   if(startDate !== null ||  endDate !== null)  dateQuery ={"createdAt":{$gte:new Date(new Date(startDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(endDate).setUTCHours(23,59,59,59))}};
 
-      const transactions = await Transaction.find(dateQuery).populate({path:'personalInfoId', select: "tel firstName lastName"})
-      .populate({path:'shopId',select:"marketName,name,shopNumber"});
-     return transactions
-    },
+    //   const transactions = await Transaction.find(dateQuery).populate({path:'personalInfoId', select: "tel firstName lastName"})
+    //   .populate({path:'shopId',select:"marketName,name,shopNumber"});
+    //  return transactions
+    // },
+
+
+    getTransaction:async(_,{page,limit,keyword,startDate,endDate,marketName},{Transaction})=>{
+      const options = {
+          page: page || 1,
+          limit: limit || 10,
+          customLabels: Transactionlabels,
+          sort: {
+            createdAt: -1,
+          },
+          populate: "personalInfoId shopId",
+        };
+        let dateQuery = {};
+        let marketNameQuery ={}
+        if(marketName!=="" && marketName !==null){
+          marketNameQuery = {"marketName":marketName};
+        }
+
+        if(startDate !== null ||  endDate !== null)  dateQuery = {"createdAt":{$gte:new Date(new Date(startDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(endDate).setUTCHours(23,59,59,59))}};
+        
+     
+    let    query = {
+          $and: [
+            dateQuery,
+            {buyer:true},
+            {
+              $or: [
+                {
+                  "$expr": {
+                    "$regexMatch": {
+                      "input": { "$concat": ["$lastName"," ","$firstName"] },
+                      "regex": keyword,  //Your text search here
+                      "options": "i"
+                    }
+                  }
+                },
+
+                { englishName: { $regex: keyword, $options: "i" } },
+                { tel: { $regex: keyword, $options: "i" } },
+                { village: { $regex: keyword, $options: "i" } },
+                // { commune: { $regex: keyword, $options: "i" } },
+                // { disctrict: { $regex: keyword, $options: "i" } },
+                // { province: { $regex: keyword, $options: "i" } },
+                // { patientId: { $regex: keyword, $options: "i" } },
+                // { idCard: { $regex: keyword, $options: "i" } },
+
+              ],
+            },
+
+        
+          
+          ],
+        };
+
+      
+        const transactions = await Transaction.paginate(query, options);
+
+        
+        return transactions;
+  },
+
 
     // const options = { sort: [['personalInfo.name', 'asc' ]] };
 // UserModel.find({})

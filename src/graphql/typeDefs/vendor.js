@@ -9,9 +9,9 @@ export default gql`
     # excelExport(startDate:Date, endDate:Date): [PersonalInfo!]!
     getSellerWithpagination(keyword:String,limit:Int,page:Int,isSeller:Boolean,marketName:String):PaginateResponse @isAuth(requires:VIEW_SELLER)
     getBuyerWithPagination(keyword:String,limit:Int,page:Int,startDate:Date, endDate:Date):PaginateResponse @isAuth(requires:VIEW_BUYER)
-    getTransaction(startDate:Date, endDate:Date,market:String,limit:Int,marketName:String):[Transaction!]!
+    getTransaction(startDate:Date, endDate:Date,market:String,limit:Int,page:Int,marketName:String):[Transaction!]!
     testPopulate:String
-    
+
   }
   
   extend type Mutation {
