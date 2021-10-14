@@ -41,8 +41,7 @@ export default {
     //
     //test query
 
-    getMarketWithTotalScan:async(_,{},{Transaction})=>{
-
+    getMarketWithTotalScan:async(_,{},{Transaction,Shop})=>{
       var start = new Date(new Date().setUTCHours(0, 0, 0, 0));
       var end = new Date(new Date().setUTCHours(23, 59, 59, 59));
    
@@ -80,29 +79,81 @@ export default {
         },
       ];
 
+      let query2 = [
+        {
+          $project: {
+            marketName: 1,
+            totalShop:1,
+            totalShoptoday: {
+              $cond: [
+                {
+                  $and: [
+                    dateStart,
+                    dateEnd,
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+            //
+          },
+        },
+        {
+          $group: {
+            _id: "$marketName",
+            totalShop: { $sum: 1 },
+            totalShoptoday: { $sum: "$totalShoptoday" },
+          },
+        },
+        {$match:{"_id":{$ne:null}}}
+      ];
+
+ const joinArray = (arr1, arr2) => {
+        let arr = []
+        arr1.map(load => {
+            arr2.map(load1 => {
+                if(load1._id === load._id){
+                    arr.push({...load, ...load1})
+                }
+            })
+        })
+      return arr;
+      }
       const marketList = await Transaction.aggregate(query);
-     
-      return marketList;
+      const shopGroup = await Shop.aggregate(query2);
+
+ const newArr= joinArray(shopGroup,marketList);
+
+      return newArr;
     },
 
     getDataForTotalBoxes: async (
       _,
-      {},
+      {marketName},
       { PersonalInfo, Shop, Transaction }
     ) => {
+
+      let marketNameQuery ={};
+      if(marketName!==""){
+        marketNameQuery = {"marketName":marketName};
+      }
+
       var start = new Date(new Date().setUTCHours(0, 0, 0, 0));
       var end = new Date(new Date().setUTCHours(23, 59, 59, 59));
-      const totalTransaction = await Transaction.countDocuments({});
+      const totalTransaction = await Transaction.countDocuments(marketNameQuery);
       const totalTransactionToday = await Transaction.countDocuments({
         createdAt: { $gte: start, $lt: end },
+        marketNameQuery,
       });
       const totalBuyer = await PersonalInfo.countDocuments({ buyer: true });
       const totalBuyerToday = await PersonalInfo.countDocuments({
         createdAt: { $gte: start, $lt: end },
       });
-      const totalShops = await Shop.countDocuments({});
+      const totalShops = await Shop.countDocuments(marketNameQuery);
       const totalShopToday = await Shop.countDocuments({
         createdAt: { $gte: start, $lt: end },
+        marketNameQuery
       });
       const totalM = await Shop.aggregate([
         { $group: { _id: "$marketName", total: { $sum: 1 } } },
