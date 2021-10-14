@@ -24,6 +24,7 @@ const Transactionlabels = {
   totalDocs: "totalDocs",
   totalPages: "totalPages",
 };
+
 const PersonalInfoLabels = {
   docs: "personalInfos",
   limit: "perPage",
@@ -40,6 +41,11 @@ export default {
   Query: {
     //
     //test query
+    // testPopulate:async(_,{},{PersonalInfo})=>{
+    //   const deleted = await PersonalInfo.deleteMany({buyer:true});
+
+    //   console.log(deleted)
+    // },
 
     getMarketWithTotalScan:async(_,{},{Transaction,Shop})=>{
       var start = new Date(new Date().setUTCHours(0, 0, 0, 0));
@@ -127,7 +133,7 @@ export default {
 
       return newArr;
     },
-
+//@For boxes data
     getDataForTotalBoxes: async (
       _,
       {marketName},
@@ -143,17 +149,17 @@ export default {
       var end = new Date(new Date().setUTCHours(23, 59, 59, 59));
       const totalTransaction = await Transaction.countDocuments(marketNameQuery);
       const totalTransactionToday = await Transaction.countDocuments({
-        createdAt: { $gte: start, $lt: end },
-        marketNameQuery,
+      $and:[{createdAt: { $gte: start, $lt: end }},
+        marketNameQuery]
       });
       const totalBuyer = await PersonalInfo.countDocuments({ buyer: true });
       const totalBuyerToday = await PersonalInfo.countDocuments({
-        createdAt: { $gte: start, $lt: end },
+       $and:[{createdAt: { $gte: start, $lt: end }},{buyser:true}]
       });
       const totalShops = await Shop.countDocuments(marketNameQuery);
       const totalShopToday = await Shop.countDocuments({
-        createdAt: { $gte: start, $lt: end },
-        marketNameQuery
+        $and : [{createdAt: { $gte: start, $lt: end }},
+        marketNameQuery]
       });
       const totalM = await Shop.aggregate([
         { $group: { _id: "$marketName", total: { $sum: 1 } } },
