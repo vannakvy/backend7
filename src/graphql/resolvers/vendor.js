@@ -154,7 +154,7 @@ export default {
       });
       const totalBuyer = await PersonalInfo.countDocuments({ buyer: true });
       const totalBuyerToday = await PersonalInfo.countDocuments({
-       $and:[{createdAt: { $gte: start, $lt: end }},{buyser:true}]
+       $and:[{createdAt: { $gte: start, $lt: end }},{buyer:true}]
       });
       const totalShops = await Shop.countDocuments(marketNameQuery);
       const totalShopToday = await Shop.countDocuments({
