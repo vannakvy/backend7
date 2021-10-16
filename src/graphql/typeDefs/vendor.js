@@ -10,7 +10,7 @@ export default gql`
     getSellerWithpagination(keyword:String,limit:Int,page:Int,isSeller:Boolean,marketName:String):PaginateResponse 
     getBuyerWithPagination(keyword:String,limit:Int,page:Int,startDate:Date, endDate:Date):PaginateResponse @isAuth(requires:VIEW_BUYER)
     getTransactionWithPagination(startDate:Date, endDate:Date,market:String,limit:Int,page:Int,marketName:String,keyword:String,shopName:String):Paginator3!
-    getTransactionForGraph(startDate:Date,endDate:Date,marketName:String):[GraphTranResponse!]!
+    getTransactionForGraph(startDate:Date,endDate:Date,marketName:String):GraphTranResponse!
     getDataForTotalBoxes(marketName:String):TotalResponse
     getMarketWithTotalScan:[MarketListResponse]
     testPopulate:String
@@ -45,10 +45,18 @@ export default gql`
     totalShoptoday: Int
   }
 
+
+
 type GraphTranResponse {
+  graph_transaction:[GraphType]
+  graph_buyer:[GraphType]
+}
+
+type GraphType{
   _id:String,
   total:Int
 }
+
 
   type Paginator1{
     shops:[Transaction]

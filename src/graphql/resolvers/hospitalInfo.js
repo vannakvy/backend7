@@ -13,7 +13,7 @@ const HospitalInfoLabels = {
   };
 
 export default {
-    Query:{
+    Query:{ 
 
         //@Desc get total patient that is recovered immigrant worker to a specific country 
         //@Access doctor 
@@ -56,7 +56,6 @@ export default {
             let totalDeltaIn = await PersonalInfo.countDocuments({$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},
                 {hospitalizations: { $elemMatch: { covidVariant:"DELTA"} }} ]} )
              
-
 
             let totalOutToday = await PersonalInfo.countDocuments(
                 {$and:[ {hospitalizations: { $elemMatch: { hospitalInfo: hospitalInfo } }},{ hospitalizations: { $elemMatch: { date_out: {$gte:today,$lt:tomorrow}}}} ]} ) 

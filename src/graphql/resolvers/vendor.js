@@ -181,9 +181,9 @@ export default {
     getTransactionForGraph: async (
       _,
       { marketName, startDate, endDate },
-      { Transaction }
+      { Transaction,PersonalInfo }
     ) => {
- 
+
       let dateQuery = {};
       let marketNameQuery = {};
       if (marketName !== "" && marketName !== null) {
@@ -219,8 +219,36 @@ export default {
         },
         { $sort: { _id: 1 } },
       ]);
-      return transGraph;
+
+      const transGraph2 = await PersonalInfo.aggregate([
+        { $match: {buyer:true} },
+        { $match: dateQuery },
+        {
+          $project: {
+            yearMonthDayUTC: {
+              $dateToString: {
+                format: "%d-%m-%Y",
+                date: "$createdAt",
+              },
+            },
+          },
+        },
+        {
+          $group: {
+            _id: "$yearMonthDayUTC",
+            total: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+      ]);
+      
+      return {
+        graph_transaction:transGraph,
+        graph_buyer:transGraph2
+      }
     },
+
+    
 
     getTransactionWithPagination: async (
       _,
