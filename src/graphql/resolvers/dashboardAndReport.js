@@ -158,7 +158,6 @@ export default {
       let recoveredEndDateQuery = {};
       let deathDateStart = {};
       let deathEndDateQuery = {};
-
       if (startDate !== null && endDate !== null) {
         confirmDateStart = { $gte: ["$currentState.confirmedAt", start] };
         confirmEndDateQuery = { $lt: ["$currentState.confirmedAt", end] };
@@ -225,59 +224,48 @@ export default {
 
       const data = await PersonalInfo.aggregate(d);
       let keys = [
-        { label: "1-10", death: 0, recovered: 0, confirm: 0 },
-        { label: "11-19", death: 0, recovered: 0, confirm: 0 },
-        { label: "20-30", death: 0, recovered: 0, confirm: 0 },
-        { label: "31-45", death: 0, recovered: 0, confirm: 0 },
-        { label: "46-60", death: 0, recovered: 0, confirm: 0 },
-        { label: "61-80", death: 0, recovered: 0, confirm: 0 },
-        { label: "81-95", death: 0, recovered: 0, confirm: 0 },
-        { label: "96-UP", death: 0, recovered: 0, confirm: 0 },
+        { label: "0-5", death: 0, recovered: 0, confirm: 0 },
+        { label: "6-11", death: 0, recovered: 0, confirm: 0 },
+        { label: "12-17", death: 0, recovered: 0, confirm: 0 },
+        { label: "18-45", death: 0, recovered: 0, confirm: 0 },
+        { label: "46-59", death: 0, recovered: 0, confirm: 0 },
+        { label: "61-ឡើង", death: 0, recovered: 0, confirm: 0 },
       ];
 
       data.map((el) => {
-        if (el._id <= 10) {
+        if (el._id <= 5) {
           keys[0].death += el.death;
           keys[0].recovered += el.recovered;
           keys[0].confirm += el.confirm;
         }
-        if (el._id >= 11 && el._id <= 19) {
+        if (el._id >= 6 && el._id <= 11) {
           keys[1].death += el.death;
           keys[1].recovered += el.recovered;
           keys[1].confirm += el.confirm;
         }
-        if (el._id >= 20 && el._id <= 30) {
+        if (el._id >= 12 && el._id <= 17) {
           keys[2].death += el.death;
           keys[2].recovered += el.recovered;
           keys[2].confirm += el.confirm;
         }
-        if (el._id >= 31 && el._id <= 45) {
+        if (el._id >= 18 && el._id <= 45) {
           keys[3].death += el.death;
           keys[3].recovered += el.recovered;
           keys[3].confirm += el.confirm;
         }
-        if (el._id >= 46 && el._id <= 60) {
+        if (el._id >= 46 && el._id <= 59) {
           keys[4].death += el.death;
           keys[4].recovered += el.recovered;
           keys[4].confirm += el.confirm;
         }
-        if (el._id >= 61 && el._id <= 80) {
+        if (el._id >= 60) {
           keys[5].death += el.death;
           keys[5].recovered += el.recovered;
           keys[5].confirm += el.confirm;
         }
-        if (el._id >= 81 && el._id <= 95) {
-          keys[6].death += el.death;
-          keys[6].recovered += el.recovered;
-          keys[6].confirm += el.confirm;
-        }
-        if (el._id >= 96) {
-          keys[7].death += el.death;
-          keys[7].recovered += el.recovered;
-          keys[7].confirm += el.confirm;
-        }
+      
       });
-
+      
       return keys;
     },
 

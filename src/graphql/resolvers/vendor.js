@@ -41,11 +41,31 @@ export default {
   Query: {
     //
     //test query
-    // testPopulate:async(_,{},{PersonalInfo})=>{
-    //   const deleted = await PersonalInfo.deleteMany({buyer:true});
+    testPopulate:async(_,{},{PersonalInfo,Transaction})=>{
+      var start = new Date(new Date().setUTCHours(0, 0, 0, 0));
+      var end = new Date(new Date().setUTCHours(23, 59, 59, 59));
 
-    //   console.log(deleted)
-    // },
+    //get buyer all buyer scanning
+    // const a =  await Transaction.aggregate([
+    //     {
+    //         $group: { _id: '$personalInfoId',count:{$sum:1} }
+    //     },{
+    //     $count: "count"}
+    //     ]);
+
+
+    //get buyer today scanning 
+     const a =  await Transaction.aggregate([
+      // { $match: { createdAt: { $gte: start,$lt:end } } },
+        {
+            $group: { _id: '$personalInfoId',count:{$sum:1} }
+        },{
+        $count: "count"}
+        ]);
+        
+        // let b = await Transaction.find({}).count()
+        console.log(a,"ddd")
+    },
 
     getMarketWithTotalScan:async(_,{},{Transaction,Shop})=>{
       var start = new Date(new Date().setUTCHours(0, 0, 0, 0));
@@ -53,9 +73,6 @@ export default {
    
      let   dateStart = { $gte: ["$createdAt", start] };
      let   dateEnd = { $lt: ["$createdAt", end] };
-    
-
-   
       let query = [
         {
           $project: {
