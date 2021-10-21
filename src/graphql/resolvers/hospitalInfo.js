@@ -19,15 +19,6 @@ export default {
         //@Access doctor 
         reportForImmigrantWorker:async(_,{hospitalId},{PersonalInfo,HospitalInfo})=>{
            let id = await mongoose.Types.ObjectId(hospitalId);
-            // const data = await PersonalInfo.aggregate([
-            //     // {$match:{hospitalizations:{$elemMatch:{hospitalInfo:{$eq:hospitalId.toString()}}}}},
-            
-            //     { $match:{hospitalizations: { $elemMatch: { hospitalInfo:{$eq:id}  } }} },
-            //     {$match:{hospitalizations:{$elemMatch:{personTypes:"ពលករ"}}}},
-            //     {$match:{"hospitalizations.province":{$ne:null}}},
-            //     {$unwind:"$hospitalizations"},
-            //     { $group: { _id: "$hospitalizations.province", total: { $sum: 1 } } },
-            // ]);
                         const data = await PersonalInfo.aggregate([
                 {$match:{"hospitalizations.province":{$ne:null}}},
                 {$match:{"hospitalizations.hospitalInfo":{$eq:id}}},

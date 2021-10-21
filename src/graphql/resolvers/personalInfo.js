@@ -49,7 +49,6 @@ export default {
         { $unwind: "$sampleTest" },
         { $group: { _id: "$sampleTest.testLocation" } },
       ]);
-
       return locationName;
     },
 
@@ -131,8 +130,6 @@ export default {
       if (startDate !== null || endDate !== null) {
         start = formatDate(startDate) + "T00:00:00.00";
         end = formatDate(endDate) + "T23:59:59.00";
-        // start = startDate;
-        // end = endDate;
         query = {
           $and: [
             {
@@ -146,7 +143,6 @@ export default {
                     }
                   }
                 },
-
                 { englishName: { $regex: keyword, $options: "i" } },
                 { tel: { $regex: keyword, $options: "i" } },
                 { village: { $regex: keyword, $options: "i" } },

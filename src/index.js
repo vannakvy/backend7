@@ -63,9 +63,6 @@ const startApp = async () => {
       app,
       cors: true,
     });   
-
-// var env = process.env.NODE_ENV || 'development';
-// loadConfigFile(env + '.json', doStuff);
     const httpServer = http.createServer(app);
     server.installSubscriptionHandlers(httpServer);
     httpServer.listen(PORT, () => {
