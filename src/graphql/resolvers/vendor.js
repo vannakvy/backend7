@@ -200,13 +200,11 @@ export default {
       { marketName, startDate, endDate },
       { Transaction,PersonalInfo }
     ) => {
-
       let dateQuery = {};
       let marketNameQuery = {};
       if (marketName !== "" && marketName !== null) {
         marketNameQuery = { marketName: marketName };
       }
-
       if (startDate !== null || endDate !== null)
         dateQuery = {
           createdAt: {
@@ -214,12 +212,40 @@ export default {
             $lt: new Date(new Date(endDate).setUTCHours(23, 59, 59, 59)),
           },
         };
-      
+        const test = await Transaction.aggregate([
+          { $match: marketNameQuery },
+          { $match: dateQuery },
+          {
+            $project: {
+              yearMonthDayUTC: {
+                $dateToString: {
+                  format: "%d-%m-%Y",
+                  date: "$createdAt",
+                },
+              },
+            },
+          },
+      {
+        $group:{
+          _id: "$yearMonthDayUTC",
+          total: { $sum: 1 },
+        }
+      },
+      { $sort: { _id: 1 } },
+  ]);
+
+        // const abc = await Transaction.aggregate([
+        //   { $match: marketNameQuery },
+        //   { $match: dateQuery }, 
+        // ]);
+
+        console.log(test,"ddtest")
       const transGraph = await Transaction.aggregate([
         { $match: marketNameQuery },
         { $match: dateQuery },
         {
           $project: {
+            personalInfoId:1,
             yearMonthDayUTC: {
               $dateToString: {
                 format: "%d-%m-%Y",
@@ -228,15 +254,22 @@ export default {
             },
           },
         },
+        
         {
           $group: {
-            _id: "$yearMonthDayUTC",
+            _id: {yearMonthDayUTC:"$yearMonthDayUTC",personalInfoId:"$personalInfoId"},
             total: { $sum: 1 },
           },
         },
+        // {
+        //   $group: {
+        //     _id: "$_id.yearMonthDayUTC",
+        //     total: { $sum: 1 },
+        //   },
+        // },
         { $sort: { _id: 1 } },
       ]);
-
+       console.log(transGraph,"Sd");
       const transGraph2 = await PersonalInfo.aggregate([
         { $match: {buyer:true} },
         { $match: dateQuery },
@@ -258,6 +291,8 @@ export default {
         },
         { $sort: { _id: 1 } },
       ]);
+
+      console.log(transGraph2,"Sdd");
       
       return {
         graph_transaction:transGraph,

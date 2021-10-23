@@ -81,9 +81,6 @@ export default {
         { $sort: { _id: 1} }
       ]);
 
-      
-
-      
       return data
     },
     //@Desc get perfornal info for the Hospital
