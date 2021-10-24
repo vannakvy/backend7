@@ -200,13 +200,11 @@ export default {
       { marketName, startDate, endDate },
       { Transaction,PersonalInfo }
     ) => {
-
       let dateQuery = {};
       let marketNameQuery = {};
       if (marketName !== "" && marketName !== null) {
         marketNameQuery = { marketName: marketName };
       }
-
       if (startDate !== null || endDate !== null)
         dateQuery = {
           createdAt: {
@@ -237,15 +235,22 @@ export default {
             },
           },
         },
+        
         {
           $group: {
-            _id: "$yearMonthDayUTC",
+            _id: {yearMonthDayUTC:"$yearMonthDayUTC",personalInfoId:"$personalInfoId"},
             total: { $sum: 1 },
           },
         },
+        // {
+        //   $group: {
+        //     _id: "$_id.yearMonthDayUTC",
+        //     total: { $sum: 1 },
+        //   },
+        // },
         { $sort: { _id: 1 } },
       ]);
-
+       console.log(transGraph,"Sd");
       const transGraph2 = await PersonalInfo.aggregate([
         { $match: {buyer:true} },
         { $match: dateQuery },
@@ -267,6 +272,8 @@ export default {
         },
         { $sort: { _id: 1 } },
       ]);
+
+      console.log(transGraph2,"Sdd");
       
       return {
         graph_transaction:transGraph,
