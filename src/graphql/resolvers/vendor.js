@@ -214,13 +214,22 @@ export default {
             $lt: new Date(new Date(endDate).setUTCHours(23, 59, 59, 59)),
           },
         };
+
+        // const a =  await Transaction.aggregate([
+        //   // { $match: { createdAt: { $gte: start,$lt:end } } },
+        //     {
+        //         $group: { _id: '$personalInfoId',count:{$sum:1} }
+        //     },{
+        //     $count: "count"}
+        //     ]);
       
       const transGraph = await Transaction.aggregate([
         { $match: marketNameQuery },
         { $match: dateQuery },
+        {$group: { _id: '$personalInfoId',createdAt:1,count:{$sum:1}}} ,
         {
           $project: {
-            yearMonthDayUTC: {
+            yearMonthDayUTC: {  
               $dateToString: {
                 format: "%d-%m-%Y",
                 date: "$createdAt",

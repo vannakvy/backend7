@@ -397,6 +397,7 @@ export default {
     //  * @Access Private
     //  */
     updateAccount: async (_, { userId, password, username }, { User }) => {
+
       try {
         let userExist = await User.findById(userId);
         let user = await User.findOne({
@@ -405,27 +406,30 @@ export default {
         // console.log(userExist,"ddd")
         // console.log(user,"bb")
 
+        // if(user){
+        //   return {
+        //     message: "Username ត្រូវបានប្រើប្រាស់រួចហើយ",
+        //     success: false,
+        //   };
+        // }
+
+        let pass =  await hash(password, 10);
+        
         if (userExist) {
-          // Check if the Username is taken
-          if (user === null || userExist.username === username) {
             userExist.username = username;
-            userExist.password = await hash(password, 10);
+            userExist.password = pass;
             let result = await userExist.save();
 
-            return {
-              message: "Successfully update the Account",
-              success: true,
-            };
-          } else {
-            return {
-              message: "Cannot update this account",
-              success: false,
-            };
-          }
+            console.log(result)
         }
+        return {
+          message: "Successfully update the Account",
+          success: true,
+        };
+
       } catch (err) {
         return {
-          message: "This user is not exist",
+          message: err.message,
           success: false,
         };
       }
