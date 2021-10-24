@@ -116,7 +116,6 @@ export default {
           forDividualDistrictQuery = {district:lastName};
         }
       }
-console.log(forDividualDistrictQuery);
       if(fillStartDate!==null && fillEndDate !==null){
         fillDateQuery = {"currentState.confirmFormFilled":{$gte:new Date(new Date(fillStartDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(fillEndDate).setUTCHours(23,59,59,59))}}; 
       }
