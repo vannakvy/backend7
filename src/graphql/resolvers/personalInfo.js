@@ -91,7 +91,7 @@ export default {
       { PersonalInfo,pubsub,req}
     ) => {
   
-
+  
       const options = {
         page: page || 1,
         limit: limit || 25,
@@ -106,6 +106,17 @@ export default {
       let end;
       let testLocationQuery = {};
       let fillDateQuery = {};
+
+      let forDividualDistrictQuery = {};
+      
+      if(req.user){
+        let firstName = req.user.firstName;
+        let lastName = req.user.lastName;
+        if(firstName==="district" || firstName==="city"){
+          forDividualDistrictQuery = {district:lastName};
+        }
+      }
+console.log(forDividualDistrictQuery);
       if(fillStartDate!==null && fillEndDate !==null){
         fillDateQuery = {"currentState.confirmFormFilled":{$gte:new Date(new Date(fillStartDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(fillEndDate).setUTCHours(23,59,59,59))}}; 
       }
@@ -129,6 +140,7 @@ export default {
         end = formatDate(endDate) + "T23:59:59.00";
         query = {
           $and: [
+            forDividualDistrictQuery,
             {
               $or: [
                 {
@@ -1557,7 +1569,6 @@ export default {
         };
       }
     },
-
 
     //@Desc update the current State
     //@Access auth
