@@ -6,8 +6,32 @@ import Paginate from 'mongoose-paginate-v2';
 const roleSchema = Schema({
     role:{
         type: String,
-         enum:['BASIC','ADMIN','SUPPER','DOCTOR','OFFICER','POLICE','DEVELOPER','QUARANTINECONTROLLER'], 
-         default:'BASIC'},
+         default:'BASIC',
+         enum:["BASIC","SUPPER","DEVELOPER",
+                                "ADMIN",
+                                "DOCTOR",
+                                "OFFICER",
+                                "POLICE",
+                                "QUARANTINECONTROLLER",
+                                "DELETE_TRANSACTION",
+                                "CREATE_TRANSACTION",
+                                "UPDATE_TRANSACTION",
+                                "CREATE_SHOP",
+                                "DELETE_SHOP",
+                                "UPDATE_SHOP",
+                                "CREATE_PERSONALINFO",
+                                "UPDATE_PERSONALINFO",
+                                "DELETE_PERSONALINFO",
+                                "PRINT_QRCODE",
+                                "VIEW_SHOP_DETAIL",
+                                "VIEW_BUYER_DETAIL",
+                                "VIEW_ALL_SHOP",
+                                "VIEW_SELLER",
+                                "VIEW_BUYER",
+                                "VIEW_ONE_SHOP",
+                                "SHOP",
+                                "SELLER"]
+                            },
     
 })
 

@@ -212,41 +212,22 @@ export default {
             $lt: new Date(new Date(endDate).setUTCHours(23, 59, 59, 59)),
           },
         };
-        const test = await Transaction.aggregate([
-          { $match: marketNameQuery },
-          { $match: dateQuery },
-          {
-            $project: {
-              yearMonthDayUTC: {
-                $dateToString: {
-                  format: "%d-%m-%Y",
-                  date: "$createdAt",
-                },
-              },
-            },
-          },
-      {
-        $group:{
-          _id: "$yearMonthDayUTC",
-          total: { $sum: 1 },
-        }
-      },
-      { $sort: { _id: 1 } },
-  ]);
 
-        // const abc = await Transaction.aggregate([
-        //   { $match: marketNameQuery },
-        //   { $match: dateQuery }, 
-        // ]);
-
-        console.log(test,"ddtest")
+        // const a =  await Transaction.aggregate([
+        //   // { $match: { createdAt: { $gte: start,$lt:end } } },
+        //     {
+        //         $group: { _id: '$personalInfoId',count:{$sum:1} }
+        //     },{
+        //     $count: "count"}
+        //     ]);
+      
       const transGraph = await Transaction.aggregate([
         { $match: marketNameQuery },
         { $match: dateQuery },
+        {$group: { _id: '$personalInfoId',createdAt:1,count:{$sum:1}}} ,
         {
           $project: {
-            personalInfoId:1,
-            yearMonthDayUTC: {
+            yearMonthDayUTC: {  
               $dateToString: {
                 format: "%d-%m-%Y",
                 date: "$createdAt",
