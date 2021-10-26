@@ -30,7 +30,6 @@ function formatDate(date) {
     month = "" + (d.getMonth() + 1),
     day = "" + d.getDate(),
     year = d.getFullYear();
-
   if (month.length < 2) month = "0" + month;
   if (day.length < 2) day = "0" + day;
 
@@ -39,12 +38,51 @@ function formatDate(date) {
 
 export default {
   Query: {
+    //group by array size 
 
- 
+    // const getDeath = 
+     getDeathDataByVaccination : async(_,{},{PersonalInfo})=>{
+      const vaccinations = await PersonalInfo.aggregate([
+        {$match:{"currentState.death":{$eq:true}}},
+        {
+        $unwind: "$vaccination"
+    },
+    {$match:{"vaccination.times":{$ne:0}}},
+    {$match:{"vaccination.times":{$ne:null}}},
+    {
+        $group: {
+            _id: "$_id",
+            size: {
+                $sum: 1
+            }
+        }
+    },
+    {
+        $group: {
+            _id: "$size",
+            frequency: {
+                $sum: 1
+            }
+        }
+    },
+    {
+        $project: {
+            times: "$_id",
+            frequency: 1,
+            _id: 0
+        }
+    }
+    ])
+
+   return vaccinations;
+  },
+
+    // const groupByArraySize;
     //For Doctor
     //@Desc Get location of the sample test
     //@Access Auth
     getSampleTestLocation: async (_, {}, { PersonalInfo,pubsub,req  }) => {
+
       let locationName = await PersonalInfo.aggregate([
         { $unwind: "$sampleTest" },
         { $group: { _id: "$sampleTest.testLocation" } },
@@ -91,7 +129,6 @@ export default {
       { PersonalInfo,pubsub,req}
     ) => {
   
-  
       const options = {
         page: page || 1,
         limit: limit || 25,
@@ -106,9 +143,7 @@ export default {
       let end;
       let testLocationQuery = {};
       let fillDateQuery = {};
-
       let forDividualDistrictQuery = {};
-      
       if(req.user){
         let firstName = req.user.firstName;
         let lastName = req.user.lastName;
@@ -1157,8 +1192,7 @@ export default {
               "sampleTest.$.resultDate": sampleTest.resultDate,
               "sampleTest.$.testType": sampleTest.testType,
               "sampleTest.$.formFillerName": sampleTest.formFillterName,
-              "sampleTest.$.labFormCompletedByTel":
-                sampleTest.labFormCompletedByTel,
+              "sampleTest.$.labFormCompletedByTel":sampleTest.labFormCompletedByTel,
               "sampleTest.$.formFillerTel": sampleTest.formFillerTel,
               "sampleTest.$.nextSampleTestDate": sampleTest.nextSampleTestDate,
               "sampleTest.$.updatedBy": req.user.id,

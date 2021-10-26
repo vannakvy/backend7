@@ -1,7 +1,7 @@
 import { gql } from "apollo-server-express";
 export default gql`
   extend type Query {
- 
+    getDeathDataByVaccination:[VaccinationTimes]
     excelExport(startDate:Date, endDate:Date): [test!]!
     allPersonalInfos: [PersonalInfo!]!
     allPersonalInfosForThatNegative: [PersonalInfo!]!
@@ -203,6 +203,11 @@ type Actions {
     times:Int 
     vaccineType:String
     vacinatedAt:String
+  }
+
+  type VaccinationTimes{
+    frequency:Int 
+    times:Int
   }
   type Quarantings{
         id:ID

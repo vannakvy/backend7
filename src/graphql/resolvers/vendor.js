@@ -70,9 +70,9 @@ export default {
     getMarketWithTotalScan:async(_,{},{Transaction,Shop})=>{
       var start = new Date(new Date().setUTCHours(0, 0, 0, 0));
       var end = new Date(new Date().setUTCHours(23, 59, 59, 59));
-   
      let   dateStart = { $gte: ["$createdAt", start] };
      let   dateEnd = { $lt: ["$createdAt", end] };
+     let dateQuery = {createdAt:{$gte:start,$lt:end}};
       let query = [
         {
           $project: {
@@ -101,7 +101,85 @@ export default {
           },
         },
       ];
+      //
+      const buyer_distinct = await Transaction.aggregate([
+        // { $match: dateQuery },
+        {
+          $project: {
+            personalInfoId:1,
+            marketName:1
+          },
+        },
+        
+        {
+          $group: {
+            _id: {personalInfoId:"$personalInfoId",marketName:"$marketName"},
+          },
+        },
+        {
+          $group: {
+            _id: "$_id.marketName",
+            totalBuyer: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
 
+      ]);
+      ///
+      const buyer_distinct_today = await Transaction.aggregate([
+        { $match: dateQuery },
+        {
+          $project: {
+            personalInfoId:1,
+            marketName:1
+          },
+        },
+        
+        {
+          $group: {
+            _id: {personalInfoId:"$personalInfoId",marketName:"$marketName"},
+          },
+        },
+        {
+          $group: {
+            _id: "$_id.marketName",
+            totalBuyerToday: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+
+      ]);
+
+
+      let query3 = [
+        {
+          $project: {
+            marketName: 1,
+            totalShop:1,
+            totalShoptoday: {
+              $cond: [
+                {
+                  $and: [
+                    dateStart,
+                    dateEnd,
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+            //
+          },
+        },
+        {
+          $group: {
+            _id: "$marketName",
+            totalShop: { $sum: 1 },
+            totalShoptoday: { $sum: "$totalShoptoday" },
+          },
+        },
+        {$match:{"_id":{$ne:null}}}
+      ];
       let query2 = [
         {
           $project: {
@@ -143,12 +221,15 @@ export default {
         })
       return arr;
       }
+      
       const marketList = await Transaction.aggregate(query);
       const shopGroup = await Shop.aggregate(query2);
-
+    
  const newArr= joinArray(shopGroup,marketList);
+ const newArr2= joinArray(buyer_distinct,buyer_distinct_today);
+ const newArr3= joinArray(newArr,newArr2);
 
-      return newArr;
+      return newArr3;
     },
 //@For boxes data
     getDataForTotalBoxes: async (
@@ -212,19 +293,9 @@ export default {
             $lt: new Date(new Date(endDate).setUTCHours(23, 59, 59, 59)),
           },
         };
-
-        // const a =  await Transaction.aggregate([
-        //   // { $match: { createdAt: { $gte: start,$lt:end } } },
-        //     {
-        //         $group: { _id: '$personalInfoId',count:{$sum:1} }
-        //     },{
-        //     $count: "count"}
-        //     ]);
-      
       const transGraph = await Transaction.aggregate([
-        { $match: marketNameQuery },
         { $match: dateQuery },
-        {$group: { _id: '$personalInfoId',createdAt:1,count:{$sum:1}}} ,
+        { $match: marketNameQuery },
         {
           $project: {
             yearMonthDayUTC: {  
@@ -233,24 +304,33 @@ export default {
                 date: "$createdAt",
               },
             },
+            personalInfoId:1
           },
         },
         
         {
           $group: {
             _id: {yearMonthDayUTC:"$yearMonthDayUTC",personalInfoId:"$personalInfoId"},
+          },
+        },
+        {
+          $group: {
+            _id: "$_id.yearMonthDayUTC",
             total: { $sum: 1 },
           },
         },
-        // {
-        //   $group: {
-        //     _id: "$_id.yearMonthDayUTC",
-        //     total: { $sum: 1 },
-        //   },
-        // },
         { $sort: { _id: 1 } },
+        {
+          $project:{
+            date:"$_id",
+            value:"$total"
+
+          }
+        }
       ]);
-       console.log(transGraph,"Sd");
+
+      
+
       const transGraph2 = await PersonalInfo.aggregate([
         { $match: {buyer:true} },
         { $match: dateQuery },
@@ -271,13 +351,49 @@ export default {
           },
         },
         { $sort: { _id: 1 } },
+        {
+          $project:{
+            date:"$_id",
+            value:"$total"
+
+          }
+        }
       ]);
 
-      console.log(transGraph2,"Sdd");
-      
+      const transGraph3 = await Transaction.aggregate([
+        { $match: dateQuery },
+        { $match: marketNameQuery },
+        {
+          $project: {
+            yearMonthDayUTC: {
+              $dateToString: {
+                format: "%d-%m-%Y",
+                date: "$createdAt",
+              },
+            },
+          },
+        },
+        {
+          $group: {
+            _id: "$yearMonthDayUTC",
+            total: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+        {
+          $project:{
+            date:"$_id",
+            value:"$total"
+
+          }
+        }
+      ]);
+
+     
       return {
-        graph_transaction:transGraph,
-        graph_buyer:transGraph2
+        graph_transaction:transGraph3,
+        graph_buyer:transGraph,
+        graph_buyer_register:transGraph2
       }
     },
 

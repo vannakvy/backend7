@@ -8,6 +8,7 @@ const DB_URI = IN_PROD? "mongodb://192.168.1.152:27017/newDatabase" : DB
 
 const connectDB =   async()=>{
     try{
+        console.log(DB_URI);
         const conn =  await mongoose.connect(DB_URI,{useFindAndModify: false,useUnifiedTopology:true,useNewUrlParser: true,useCreateIndex: true })
         success({
             badge: true,

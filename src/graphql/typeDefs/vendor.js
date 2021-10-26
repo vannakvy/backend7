@@ -38,11 +38,13 @@ export default gql`
   }
 
   type MarketListResponse{
-    _id:String,
+    _id:String
     total:Int 
     today:Int
     totalShop:Int,
     totalShoptoday: Int
+    totalBuyer: Int,
+    totalBuyerToday:Int
   }
 
 
@@ -50,11 +52,12 @@ export default gql`
 type GraphTranResponse {
   graph_transaction:[GraphType]
   graph_buyer:[GraphType]
+  graph_buyer_register:[GraphType]
 }
 
 type GraphType{
-  _id:String,
-  total:Int
+  date:String,
+  value:Int
 }
 
 
