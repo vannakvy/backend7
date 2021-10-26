@@ -147,10 +147,12 @@ export default {
       if(req.user){
         let firstName = req.user.firstName;
         let lastName = req.user.lastName;
-        if(firstName==="district" || firstName==="city"){
-          forDividualDistrictQuery = {district:lastName};
+        console.log(firstName , lastName)
+        if(lastName==="district" || lastName==="City"){
+          forDividualDistrictQuery = {district:firstName};
         }
       }
+      console.log(forDividualDistrictQuery)
       if(fillStartDate!==null && fillEndDate !==null){
         fillDateQuery = {"currentState.confirmFormFilled":{$gte:new Date(new Date(fillStartDate).setUTCHours(0,0,0,0)),$lt: new Date(new Date(fillEndDate).setUTCHours(23,59,59,59))}}; 
       }
@@ -205,6 +207,7 @@ export default {
       } else {
         query = {
           $and: [
+            forDividualDistrictQuery,
             {
               $or: [
                 {
