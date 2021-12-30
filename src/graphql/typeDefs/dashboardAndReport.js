@@ -106,6 +106,7 @@ omicronToday:Int
     recoveredFilledToday:Int,
     deathFilledFromToday:Int,
     deltaConfirmFilledFromToday:Int,
+    omicronConfirmFilledFromToday:Int,
 
   
 }

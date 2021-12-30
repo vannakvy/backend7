@@ -643,6 +643,7 @@ export default {
       let totalAffectedPeopleToday = 0;
 
       let deltaConfirmFilledFromToday = 0;
+      let omicronConfirmFilledFromToday = 0;
       let confirmFilledToday = 0;
       let recoveredFilledToday = 0;
       let deathFilledFromToday = 0;
@@ -744,6 +745,16 @@ export default {
           ],
         });
 
+        omicronConfirmFilledFromToday = await PersonalInfo.countDocuments({
+          $and: [
+            { "currentState.confirm": true },
+            { "currentState.covidVariant": "OMICRON" },
+            {
+              "currentState.confirmFormFilled": { $gte: today, $lt: tomorrow },
+            },
+          ],
+        });
+
         delta = await PersonalInfo.countDocuments({
           $and: [
             { "currentState.confirm": true },
@@ -831,6 +842,15 @@ export default {
         });
 
         deltaConfirmFilledFromToday = await PersonalInfo.countDocuments({
+          $and: [
+            { "currentState.confirm": true },
+            { "currentState.covidVariant": "DELTA" },
+            { "currentState.confirmedAt": { $gte: today, $lt: tomorrow } },
+            { district: district },
+          ],
+        });
+
+        omicronConfirmFilledFromToday = await PersonalInfo.countDocuments({
           $and: [
             { "currentState.confirm": true },
             { "currentState.covidVariant": "DELTA" },
@@ -994,6 +1014,7 @@ export default {
       // console.log(dataToday[0].count,"dataToday",dataAll[0].count)
 
       let dataForBoxes = {
+        omicronConfirmFilledFromToday: omicronConfirmFilledFromToday,
         omicron: omicron,
         omicronToday: omicronToday,
         delta: delta,
