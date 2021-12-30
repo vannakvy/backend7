@@ -621,7 +621,9 @@ export default {
       }
     ) => {
       let delta = 0;
-      let deltaToday;
+      let deltaToday=0;
+      let omicron = 0;
+      let omicronToday=0;
       let confirm = 0;
       let recover = 0;
       let death = 0;
@@ -651,7 +653,7 @@ export default {
       let totalHospital = await HospitalInfo.countDocuments({});
       let totalQuarantine = await QuarantineInfo.countDocuments({});
 
-      if (district === "" || district === "ករំីណីទាំងអស់") {
+      if (district === ""||district===null || district === "ករំីណីទាំងអស់") {
         //
 
         totalAffectedPeople = await PersonalInfo.countDocuments({
@@ -723,6 +725,14 @@ export default {
           ],
         });
 
+        omicronToday = await PersonalInfo.countDocuments({
+          $and: [
+            { "currentState.confirm": true },
+            { "currentState.covidVariant": "OMICRON" },
+            { "currentState.confirmedAt": { $gte: today, $lt: tomorrow } },
+          ],
+        });
+
         //deltaConfirmFilledFromToday
         deltaConfirmFilledFromToday = await PersonalInfo.countDocuments({
           $and: [
@@ -738,6 +748,13 @@ export default {
           $and: [
             { "currentState.confirm": true },
             { "currentState.covidVariant": "DELTA" },
+          ],
+        });
+
+        omicron = await PersonalInfo.countDocuments({
+          $and: [
+            { "currentState.confirm": true },
+            { "currentState.covidVariant": "OMICRON" },
           ],
         });
 
@@ -804,6 +821,15 @@ export default {
           ],
         });
 
+        omicronToday = await PersonalInfo.countDocuments({
+          $and: [
+            { "currentState.confirm": true },
+            { "currentState.covidVariant": "OMICRON" },
+            { "currentState.confirmedAt": { $gte: today, $lt: tomorrow } },
+            { district: district },
+          ],
+        });
+
         deltaConfirmFilledFromToday = await PersonalInfo.countDocuments({
           $and: [
             { "currentState.confirm": true },
@@ -820,6 +846,16 @@ export default {
             { district: district },
           ],
         });
+
+          omicron = await PersonalInfo.countDocuments({
+          $and: [
+            { "currentState.confirm": true },
+            { "currentState.covidVariant": "OMICRON" },
+            { district: district },
+          ],
+        });
+
+        console.log(omicron);
 
         totalAffectedLocation = await AffectedLocation.countDocuments({
           district: district,
@@ -958,6 +994,8 @@ export default {
       // console.log(dataToday[0].count,"dataToday",dataAll[0].count)
 
       let dataForBoxes = {
+        omicron: omicron,
+        omicronToday: omicronToday,
         delta: delta,
         deltaToday: deltaToday,
         sampleTest: sampleTest,
@@ -987,7 +1025,7 @@ export default {
         // totalQuarantine,
         // totalAffectedLocation,
       };
-
+console.log(dataForBoxes);
       return dataForBoxes;
     },
 

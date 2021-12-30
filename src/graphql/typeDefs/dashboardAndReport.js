@@ -77,10 +77,12 @@ type Inter{
 }
 
 type AllProvince{
-    delta:Int,
-    deltaToday:Int,
-    sampleTest:Int,
-    sampleTestToday:Int,
+omicron:Int 
+omicronToday:Int
+    delta:Int
+    deltaToday:Int
+    sampleTest:Int
+    sampleTestToday:Int
     confirmedCase:Int
     confirmedCaseToday:Int
     death: Int 
